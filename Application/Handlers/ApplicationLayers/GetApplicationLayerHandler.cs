@@ -41,7 +41,6 @@ namespace Application.Handlers.ApplicationLayers
                 string message = $"Layer not found {request.Id}";
                 layerDto.SetError(message);
                 logger.LogError(message);
-                throw new BusinessLogicException(message);
             }
             return layerDto;
         }
