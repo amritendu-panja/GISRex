@@ -49,7 +49,10 @@ namespace Web.Middlewares
             }
             _logger.LogError(exception, message);
 
-            var exceptionResult = JsonSerializer.Serialize(new { error = message });
+            Common.Dtos.BaseResponseDto responseDto = new Common.Dtos.BaseResponseDto();
+            responseDto.SetError(message);
+
+            var exceptionResult = JsonSerializer.Serialize(responseDto);
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)statusCode;
 
