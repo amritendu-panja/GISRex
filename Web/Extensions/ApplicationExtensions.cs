@@ -9,5 +9,11 @@ namespace Web.Extensions
             app.UseMiddleware<ErrorHandlingMiddleware>();
             return app;
         }
+
+        public static IApplicationBuilder UseApiKeyHandler(this IApplicationBuilder app)
+        {
+            app.UseMiddleware<ApiKeyMiddleware>();
+            return app;
+        }
     }
 }

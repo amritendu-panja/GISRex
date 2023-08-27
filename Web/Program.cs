@@ -1,12 +1,14 @@
 using Application.Repository;
 using Common.Entities;
 using Common.Mappings;
+using Common.Settings;
 using Infrastructure.Data.ApplicationDbContext;
 using Infrastructure.Data.Repository;
 using Microsoft.EntityFrameworkCore;
 using NLog.Web;
 using System.Reflection;
 using Web.Extensions;
+using Web.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +18,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql
 builder.Services.AddTransient<SharedMapping>();
 builder.Services.AddTransient<IRepository<ApplicationUser>, Repository<ApplicationUser>>();
 builder.Services.AddTransient<IRepository<ApplicationLayer>, Repository<ApplicationLayer>>();
+builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(
     Assembly.GetExecutingAssembly(),
@@ -45,6 +48,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.UseGlobalExceptionHandler();
+app.UseApiKeyHandler();
 
 app.MapControllers();
 
