@@ -8,6 +8,6 @@ namespace Common.Settings
 {
     public class Constants
     {
-        public const string APIKEY = "XApiKey";
+        public const int SaltWorkFactor = 10;
     }
 }

@@ -1,6 +1,4 @@
-﻿using System.Text;
-
-namespace Common.Entities
+﻿namespace Common.Entities
 {
     public class ApplicationUser
     {
@@ -18,12 +16,14 @@ namespace Common.Entities
 
         public ICollection<ApplicationLayer> ApplicationLayers { get; set; } = new List<ApplicationLayer>();
 
-        public ApplicationUser(string userName, string passwordSalt, string email)
+        protected ApplicationUser() { }
+
+        public ApplicationUser(string userName, string passwordSalt, string encryptedPassword, string email)
         {
             UserName = userName;
             UserGuid = Guid.NewGuid();
             PasswordSalt = passwordSalt;
-            PasswordEncrypted = Convert.ToBase64String(Encoding.UTF8.GetBytes(passwordSalt));
+            PasswordEncrypted = encryptedPassword;
             Email = email;
             IsEnabled = true;
             IsPasswordExpired = false;

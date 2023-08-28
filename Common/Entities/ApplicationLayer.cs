@@ -8,7 +8,7 @@
         public int OwnerId { get; private set; }
         public DateTime CreateDate { get; private set; }
         public DateTime ModifiedDate { get; private set; }
-        public ApplicationUser Owner { get; set; }
+        public ApplicationUser? Owner { get; set; }
 
         public ApplicationLayer(Guid layerId, string layerName, string filePath, int ownerId, DateTime createDate, DateTime modifiedDate)
         {

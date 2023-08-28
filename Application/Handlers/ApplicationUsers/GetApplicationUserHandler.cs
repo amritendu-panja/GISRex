@@ -10,10 +10,10 @@ namespace Application.Handlers.ApplicationUsers
     public class GetApplicationUserHandler : IRequestHandler<GetApplicationUserRequest, ApplicationUserResponseDto>
     {
         private ILogger<GetApplicationUserHandler> logger;
-        private readonly IRepository<ApplicationUser> repository;
+        private readonly IApplicationUserRepository repository;
         private readonly SharedMapping sharedMapping;
 
-        public GetApplicationUserHandler(IRepository<ApplicationUser> repository, SharedMapping sharedMapping, ILogger<GetApplicationUserHandler> logger)
+        public GetApplicationUserHandler(IApplicationUserRepository repository, SharedMapping sharedMapping, ILogger<GetApplicationUserHandler> logger)
         {
             this.repository = repository;
             this.sharedMapping = sharedMapping;

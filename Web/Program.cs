@@ -1,9 +1,12 @@
+using Application.Helpers;
 using Application.Repository;
 using Common.Entities;
 using Common.Mappings;
 using Common.Settings;
 using Infrastructure.Data.ApplicationDbContext;
+using Infrastructure.Data.ApplicationDbContext.Repositories;
 using Infrastructure.Data.Repository;
+using Infrastructure.Helpers;
 using Microsoft.EntityFrameworkCore;
 using NLog.Web;
 using System.Reflection;
@@ -16,7 +19,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DBConnection")));
 
 builder.Services.AddTransient<SharedMapping>();
-builder.Services.AddTransient<IRepository<ApplicationUser>, Repository<ApplicationUser>>();
+builder.Services.AddTransient<IHashHelper, HashHelper>();
+builder.Services.AddTransient<ITokenHelper, JwtTokenHelper>();
+builder.Services.AddTransient<IApplicationUserRepository, ApplicationUserRepository>();
 builder.Services.AddTransient<IRepository<ApplicationLayer>, Repository<ApplicationLayer>>();
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 

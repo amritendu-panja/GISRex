@@ -10,11 +10,11 @@ namespace Application.Handlers.ApplicationLayers
     public class CreateApplicationLayerHandler : IRequestHandler<CreateAplicationLayerCommand, ApplicationLayerResponseDto>
     {
         private readonly IRepository<ApplicationLayer> _layerRepository;
-        private readonly IRepository<ApplicationUser> _userRepository;
+        private readonly IApplicationUserRepository _userRepository;
         private readonly ILogger<CreateApplicationLayerHandler> _logger;
         private readonly SharedMapping _sharedMapping;
 
-        public CreateApplicationLayerHandler(IRepository<ApplicationLayer> layerRepository, IRepository<ApplicationUser> userRepository, ILogger<CreateApplicationLayerHandler> logger, SharedMapping sharedMapping)
+        public CreateApplicationLayerHandler(IRepository<ApplicationLayer> layerRepository, IApplicationUserRepository userRepository, ILogger<CreateApplicationLayerHandler> logger, SharedMapping sharedMapping)
         {
             _layerRepository = layerRepository;
             _userRepository = userRepository;
