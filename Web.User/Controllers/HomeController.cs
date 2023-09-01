@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using Web.User.Models;
 
@@ -15,7 +16,28 @@ namespace Web.User.Controllers
 
         public IActionResult Index()
         {
+            if (!HttpContext.User.Identity?.IsAuthenticated ?? false)
+            {
+                return Redirect("login");
+            }
             return View();
+        }
+
+        [HttpGet("login")]
+        public IActionResult Login()
+        {
+            return View();
+        }
+
+        [HttpPost("login")]
+        [ValidateAntiForgeryToken]
+        public IActionResult PostLogin(LoginModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            return Redirect("index");
         }
 
         public IActionResult Privacy()
