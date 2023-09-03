@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using Common.Dtos;
+using Common.Settings;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
@@ -13,12 +15,17 @@ namespace Web.User.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly AuthService _authService;
         private readonly AuthHelper _authHelper;
+        private readonly CacheHelper _cacheHelper;
 
-        public HomeController(ILogger<HomeController> logger, AuthService authService, AuthHelper authHelper)
+        public HomeController(ILogger<HomeController> logger, 
+            AuthService authService, 
+            AuthHelper authHelper,
+            CacheHelper cacheHelper)
         {
             _logger = logger;
             _authService = authService;
             _authHelper = authHelper;
+            _cacheHelper = cacheHelper;
         }
 
         [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
@@ -46,6 +53,7 @@ namespace Web.User.Controllers
             if (loginResponse.Success)
             {
                 await _authHelper.SignInAsync(loginResponse.AccessToken, HttpContext);
+                _cacheHelper.Set<LoginResponseDto>(Constants.AuthenticationCacheKey, loginResponse);
                 return Redirect("/");
             }
             return RedirectToAction("login");

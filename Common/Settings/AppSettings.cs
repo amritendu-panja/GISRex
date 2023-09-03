@@ -3,6 +3,7 @@
     public class AppSettings
     {
         public Security Security { get; set; }
+        public Cache Cache { get; set; }
     }
 
     public class Security
@@ -20,5 +21,10 @@
         public int AccessTokenTTLInMinutes { get; set; }
         public string RefreshTokenSecret { get; set; }
         public int RefreshTokenTTLInMinutes { get; set; }
+    }
+
+    public class Cache
+    {
+        public int TimeoutInMinutes { get; set; }
     }
 }

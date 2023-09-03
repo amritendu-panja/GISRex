@@ -15,6 +15,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 builder.Services.AddTransient<AuthService>();
 builder.Services.AddTransient<AuthHelper>();
+builder.Services.AddMemoryCache();
+builder.Services.AddTransient<CacheHelper>();
 
 builder.Services.AddControllersWithViews();
 
