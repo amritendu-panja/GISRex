@@ -15,8 +15,12 @@ namespace Infrastructure.Data.ApplicationDbContext.Mappings
             builder
                 .HasMany(u => u.ApplicationLayers)
                 .WithOne(u => u.Owner)
-                .HasForeignKey(u=> u.OwnerId);                
+                .HasForeignKey(u=> u.OwnerId);
 
+            builder
+                .HasMany(u => u.SecurityTokenLogs)
+                .WithOne(u => u.User)
+                .HasForeignKey(u => u.UserId);
         }
     }
 }

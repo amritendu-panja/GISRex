@@ -10,6 +10,7 @@ namespace Common.Dtos
         [Required]
         public string PasswordSalt { get; set; }
         [Required]
+        [EmailAddress]
         public string Email { get; set; }
     }
 }

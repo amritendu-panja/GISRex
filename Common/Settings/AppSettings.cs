@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Common.Settings
+﻿namespace Common.Settings
 {
     public class AppSettings
     {
@@ -15,5 +9,16 @@ namespace Common.Settings
     {
         public string KeyHeader { get; set; }
         public string ApiKey { get; set; }
+        public Authentication Authentication { get; set; }
+    }
+
+    public class Authentication
+    {
+        public string Issuer { get; set; }
+        public string Audience { get; set; }
+        public string AccessTokenSecret { get; set; }
+        public int AccessTokenTTLInMinutes { get; set; }
+        public string RefreshTokenSecret { get; set; }
+        public int RefreshTokenTTLInMinutes { get; set; }
     }
 }

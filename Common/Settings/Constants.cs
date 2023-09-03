@@ -1,13 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Common.Settings
+﻿namespace Common.Settings
 {
     public class Constants
     {
-        public const string APIKEY = "XApiKey";
+        public const int SaltWorkFactor = 10;
+        public const string JwtIdKey = "id";
+    }
+
+    public enum TokenTypes
+    {
+        AccessToken = 1,
+        RefreshToken = 2
     }
 }

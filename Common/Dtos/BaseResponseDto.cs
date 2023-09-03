@@ -11,6 +11,11 @@ namespace Common.Dtos
         public bool Success { get; set; }
         public string Message { get; set; }
 
+        public BaseResponseDto() 
+        {
+            Success = true;
+        }
+
         public void SetSuccess()
         {
             Success = true;
