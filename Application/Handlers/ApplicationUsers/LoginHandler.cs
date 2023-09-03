@@ -1,27 +1,39 @@
 ﻿using Application.Helpers;
 using Application.Repository;
 using Common.Dtos;
+using Common.Entities;
+using Common.Settings;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Application.Handlers.ApplicationUsers
 {
     public class LoginHandler : IRequestHandler<LoginRequest, LoginResponseDto>
     {
         private readonly ILogger<LoginHandler> _logger;
-        private readonly IApplicationUserRepository _repository;        
+        private readonly IApplicationUserRepository _repository;
+        private readonly IRepository<SecurityTokenLog> _securityLogRepository;
         private readonly IHashHelper _hashHelper;
         private readonly ITokenHelper _tokenHelper;
+        private readonly AppSettings _appSettings;
 
-        public LoginHandler(ILogger<LoginHandler> logger, IApplicationUserRepository repository, IHashHelper hashHelper, ITokenHelper tokenHelper)
+        public LoginHandler(ILogger<LoginHandler> logger, 
+            IApplicationUserRepository repository, 
+            IHashHelper hashHelper, 
+            ITokenHelper tokenHelper, 
+            IRepository<SecurityTokenLog> securityLogRepository,
+            IOptions<AppSettings> appSettings)
         {
             _logger = logger;
             _repository = repository;
             _hashHelper = hashHelper;
             _tokenHelper = tokenHelper;
+            _securityLogRepository = securityLogRepository;
+            _appSettings = appSettings.Value;
         }
 
-        public Task<LoginResponseDto> Handle(LoginRequest request, CancellationToken cancellationToken)
+        public async Task<LoginResponseDto> Handle(LoginRequest request, CancellationToken cancellationToken)
         {
             var errorMessage = "Invalid username / password";
             LoginResponseDto response = new LoginResponseDto();
@@ -41,10 +53,15 @@ namespace Application.Handlers.ApplicationUsers
                 else
                 {
                     _logger.LogInformation("Generating tokens");
-                    response.AccessToken = _tokenHelper.GenerateToken(user);
+                    response.AccessToken = _tokenHelper.GenerateAccessToken(user);
+                    response.RefreshToken = _tokenHelper.GenerateRefreshToken();
+                    DateTime accessTokenExpiration = DateTime.UtcNow.AddMinutes(_appSettings.Security.Authentication.AccessTokenTTLInMinutes);
+                    await _securityLogRepository.AddAsync(new SecurityTokenLog(response.AccessToken, TokenTypes.AccessToken, user.UserId, accessTokenExpiration));
+                    DateTime refreshTokenExpiration = DateTime.UtcNow.AddMinutes(_appSettings.Security.Authentication.RefreshTokenTTLInMinutes);
+                    await _securityLogRepository.AddAsync(new SecurityTokenLog(response.RefreshToken, TokenTypes.RefreshToken, user.UserId, refreshTokenExpiration));
                 }
-            }            
-            return Task.FromResult(response);
+            }
+            return response;
         }
     }
 }

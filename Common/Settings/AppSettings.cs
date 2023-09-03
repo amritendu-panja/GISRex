@@ -16,7 +16,9 @@
     {
         public string Issuer { get; set; }
         public string Audience { get; set; }
-        public string TokenSecret { get; set; }
-        public int TokenTTLInMinutes { get; set; }
+        public string AccessTokenSecret { get; set; }
+        public int AccessTokenTTLInMinutes { get; set; }
+        public string RefreshTokenSecret { get; set; }
+        public int RefreshTokenTTLInMinutes { get; set; }
     }
 }

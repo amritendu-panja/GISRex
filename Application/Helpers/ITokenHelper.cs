@@ -9,6 +9,8 @@ namespace Application.Helpers
 {
     public interface ITokenHelper
     {
-        string GenerateToken(ApplicationUser user);
+        string GenerateAccessToken(ApplicationUser user);
+        string GenerateRefreshToken();
+        bool ValidateRefreshToken(string refreshToken);
     }
 }

@@ -15,6 +15,7 @@
         public DateTime ModifiedDate { get; private set;}
 
         public ICollection<ApplicationLayer> ApplicationLayers { get; set; } = new List<ApplicationLayer>();
+        public ICollection<SecurityTokenLog> SecurityTokenLogs { get; set; } = new List<SecurityTokenLog>();
 
         protected ApplicationUser() { }
 
