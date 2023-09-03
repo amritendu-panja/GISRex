@@ -5,11 +5,6 @@ using Common.Exceptions;
 using Common.Mappings;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.Handlers.ApplicationLayers
 {
@@ -31,17 +26,12 @@ namespace Application.Handlers.ApplicationLayers
             logger.LogInformation($"Fetching record for Layer : {request.Id}");
             ApplicationLayerResponseDto layerDto = new ApplicationLayerResponseDto();
             var layer = repository.Find(l => l.LayerId == request.Id).FirstOrDefault();
-            if (layer != null)
+            if (layer == null)
             {
-                layerDto.SetSuccess();
-                sharedMapping.Map(layer, layerDto);                
+                throw new BusinessLogicException($"Layer not found {request.Id}");            
             }
-            else
-            {
-                string message = $"Layer not found {request.Id}";
-                layerDto.SetError(message);
-                logger.LogError(message);
-            }
+            layerDto.SetSuccess();
+            sharedMapping.Map(layer, layerDto);
             return layerDto;
         }
     }
