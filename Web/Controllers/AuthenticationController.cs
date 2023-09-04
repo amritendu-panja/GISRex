@@ -82,15 +82,8 @@ namespace Web.Controllers
         [Authorize]
         [HttpPost]
         [Route("logout")]
-        public async Task<IActionResult> Logout()
-        {
-            string? userId = HttpContext.User.FindFirstValue(Constants.JwtIdKey);
-            if (userId == null)
-            {
-                throw new InvalidModelException("Invalid request.");
-            }
-
-            LogoutRequest request = new LogoutRequest { UserId = Convert.ToInt32(userId) };
+        public async Task<IActionResult> Logout([FromBody] LogoutRequest request)
+        {            
             var result = await mediator.Send(request);
             if (result != null)
             {

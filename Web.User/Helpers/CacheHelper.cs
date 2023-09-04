@@ -17,6 +17,7 @@ namespace Web.User.Helpers
 
         public void Set<T>(string key, T value)
         {
+            Remove(key);
             var entryOptions = new MemoryCacheEntryOptions();
             entryOptions.SetSlidingExpiration(TimeSpan.FromMinutes(appSettings.Cache.TimeoutInMinutes));
             memoryCache.Set<T>(key, value, entryOptions);
@@ -30,8 +31,7 @@ namespace Web.User.Helpers
 
         public void Remove(string key) 
         {
-            memoryCache.TryGetValue(key, out var value);
-            if (value != null)
+            if(memoryCache.TryGetValue(key, out var value))
             {
                 memoryCache.Remove(key);
             }

@@ -11,6 +11,6 @@ namespace Common.Dtos
     public class LogoutRequest: IRequest<LogoutResponseDto>
     {
         [Required]
-        public int UserId { get; set; }
+        public Guid UserId { get; set; }
     }
 }

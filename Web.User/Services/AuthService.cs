@@ -41,5 +41,15 @@ namespace Web.User.Services
 
             return await _client.Register(command, _appSettings.Security.ApiKey, cancellationToken);
         }
+
+        public async Task<LogoutResponseDto> LogoutAsync(string userId, string accessToken, CancellationToken cancellationToken)
+        {
+            LogoutRequest logoutRequest = new LogoutRequest
+            {
+                UserId = Guid.Parse(userId)
+            };
+
+            return await _client.Logout(logoutRequest, _appSettings.Security.ApiKey, accessToken, cancellationToken);
+        }
     }
 }

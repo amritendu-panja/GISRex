@@ -69,5 +69,10 @@ namespace Web.User.Helpers
                 ClockSkew = TimeSpan.Zero
             };
         }
+
+        public async Task SignoutAsync(HttpContext context)
+        {
+            await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        }
     }
 }

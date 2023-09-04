@@ -36,16 +36,22 @@
         public void SetLock(bool lockStatus)
         {
             IsUserLocked = lockStatus;
+            CreatedDate = CreatedDate.ToUniversalTime();
+            ModifiedDate = DateTime.UtcNow;
         }
 
         public void SetPasswordExpiration(bool isExpired)
         {
             IsPasswordExpired = isExpired;
+            CreatedDate = CreatedDate.ToUniversalTime();
+            ModifiedDate = DateTime.UtcNow;
         }
 
         public void SetEnabled(bool isEnabled)
         {
             IsEnabled = isEnabled;
+            CreatedDate = CreatedDate.ToUniversalTime();
+            ModifiedDate = DateTime.UtcNow;
         }
     }
 }
