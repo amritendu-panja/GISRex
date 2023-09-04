@@ -35,15 +35,8 @@ namespace Web.User.Controllers
 
         [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
         public IActionResult Index()
-        {
-            IndexModel indexModel = new IndexModel();
-            if (User.Identity?.IsAuthenticated ?? false)
-            {
-                indexModel.IsAuthenticated = true;
-                indexModel.UserName = User.Identity.Name;
-                indexModel.Email = User.FindFirstValue(ClaimTypes.Email);
-            }
-            return View(indexModel);
+        {            
+            return View();
         }
 
         [HttpGet("login")]
@@ -115,13 +108,6 @@ namespace Web.User.Controllers
                 }
             }
             HttpContext.User = new GenericPrincipal(new GenericIdentity(string.Empty), null);
-            return View();
-        }
-
-        [HttpGet("postlogout")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> PostLogout([FromBody] LogoutModel model, CancellationToken cancellationToken)
-        {
             return View();
         }
 
