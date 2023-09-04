@@ -1,10 +1,8 @@
 ﻿using Common.Dtos;
 using Common.Exceptions;
-using Common.Settings;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace Web.Controllers
 {

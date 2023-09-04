@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using System.Security.Claims;
 using System.Security.Principal;
 using Web.User.Helpers;
 using Web.User.Models;
@@ -20,8 +19,8 @@ namespace Web.User.Controllers
         private readonly CacheHelper _cacheHelper;
         private readonly CacheKeyGenrator _cachekeyGen;
 
-        public HomeController(ILogger<HomeController> logger, 
-            AuthService authService, 
+        public HomeController(ILogger<HomeController> logger,
+            AuthService authService,
             AuthHelper authHelper,
             CacheHelper cacheHelper,
             CacheKeyGenrator cachekeyGen)
@@ -35,7 +34,7 @@ namespace Web.User.Controllers
 
         [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
         public IActionResult Index()
-        {            
+        {
             return View();
         }
 
@@ -92,10 +91,10 @@ namespace Web.User.Controllers
         }
 
         [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
-        [HttpGet("logout")]        
+        [HttpGet("logout")]
         public async Task<IActionResult> Logout(CancellationToken cancellationToken)
         {
-            var key = _cachekeyGen.CreateCacheKey(User, Constants.AuthenticationCacheKey);            
+            var key = _cachekeyGen.CreateCacheKey(User, Constants.AuthenticationCacheKey);
             var loginData = _cacheHelper.Get<LoginResponseDto>(key);
             await _authHelper.SignoutAsync(HttpContext);
             if (loginData != null)
