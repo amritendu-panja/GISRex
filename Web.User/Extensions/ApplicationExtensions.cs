@@ -6,7 +6,9 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Refit;
 using Web.User.Clients;
+using Web.User.Helpers;
 using Web.User.Middlewares;
+using Web.User.Services;
 
 namespace Web.User.Extensions
 {
@@ -22,6 +24,27 @@ namespace Web.User.Extensions
         {
             app.UseMiddleware<AuthRefreshMiddleware>();
             return app;
+        }
+
+        public static IServiceCollection AddApplicationHelpers(this IServiceCollection services)
+        {
+            services.AddTransient<CacheHelper>();
+            services.AddTransient<CacheKeyGenrator>();
+            services.AddTransient<AuthHelper>();
+            services.AddTransient<AuthService>();
+            return services;
+        }
+
+        public static IServiceCollection AddApplicationSession(this IServiceCollection services, AppSettings settings)
+        {
+            services.AddDistributedMemoryCache();
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromHours(settings.Cache.SessionTimeoutInHours);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
+            return services;
         }
 
         public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, AppSettings settings)
@@ -42,7 +65,7 @@ namespace Web.User.Extensions
                 .AddJwtBearer(o =>
                 {
                     o.SaveToken = true;
-                    o.RequireHttpsMetadata = false;                    
+                    o.RequireHttpsMetadata = false;
                     o.TokenValidationParameters = new TokenValidationParameters
                     {
                         IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(settings.Security.Authentication.AccessTokenSecret)),

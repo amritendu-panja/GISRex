@@ -25,6 +25,7 @@
 
     public class Cache
     {
+        public int SessionTimeoutInHours { get; set; }
         public int TimeoutInMinutes { get; set; }
     }
 }

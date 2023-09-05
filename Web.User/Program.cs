@@ -1,31 +1,20 @@
 using Common.Settings;
 using Web.User.Extensions;
-using Web.User.Helpers;
-using Web.User.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
-builder.Services.AddTransient<AuthService>();
-builder.Services.AddTransient<AuthHelper>();
+
 builder.Services.AddMemoryCache();
-builder.Services.AddTransient<CacheHelper>();
-builder.Services.AddTransient<CacheKeyGenrator>();
-
-builder.Services.AddDistributedMemoryCache();
-
-builder.Services.AddSession(options =>
-{
-    options.IdleTimeout = TimeSpan.FromDays(1);
-    options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true;
-});
-
-builder.Services.AddControllersWithViews();
+builder.Services.AddApplicationHelpers();
 
 AppSettings settings = new AppSettings();
 builder.Configuration.Bind("AppSettings", settings);
+
+builder.Services.AddApplicationSession(settings);
+
+builder.Services.AddControllersWithViews();
 
 builder.Services.AddJwtAuthentication(settings);
 builder.Services.AddRefitClients(settings);
