@@ -31,6 +31,8 @@ namespace Common.Entities
         public void Disable()
         {
             IsEnabled = false;
+            CreateDate = CreateDate.ToUniversalTime();
+            ExpirationDate = ExpirationDate.ToUniversalTime();
         }
 
         protected SecurityTokenLog() { }

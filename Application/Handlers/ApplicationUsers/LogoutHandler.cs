@@ -25,14 +25,14 @@ namespace Application.Handlers.ApplicationUsers
         public async Task<LogoutResponseDto> Handle(LogoutRequest request, CancellationToken cancellationToken)
         {
             var errorMessage = "User not validated.";
-            var user = _userRepository.Find(u => u.UserId == request.UserId && u.IsEnabled == true).FirstOrDefault();
+            var user = _userRepository.Find(u => u.UserGuid == request.UserId && u.IsEnabled == true).FirstOrDefault();
             
             if (user == null)
             {
                 throw new InvalidModelException(errorMessage);
             }
 
-            var tokenLogs = _repository.Find(l => l.UserId ==  request.UserId && l.IsEnabled == true);
+            var tokenLogs = _repository.Find(l => l.UserId ==  user.UserId && l.IsEnabled == true).ToList();
             if (tokenLogs != null && tokenLogs.Count() > 0)
             {
                 foreach (var tokenLog in tokenLogs)

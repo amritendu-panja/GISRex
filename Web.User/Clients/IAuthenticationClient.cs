@@ -15,6 +15,6 @@ namespace Web.User.Clients
         Task<LogoutResponseDto> Logout([Body] LogoutRequest request, [Header("XApiKey")] string apiKey, [Authorize("Bearer")] string accessToken,  CancellationToken cancellationToken);
 
         [Post("/api/auth/refresh")]
-        Task<LoginResponseDto> Refresh([Body] LogoutRequest request, [Header("XApiKey")] string apiKey, CancellationToken cancellationToken);
+        Task<LoginResponseDto> Refresh([Body] RefreshRequest request, [Header("XApiKey")] string apiKey, CancellationToken cancellationToken);
     }
 }

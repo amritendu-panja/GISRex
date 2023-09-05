@@ -11,15 +11,13 @@ namespace Web.User.Helpers
     public class AuthHelper
     {
         private readonly AppSettings appSettings;
-        private readonly ILogger<AuthHelper> logger;
 
-        public AuthHelper(IOptions<AppSettings> appSettings, ILogger<AuthHelper> logger)
+        public AuthHelper(IOptions<AppSettings> appSettings)
         {
             this.appSettings = appSettings.Value;
-            this.logger = logger;
         }
 
-        public async Task SignInAsync(string accessToken, HttpContext context)
+        public async Task<ClaimsPrincipal> SignInAsync(string accessToken, DateTime expiration,  HttpContext context)
         {
             var principal = ValidateToken(accessToken);
             var authProperties = new AuthenticationProperties
@@ -27,7 +25,7 @@ namespace Web.User.Helpers
                 //AllowRefresh = <bool>,
                 // Refreshing the authentication session should be allowed.
 
-                //ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(10),
+                ExpiresUtc = expiration.ToUniversalTime(),
                 // The time at which the authentication ticket expires. A 
                 // value set here overrides the ExpireTimeSpan option of 
                 // CookieAuthenticationOptions set with AddCookie.
@@ -47,6 +45,7 @@ namespace Web.User.Helpers
             };
 
             await context.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, authProperties);
+            return principal;
         }
 
         public ClaimsPrincipal ValidateToken(string jwtToken)
@@ -68,6 +67,11 @@ namespace Web.User.Helpers
                 ValidateAudience = true,
                 ClockSkew = TimeSpan.Zero
             };
+        }
+
+        public async Task SignoutAsync(HttpContext context)
+        {
+            await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         }
     }
 }

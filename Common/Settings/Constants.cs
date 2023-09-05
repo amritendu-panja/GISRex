@@ -7,6 +7,7 @@
 
         //Cache keys
         public const string AuthenticationCacheKey = "auth-key";
+        public const string AuthExpireHeaderKey = "Token-Expired";
     }
 
     public enum TokenTypes

@@ -1,11 +1,5 @@
 using Common.Settings;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using Refit;
-using Web.User.Clients;
+using Web.User.Extensions;
 using Web.User.Helpers;
 using Web.User.Services;
 
@@ -17,51 +11,24 @@ builder.Services.AddTransient<AuthService>();
 builder.Services.AddTransient<AuthHelper>();
 builder.Services.AddMemoryCache();
 builder.Services.AddTransient<CacheHelper>();
+builder.Services.AddTransient<CacheKeyGenrator>();
+
+builder.Services.AddDistributedMemoryCache();
+
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromDays(1);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 builder.Services.AddControllersWithViews();
 
 AppSettings settings = new AppSettings();
 builder.Configuration.Bind("AppSettings", settings);
 
-builder.Services
-    .AddAuthentication(options =>
-    {
-        options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
-    .AddCookie(options =>
-    {
-        options.LoginPath = "/login";        
-    })
-    .AddJwtBearer(o =>
-    {
-        o.SaveToken = true;
-        o.RequireHttpsMetadata = false;
-        o.TokenValidationParameters = new TokenValidationParameters
-        {
-            IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(settings.Security.Authentication.AccessTokenSecret)),
-            ValidIssuer = settings.Security.Authentication.Issuer,
-            ValidAudience = settings.Security.Authentication.Audience,
-            ValidateIssuerSigningKey = true,
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ClockSkew = TimeSpan.Zero
-        };
-    });
-    
-builder.Services
-    .AddRefitClient<IAuthenticationClient>(provider => new RefitSettings
-        {
-            ContentSerializer = new NewtonsoftJsonContentSerializer(
-                    new JsonSerializerSettings
-                    {
-                        ContractResolver = new CamelCasePropertyNamesContractResolver()
-                    }
-            )
-        })
-    .ConfigureHttpClient(c=> c.BaseAddress = new Uri(settings.Security.Authentication.Issuer));
+builder.Services.AddJwtAuthentication(settings);
+builder.Services.AddRefitClients(settings);
 
 var app = builder.Build();
 
@@ -79,6 +46,9 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseSession();
+app.UseGlobalExceptionHandler();
+app.UseAuthRefreshMiddleware();
 
 app.MapControllerRoute(
     name: "default",
