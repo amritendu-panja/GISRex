@@ -8,12 +8,17 @@ namespace Web.User.Helpers
         public string CreateCacheKey(ClaimsPrincipal prinicpal, params string[] keys)
         {
             var userNameClaim = prinicpal.FindFirst(ClaimTypes.Name);
-            if (userNameClaim == null)
+            if (userNameClaim != null)
             {
-                throw new BusinessLogicException("Cannot create cache key.");
+                var userName = userNameClaim.Value;
+                return $"{string.Join("_", keys)}_{userName}";
             }
-            var userName = userNameClaim.Value;
-            return $"{string.Join("_", keys)}_{userName}";
+            else return string.Empty;
+        }
+
+        public string CreateCacheKey(params string[] keys)
+        {
+            return string.Join("_", keys);
         }
     }
 }

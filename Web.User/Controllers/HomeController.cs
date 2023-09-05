@@ -56,10 +56,11 @@ namespace Web.User.Controllers
             var loginResponse = await _authService.LoginAsync(model.Username, model.Password, cancellationToken);
             if (loginResponse.Success)
             {
-                await _authHelper.SignInAsync(loginResponse.AccessToken, HttpContext);
-                var principal = _authHelper.ValidateToken(loginResponse.AccessToken);
+                var principal = await _authHelper.SignInAsync(loginResponse.AccessToken, loginResponse.ExpiresAt, HttpContext);
                 var key = _cachekeyGen.CreateCacheKey(principal, Constants.AuthenticationCacheKey);
                 _cacheHelper.Set<LoginResponseDto>(key, loginResponse);
+                HttpContext.User = principal;
+                HttpContext.Session.SetString(Constants.AuthenticationCacheKey, key);
                 return Redirect("/");
             }
             return View();
@@ -84,7 +85,8 @@ namespace Web.User.Controllers
 
             if (registerResponse.Success)
             {
-                return Redirect("login");
+                LoginModel loginModel = new LoginModel { Username = model.Username, Password = model.Password };
+                return await PostLogin(loginModel, cancellationToken);
             }
 
             return View();

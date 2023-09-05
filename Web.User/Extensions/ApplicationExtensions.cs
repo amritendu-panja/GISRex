@@ -18,6 +18,12 @@ namespace Web.User.Extensions
             return app;
         }
 
+        public static IApplicationBuilder UseAuthRefreshMiddleware(this IApplicationBuilder app)
+        {
+            app.UseMiddleware<AuthRefreshMiddleware>();
+            return app;
+        }
+
         public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, AppSettings settings)
         {
             services
@@ -36,7 +42,7 @@ namespace Web.User.Extensions
                 .AddJwtBearer(o =>
                 {
                     o.SaveToken = true;
-                    o.RequireHttpsMetadata = false;
+                    o.RequireHttpsMetadata = false;                    
                     o.TokenValidationParameters = new TokenValidationParameters
                     {
                         IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(settings.Security.Authentication.AccessTokenSecret)),
@@ -46,16 +52,6 @@ namespace Web.User.Extensions
                         ValidateIssuer = true,
                         ValidateAudience = true,
                         ClockSkew = TimeSpan.Zero
-                    };
-                    o.Events = new JwtBearerEvents
-                    {
-                        OnAuthenticationFailed = context => {
-                            if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
-                            {
-                                context.Response.Headers.Add("IS-TOKEN-EXPIRED", "true");
-                            }
-                            return Task.CompletedTask;
-                        }
                     };
                 });
             return services;

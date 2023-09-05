@@ -1,11 +1,4 @@
 using Common.Settings;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using Refit;
-using Web.User.Clients;
 using Web.User.Extensions;
 using Web.User.Helpers;
 using Web.User.Services;
@@ -19,6 +12,15 @@ builder.Services.AddTransient<AuthHelper>();
 builder.Services.AddMemoryCache();
 builder.Services.AddTransient<CacheHelper>();
 builder.Services.AddTransient<CacheKeyGenrator>();
+
+builder.Services.AddDistributedMemoryCache();
+
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromDays(1);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 builder.Services.AddControllersWithViews();
 
@@ -44,7 +46,9 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseSession();
 app.UseGlobalExceptionHandler();
+app.UseAuthRefreshMiddleware();
 
 app.MapControllerRoute(
     name: "default",

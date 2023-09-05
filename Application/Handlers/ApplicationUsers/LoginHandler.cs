@@ -55,6 +55,7 @@ namespace Application.Handlers.ApplicationUsers
                     _logger.LogInformation("Generating tokens");
                     response.AccessToken = _tokenHelper.GenerateAccessToken(user);
                     response.RefreshToken = _tokenHelper.GenerateRefreshToken();
+                    response.ExpiresAt = DateTime.Now.AddMinutes(_appSettings.Security.Authentication.AccessTokenTTLInMinutes);
                     DateTime accessTokenExpiration = DateTime.UtcNow.AddMinutes(_appSettings.Security.Authentication.AccessTokenTTLInMinutes);
                     await _securityLogRepository.AddAsync(new SecurityTokenLog(response.AccessToken, TokenTypes.AccessToken, user.UserId, accessTokenExpiration));
                     DateTime refreshTokenExpiration = DateTime.UtcNow.AddMinutes(_appSettings.Security.Authentication.RefreshTokenTTLInMinutes);
