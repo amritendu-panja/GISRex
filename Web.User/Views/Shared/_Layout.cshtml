@@ -31,6 +31,7 @@
                     @if(User.Identity?.IsAuthenticated ?? false)
                     {
                         <label>@User.FindFirst(System.Security.Claims.ClaimTypes.Name).Value</label>
+                        @Html.ActionLink("Profile", "profile", "home", null, new { @class = "btn btn-success"})
                         @Html.ActionLink("Logout", "logout", "home", null, new { @class = "btn btn-info"})
                     }
                     else

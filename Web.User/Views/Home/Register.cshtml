@@ -5,37 +5,50 @@
 }
 
 @model RegisterModel
+<div class="row d-flex justify-content-center align-items-center h-100">
+    <div class="col-12 col-md-9 col-lg-7 col-xl-6">
+        <div class="shadow mb-5 bg-body rounded">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Create an account</h4>
+                </div>
+                <div class="card-body p-5">
+                    @using (Html.BeginForm(FormMethod.Post, new { @id = "frmRegister" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <div class="mb-4">
+                            @Html.LabelFor(m=> m.Email, new { @class = "form-label" })
+                            @Html.TextBoxFor(m => m.Email, new { @class = "form-control form-control-lg", @placeholder = "someone@email.com" })
+                        </div>
+                        <div class="mb-4">
+                            @Html.LabelFor(m=> m.Username, new { @class = "form-label" })
+                            @Html.TextBoxFor(m => m.Username, new { @class = "form-control", @placeholder = "User name" })
+                        </div>
+                        <div class="mb-4">
+                            @Html.LabelFor(m=> m.Password, new { @class = "form-label" })
+                            @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
 
-<div>
-    @using (Html.BeginForm(FormMethod.Post, new { @id = "frmRegister" }))
-    {
-        @Html.AntiForgeryToken()
-        <div>
-            @Html.LabelFor(m=> m.Email, new { @class = "form-control-label" })
-            <div>
-                @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                        </div>
+                        <div class="mb-4">
+                            @Html.LabelFor(m=> m.ConfirmPassword, new { @class = "form-label" })
+                            @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control" })
+                        </div>
+                        <div class="form-check d-flex justify-content-center mb-3">
+                            <input class="form-check-input me-2" type="checkbox" value="" id="form2Example3cg" />
+                            <label class="form-check-label" for="form2Example3g">
+                                I agree all statements in <a href="#!" class="text-body"><u>Terms of service</u></a>
+                            </label>
+                        </div>
+                        <div class="d-grid">
+                            <input type="submit" class="btn btn-success text-white" value="Register" />
+                        </div>
+                        <p class="text-center text-muted mt-3 mb-0">
+                            Have already an account? @Html.ActionLink("Login here", "login", "home", null, new { @class = "fw-bold text-body"})
+                        </p>
+                    }
+                </div>
             </div>
         </div>
-        <div>
-            @Html.LabelFor(m=> m.Username, new { @class = "form-control-label" })
-            <div>
-                @Html.TextBoxFor(m => m.Username, new { @class = "form-control" })
-            </div>
-        </div>
-        <div>
-            @Html.LabelFor(m=> m.Password, new { @class = "form-control-label" })
-            <div>
-                @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
-            </div>
-        </div>
-        <div>
-            @Html.LabelFor(m=> m.ConfirmPassword, new { @class = "form-control-label" })
-            <div>
-                @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control" })
-            </div>
-        </div>
-        <div>
-            <input type="submit" class="btn btn-primary" value="Register" />
-        </div>
-    }
+    </div>
 </div>
+

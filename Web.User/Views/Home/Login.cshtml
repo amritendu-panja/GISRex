@@ -5,26 +5,34 @@
 @{
 }
 
-
-<div>
-    @using(Html.BeginForm(FormMethod.Post, new {@id="frmLogin"}))
-    {
-        @Html.AntiForgeryToken()
-        <div>
-            @Html.LabelFor(m=> m.Username, new { @class = "form-control-label" })    
-            <div>
-                @Html.TextBoxFor(m => m.Username, new { @class = "form-control" })
+<div class="justify-content-center d-flex">
+    <div class="col-12 col-md-9 col-lg-7 col-xl-6">
+        <div class="shadow mb-5 bg-body rounded">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Login</h4>
+                </div>
+                <div class="card-body">
+                    @using(Html.BeginForm(FormMethod.Post, new {@id="frmLogin"}))
+                    {
+                        @Html.AntiForgeryToken()
+                        <div class="form-floating mb-3">
+                            @Html.TextBoxFor(m => m.Username, new { @class = "form-control", @placeholder="User name" })
+                            @Html.LabelFor(m=> m.Username)
+                        </div>
+                         <div class="form-floating mb-3">
+                            @Html.PasswordFor(m => m.Password, new { @class = "form-control", @placeholder="Password" })
+                            @Html.LabelFor(m=> m.Password)
+                        </div>        
+                        <div class="d-grid mb-3">
+                            <input type="submit" class="btn btn-primary" value="Login" />                
+                        </div>
+                        <div class="col-12 d-flex justify-content-center">
+                            Don't have an account? &nbsp; @Html.ActionLink("Sign Up", "register", "home", null, new { @class = "fw-bold text-body"})
+                        </div>
+                    }
+                </div>
             </div>
         </div>
-        <div>
-            @Html.LabelFor(m=> m.Password, new { @class = "form-control-label" })
-            <div>
-                @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
-            </div>
-        </div>        
-        <div>
-            <input type="submit" class="btn btn-primary" value="Login" />
-            @Html.ActionLink("Register Me!", "register", new { @class = "link-primary"})
-        </div>
-    }
+    </div>
 </div>

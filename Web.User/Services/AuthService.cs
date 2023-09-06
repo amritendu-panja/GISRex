@@ -58,5 +58,11 @@ namespace Web.User.Services
 
             return await _client.Refresh(refreshRequest, _appSettings.Security.ApiKey, cancellationToken);
         }
+
+        public async Task<ApplicationUserResponseDto> ProfileAsync(string userId, string accessToken, CancellationToken cancellationToken)
+        {
+            var userGuid = Guid.Parse(userId);
+            return await _client.Profile(userGuid, _appSettings.Security.ApiKey, accessToken, cancellationToken);
+        }
     }
 }

@@ -4,18 +4,18 @@ namespace Web.User.Models
 {
     public class RegisterModel
     {
-        [Required]
+        [Required(ErrorMessage = "Email is mandatory")]
         [EmailAddress]
-        [Display(Name ="Enter email address")]
+        [Display(Name ="Email")]
         public string Email { get; set; }
-        [Required]
-        [Display(Name = "Enter Username")]
+        [Required(ErrorMessage = "Username is mandatory")]
+        [Display(Name = "Username")]
         public string Username { get; set; }
-        [Required]
-        [Display(Name = "Enter Password")]
+        [Required(ErrorMessage = "Password is mandatory")]
+        [Display(Name = "Password")]
         [DataType(DataType.Password)]
         public string Password { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Confirm password is mandatory")]
         [Display(Name = "Confirm Password")]
         [DataType(DataType.Password)]
         public string ConfirmPassword { get; set; }

@@ -32,6 +32,7 @@ namespace Web.User.Extensions
             services.AddTransient<CacheKeyGenrator>();
             services.AddTransient<AuthHelper>();
             services.AddTransient<AuthService>();
+            services.AddTransient<Mapper>();
             return services;
         }
 

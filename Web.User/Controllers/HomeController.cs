@@ -18,21 +18,23 @@ namespace Web.User.Controllers
         private readonly AuthHelper _authHelper;
         private readonly CacheHelper _cacheHelper;
         private readonly CacheKeyGenrator _cachekeyGen;
+        private readonly Mapper _mapper;
 
         public HomeController(ILogger<HomeController> logger,
             AuthService authService,
             AuthHelper authHelper,
             CacheHelper cacheHelper,
-            CacheKeyGenrator cachekeyGen)
+            CacheKeyGenrator cachekeyGen,
+            Mapper mapper)
         {
             _logger = logger;
             _authService = authService;
             _authHelper = authHelper;
             _cacheHelper = cacheHelper;
             _cachekeyGen = cachekeyGen;
+            _mapper = mapper;
         }
 
-        [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
         public IActionResult Index()
         {
             return View();
@@ -48,20 +50,18 @@ namespace Web.User.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> PostLogin(LoginModel model, CancellationToken cancellationToken)
         {
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-                return BadRequest(ModelState);
-            }
-
-            var loginResponse = await _authService.LoginAsync(model.Username, model.Password, cancellationToken);
-            if (loginResponse.Success)
-            {
-                var principal = await _authHelper.SignInAsync(loginResponse.AccessToken, loginResponse.ExpiresAt, HttpContext);
-                var key = _cachekeyGen.CreateCacheKey(principal, Constants.AuthenticationCacheKey);
-                _cacheHelper.Set<LoginResponseDto>(key, loginResponse);
-                HttpContext.User = principal;
-                HttpContext.Session.SetString(Constants.AuthenticationCacheKey, key);
-                return Redirect("/");
+                var loginResponse = await _authService.LoginAsync(model.Username, model.Password, cancellationToken);
+                if (loginResponse.Success)
+                {
+                    var principal = await _authHelper.SignInAsync(loginResponse.AccessToken, loginResponse.ExpiresAt, HttpContext);
+                    var key = _cachekeyGen.CreateCacheKey(principal, Constants.AuthenticationCacheKey);
+                    _cacheHelper.Set<LoginResponseDto>(key, loginResponse);
+                    HttpContext.User = principal;
+                    HttpContext.Session.SetString(Constants.AuthenticationCacheKey, key);
+                    return Redirect("/");
+                }
             }
             return View();
         }
@@ -76,17 +76,15 @@ namespace Web.User.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> PostRegister(RegisterModel model, CancellationToken cancellationToken)
         {
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-                return BadRequest(ModelState);
-            }
+                var registerResponse = await _authService.RegisterAsync(model.Email, model.Username, model.Password, cancellationToken);
 
-            var registerResponse = await _authService.RegisterAsync(model.Email, model.Username, model.Password, cancellationToken);
-
-            if (registerResponse.Success)
-            {
-                LoginModel loginModel = new LoginModel { Username = model.Username, Password = model.Password };
-                return await PostLogin(loginModel, cancellationToken);
+                if (registerResponse.Success)
+                {
+                    LoginModel loginModel = new LoginModel { Username = model.Username, Password = model.Password };
+                    return await PostLogin(loginModel, cancellationToken);
+                }
             }
 
             return View();
@@ -110,6 +108,19 @@ namespace Web.User.Controllers
             }
             HttpContext.User = new GenericPrincipal(new GenericIdentity(string.Empty), null);
             return View();
+        }
+
+        [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
+        [HttpGet("profile")]
+        public async Task<IActionResult> Profile(CancellationToken cancellationToken)
+        {
+            string userid = User.FindFirst(Constants.JwtIdKey).Value;
+            var key = _cachekeyGen.CreateCacheKey(User, Constants.AuthenticationCacheKey);
+            var loginData = _cacheHelper.Get<LoginResponseDto>(key);
+            var userDto = await _authService.ProfileAsync(userid, loginData.AccessToken, cancellationToken);
+            ProfileModel profileModel = new ProfileModel();
+            _mapper.Map(userDto, profileModel);
+            return View(profileModel);
         }
 
         public IActionResult Privacy()
