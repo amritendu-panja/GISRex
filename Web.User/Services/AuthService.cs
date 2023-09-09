@@ -1,7 +1,6 @@
 ﻿using Common.Dtos;
 using Common.Settings;
 using Microsoft.Extensions.Options;
-using System.Threading;
 using Web.User.Clients;
 
 namespace Web.User.Services
@@ -63,6 +62,18 @@ namespace Web.User.Services
         {
             var userGuid = Guid.Parse(userId);
             return await _client.Profile(userGuid, _appSettings.Security.ApiKey, accessToken, cancellationToken);
+        }
+
+        public async Task<LogoutResponseDto> ChangePasswordAsync(string userId, string oldPassword, string newPassword, string accessToken, CancellationToken cancellationToken)
+        {
+            ChangeUserPasswordCommand changeUserPasswordCommand = new ChangeUserPasswordCommand
+            {
+                UserId = Guid.Parse(userId), 
+                OldPassword = oldPassword,
+                NewPassword = newPassword
+            };
+
+            return await _client.ChangePassword(changeUserPasswordCommand, _appSettings.Security.ApiKey, accessToken, cancellationToken);
         }
     }
 }

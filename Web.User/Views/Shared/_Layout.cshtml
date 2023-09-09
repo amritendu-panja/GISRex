@@ -30,9 +30,17 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-end">
                     @if(User.Identity?.IsAuthenticated ?? false)
                     {
-                        <label>@User.FindFirst(System.Security.Claims.ClaimTypes.Name).Value</label>
-                        @Html.ActionLink("Profile", "profile", "home", null, new { @class = "btn btn-success"})
-                        @Html.ActionLink("Logout", "logout", "home", null, new { @class = "btn btn-info"})
+                        <div class="dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <label>@User.FindFirst(System.Security.Claims.ClaimTypes.Name).Value</label>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                <li>@Html.ActionLink("Profile", "profile", "home", null, new { @class = "dropdown-item"})</li>
+                                <li>@Html.ActionLink("Change Password", "changepassword", "home", null, new { @class = "dropdown-item"})</li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>@Html.ActionLink("Logout", "logout", "home", null, new { @class = "dropdown-item"})</li>
+                            </ul>
+                        </div>
                     }
                     else
                     {

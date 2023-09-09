@@ -123,6 +123,43 @@ namespace Web.User.Controllers
             return View(profileModel);
         }
 
+        [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
+        [HttpGet("changepassword")]
+        public async Task<IActionResult> ChangePassword(CancellationToken cancellationToken)
+        {
+            ChangePasswordModel model = new ChangePasswordModel
+            {
+                UserId = User.FindFirst(Constants.JwtIdKey).Value
+            };
+            return View(model);
+        }
+
+        [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
+        [HttpPost("changepassword")]
+        public async Task<IActionResult> PostChangePassword(ChangePasswordModel model, CancellationToken cancellationToken)
+        {
+            string userid = User.FindFirst(Constants.JwtIdKey).Value;
+            var key = _cachekeyGen.CreateCacheKey(User, Constants.AuthenticationCacheKey);
+            var loginData = _cacheHelper.Get<LoginResponseDto>(key);
+            if (loginData != null)
+            {
+                var result = await _authService.ChangePasswordAsync(model.UserId, model.OldPassword, model.NewPassword, loginData.AccessToken, cancellationToken);
+                if (result.Success)
+                {
+                    var logoutResult = await _authService.LogoutAsync(userid, loginData.AccessToken, cancellationToken);
+                    if (logoutResult.Success)
+                    {
+                        await _authHelper.SignoutAsync(HttpContext);
+
+                        HttpContext.User = new GenericPrincipal(new GenericIdentity(string.Empty), null);
+                        _cacheHelper.Remove(key);
+
+                    }
+                }
+            }
+            return View();
+        }
+
         public IActionResult Privacy()
         {
             return View();
