@@ -4,13 +4,13 @@ namespace Web.User.Models
 {
     public class LoginModel
     {
-        [Required]
-        [Display(Name = "Enter Username")]
+        [Required(ErrorMessage = "Username cannot be blank")]
+        [Display(Name = "Username")]
         public required string Username { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Password cannot be blank")]
         [DataType(DataType.Password)]
-        [Display(Name = "Enter Password")]
+        [Display(Name = "Password")]
         public required string Password { get; set; }        
     }
 }

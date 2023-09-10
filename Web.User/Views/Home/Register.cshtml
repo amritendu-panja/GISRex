@@ -5,37 +5,93 @@
 }
 
 @model RegisterModel
+<div class="row d-flex justify-content-center align-items-center h-100">
+    <div class="col-12 col-md-9 col-lg-7 col-xl-6">
+        <div class="card mb-4 mb-xl-0">
+            <div class="card-header">
+                <h4>Create an account</h4>
+            </div>
+            <div class="card-body p-5">
+                @using (Html.BeginForm(FormMethod.Post, new { @id = "frmRegister" }))
+                {
+                    @await Html.PartialAsync("Partial/_ValidationSummary")
 
-<div>
-    @using (Html.BeginForm(FormMethod.Post, new { @id = "frmRegister" }))
-    {
-        @Html.AntiForgeryToken()
-        <div>
-            @Html.LabelFor(m=> m.Email, new { @class = "form-control-label" })
-            <div>
-                @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                    @Html.AntiForgeryToken()
+                    @Html.HiddenFor(m=>m.IsUserExists)
+                    <div class="mb-4">
+                        @Html.LabelFor(m=> m.Email, new { @class = "form-label" })
+                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control form-control-lg", @placeholder = "someone@email.com", @autocomplete = "off" })
+                    </div>
+                    <div class="mb-4">
+                        @Html.LabelFor(m=> m.Username, new { @class = "form-label" })
+                        <div class="input-group">
+                            @Html.TextBoxFor(m => m.Username, new { @class = "form-control", @placeholder = "Username", @onchange = "checkUserExists();", @autocomplete = "off" })
+                            <span class="input-group-text">
+                                <img src="images/failure_icon.svg" id="username-status">
+                            </span>
+                            <button type="button" class="btn btn-outline-secondary" onclick="checkUserExists()">
+                                <img src="images/refresh_icon.svg" id="refresh-check-username">
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        @Html.LabelFor(m=> m.Password, new { @class = "form-label" })
+                        @Html.PasswordFor(m => m.Password, new { @class = "form-control", @placeholder = "****", @autocomplete = "off" })
+
+                    </div>
+                    <div class="mb-4">
+                        @Html.LabelFor(m=> m.ConfirmPassword, new { @class = "form-label" })
+                        @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control", @placeholder = "****", @autocomplete = "off" })
+                    </div>
+                    <div class="form-check d-flex justify-content-center mb-3">
+                        @Html.CheckBoxFor(m=>m.IsAcceptedTermsAndConditions, new { @class = "form-check-input me-2"})                        
+                        <label class="form-check-label" for="@Html.IdFor(m=>m.IsAcceptedTermsAndConditions)">
+                            I agree all statements in <a href="#!" class="text-body"><u>Terms of service</u></a>
+                        </label>
+                    </div>
+                    <div class="d-grid">
+                        <input type="submit" class="btn btn-success text-white" value="Register" />
+                    </div>
+                    <p class="text-center text-muted mt-3 mb-0">
+                        Already have an account? @Html.ActionLink("Login here", "login", "home", null, new { @class = "fw-bold text-body"})
+                    </p>
+                }
             </div>
         </div>
-        <div>
-            @Html.LabelFor(m=> m.Username, new { @class = "form-control-label" })
-            <div>
-                @Html.TextBoxFor(m => m.Username, new { @class = "form-control" })
-            </div>
-        </div>
-        <div>
-            @Html.LabelFor(m=> m.Password, new { @class = "form-control-label" })
-            <div>
-                @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
-            </div>
-        </div>
-        <div>
-            @Html.LabelFor(m=> m.ConfirmPassword, new { @class = "form-control-label" })
-            <div>
-                @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control" })
-            </div>
-        </div>
-        <div>
-            <input type="submit" class="btn btn-primary" value="Register" />
-        </div>
-    }
+    </div>
 </div>
+
+@section Scripts{
+    <script type="text/javascript">
+        function checkUserExists() {            
+            var token = $('input[name="__RequestVerificationToken"]').val();
+            var userName = $("#@Html.IdFor(m=>m.Username)").val();
+            if (userName && userName.length >= 6) {
+                var url = '/checkuser/' + userName;
+
+                $.ajax({
+                    type: 'GET',
+                    url: url,
+                    headers: {
+                        "RequestVerificationToken": token
+                    },
+                    accept: 'application/json',
+                    success: function (response) {
+                        $("#@Html.IdFor(m=>m.IsUserExists)").val(response.success);
+                        if (response.success) {
+                            $("#username-status").attr("src", "images/failure_icon.svg");
+                        }
+                        else {
+                            $("#username-status").attr("src", "images/tick_icon.svg")
+                        }
+                    },
+                    error: function (xhrError) {
+                        console.log(xhrError);
+                        alert("Something went wrong! Please contact support")
+                    }
+                });
+            }
+        }
+    </script>
+
+}

@@ -12,6 +12,7 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
+                <img id="map-icon" src="images/map_icon.svg" class="me-2" />
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">WebGIS</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
@@ -30,14 +31,23 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-end">
                     @if(User.Identity?.IsAuthenticated ?? false)
                     {
-                        <label>@User.FindFirst(System.Security.Claims.ClaimTypes.Name).Value</label>
-                        @Html.ActionLink("Logout", "logout", "home", null, new { @class = "btn btn-info"})
+                        <div class="dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <label>@User.FindFirst(System.Security.Claims.ClaimTypes.Name).Value</label>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                <li>@Html.ActionLink("Profile", "profile", "home", null, new { @class = "dropdown-item"})</li>
+                                <li>@Html.ActionLink("Change Password", "changepassword", "home", null, new { @class = "dropdown-item"})</li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>@Html.ActionLink("Logout", "logout", "home", null, new { @class = "dropdown-item"})</li>
+                            </ul>
+                        </div>
                     }
                     else
                     {
                         if (!Context.Request.Path.Value?.Contains("login") ?? true)
                         {
-                            @Html.ActionLink("Log Me In", "login", "home", null, new { @class = "btn btn-info"})
+                            @Html.ActionLink("Log Me In", "login", "home", null, new { @class = "nav-link text-dark"})
                         }
                     }
                 </div>

@@ -1,9 +1,11 @@
 ﻿using Common.Dtos;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Web.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController : ControllerBase
@@ -44,6 +46,23 @@ namespace Web.Controllers
             }
             else 
             { 
+                return BadRequest();
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("findname/{userName}")]
+        public async Task<IActionResult> FindByUserName(string userName)
+        {
+            FindByUsernameRequest request = new FindByUsernameRequest { Username = userName };
+            var result = await mediator.Send(request);
+            if (result != null)
+            {
+                return Ok(result);
+            }
+            else
+            {
                 return BadRequest();
             }
         }

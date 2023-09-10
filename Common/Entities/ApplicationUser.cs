@@ -33,6 +33,15 @@
             ModifiedDate = DateTime.UtcNow;
         }
 
+        public void SetPassword(string password)
+        {
+            PasswordEncrypted = password;
+            IsPasswordExpired = false;
+            IsUserLocked = false;
+            CreatedDate = CreatedDate.ToUniversalTime();
+            ModifiedDate = DateTime.UtcNow;
+        }
+
         public void SetLock(bool lockStatus)
         {
             IsUserLocked = lockStatus;

@@ -16,5 +16,14 @@ namespace Web.User.Clients
 
         [Post("/api/auth/refresh")]
         Task<LoginResponseDto> Refresh([Body] RefreshRequest request, [Header("XApiKey")] string apiKey, CancellationToken cancellationToken);
+
+        [Get("/api/users/{userId}")]
+        Task<ApplicationUserResponseDto> Profile(Guid userId, [Header("XApiKey")] string apiKey, [Authorize("Bearer")] string accessToken, CancellationToken cancellationToken);
+
+        [Post("/api/auth/changepassword")]
+        Task<LogoutResponseDto> ChangePassword([Body] ChangeUserPasswordCommand command, [Header("XApiKey")] string apiKey, [Authorize("Bearer")] string accessToken, CancellationToken cancellationToken);
+
+        [Get("/api/users/findname/{userName}")]
+        Task<ApplicationUserResponseDto> FindByUsername(string userName, [Header("XApiKey")] string apiKey, CancellationToken cancellationToken);
     }
 }

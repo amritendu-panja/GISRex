@@ -92,5 +92,21 @@ namespace Web.Controllers
                 return BadRequest();
             }
         }
+
+        [Authorize]
+        [HttpPost]
+        [Route("changepassword")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangeUserPasswordCommand request)
+        {
+            var result = await mediator.Send(request);
+            if (result != null)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
     }
 }
