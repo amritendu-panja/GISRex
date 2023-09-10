@@ -49,5 +49,22 @@ namespace Web.Controllers
                 return BadRequest();
             }
         }
+
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("findname/{userName}")]
+        public async Task<IActionResult> FindByUserName(string userName)
+        {
+            FindByUsernameRequest request = new FindByUsernameRequest { Username = userName };
+            var result = await mediator.Send(request);
+            if (result != null)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
     }
 }

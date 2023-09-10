@@ -26,6 +26,8 @@
             <div class="card-body">
                 @using (Html.BeginForm(FormMethod.Post, new { @id = "frmProfile" }))
                 {
+                    @await Html.PartialAsync("Partial/_ValidationSummary")
+
                     @Html.AntiForgeryToken()
                     <div class="mb-3">
                         @Html.LabelFor(m=>m.UserName, new { @class = "form-control-label" })

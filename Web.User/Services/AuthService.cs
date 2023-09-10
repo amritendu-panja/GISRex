@@ -75,5 +75,10 @@ namespace Web.User.Services
 
             return await _client.ChangePassword(changeUserPasswordCommand, _appSettings.Security.ApiKey, accessToken, cancellationToken);
         }
+
+        public async Task<ApplicationUserResponseDto> CheckUserExists(string userName, CancellationToken cancellationToken)
+        {
+            return await _client.FindByUsername(userName, _appSettings.Security.ApiKey, cancellationToken);
+        }
     }
 }

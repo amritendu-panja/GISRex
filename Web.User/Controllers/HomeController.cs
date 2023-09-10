@@ -62,8 +62,12 @@ namespace Web.User.Controllers
                     HttpContext.Session.SetString(Constants.AuthenticationCacheKey, key);
                     return Redirect("/");
                 }
+                else
+                {
+                    ModelState.AddModelError("", loginResponse.Message);
+                }
             }
-            return View();
+            return View("Login", model);
         }
 
         [HttpGet("register")]
@@ -85,9 +89,13 @@ namespace Web.User.Controllers
                     LoginModel loginModel = new LoginModel { Username = model.Username, Password = model.Password };
                     return await PostLogin(loginModel, cancellationToken);
                 }
+                else
+                {
+                    ModelState.AddModelError("", registerResponse.Message);
+                }
             }
 
-            return View();
+            return View("Register", model);
         }
 
         [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
@@ -156,8 +164,24 @@ namespace Web.User.Controllers
 
                     }
                 }
+                else
+                {
+                    ModelState.AddModelError("", result.Message);
+                }
             }
-            return View();
+            return View("ChangePassword", model);
+        }
+
+        [ValidateAntiForgeryToken]
+        [HttpGet("checkuser/{userName}")]
+        public async Task<IActionResult> CheckUserExists(string userName, CancellationToken cancellationToken)
+        {
+            var result = await _authService.CheckUserExists(userName, cancellationToken);
+            BaseResponseDto baseResponseDto = new BaseResponseDto
+            {
+                Success = result.Success
+            };
+            return new JsonResult(baseResponseDto);
         }
 
         public IActionResult Privacy()
