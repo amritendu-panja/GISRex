@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "Infrastru
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common", "Common\Common.csproj", "{87BD421E-647F-490D-B2B5-D4A1AA52A262}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web.User", "Web.User\Web.User.csproj", "{58DA2705-52E3-40A7-9C0F-B2BE942F8F43}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Web.User", "Web.User\Web.User.csproj", "{58DA2705-52E3-40A7-9C0F-B2BE942F8F43}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

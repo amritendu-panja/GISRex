@@ -16,6 +16,7 @@
 
         public ICollection<ApplicationLayer> ApplicationLayers { get; set; } = new List<ApplicationLayer>();
         public ICollection<SecurityTokenLog> SecurityTokenLogs { get; set; } = new List<SecurityTokenLog>();
+        public ApplicationUserDetails UserDetails { get; set; }
 
         protected ApplicationUser() { }
 
