@@ -4,6 +4,7 @@
 @model LoginModel
 @{
 }
+@await Html.PartialAsync("_ValidationScriptsPartial")
 
 <div class="justify-content-center d-flex">
     <div class="col-12 col-md-9 col-lg-7 col-xl-6">
@@ -26,7 +27,7 @@
                         @Html.LabelFor(m=> m.Password)
                     </div>        
                     <div class="d-grid mb-3">
-                        <input type="submit" class="btn btn-primary" value="Login" />                
+                        <input type="submit" class="btn btn-primary" value="Login" />
                     </div>
                     <div class="col-12 d-flex justify-content-center">
                         Don't have an account? &nbsp; @Html.ActionLink("Sign Up", "register", "home", null, new { @class = "fw-bold text-body"})

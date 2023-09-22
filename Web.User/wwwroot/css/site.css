@@ -29,3 +29,16 @@ body {
     width: 32px;
     height:32px;
 }
+
+.validation-summary {
+
+}
+
+    .validation-summary ul {
+        list-style: none;
+    }
+
+.img-account-profile {
+    width: 150px;
+    height: 150px;
+}

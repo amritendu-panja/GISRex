@@ -18,6 +18,7 @@ namespace Web.User.Controllers
         private readonly AuthHelper _authHelper;
         private readonly CacheHelper _cacheHelper;
         private readonly CacheKeyGenrator _cachekeyGen;
+        private readonly LookupsService _lookupsService;
         private readonly Mapper _mapper;
 
         public HomeController(ILogger<HomeController> logger,
@@ -25,6 +26,7 @@ namespace Web.User.Controllers
             AuthHelper authHelper,
             CacheHelper cacheHelper,
             CacheKeyGenrator cachekeyGen,
+            LookupsService lookupsService,
             Mapper mapper)
         {
             _logger = logger;
@@ -32,6 +34,7 @@ namespace Web.User.Controllers
             _authHelper = authHelper;
             _cacheHelper = cacheHelper;
             _cachekeyGen = cachekeyGen;
+            _lookupsService = lookupsService;
             _mapper = mapper;
         }
 
@@ -78,7 +81,7 @@ namespace Web.User.Controllers
 
         [HttpPost("register")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> PostRegister(RegisterModel model, CancellationToken cancellationToken)
+        public async Task<IActionResult> Register(RegisterModel model, CancellationToken cancellationToken)
         {
             if (ModelState.IsValid)
             {
@@ -95,15 +98,16 @@ namespace Web.User.Controllers
                 }
             }
 
-            return View("Register", model);
+            return View(model);
         }
 
         [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
         [HttpGet("logout")]
         public async Task<IActionResult> Logout(CancellationToken cancellationToken)
         {
-            var key = _cachekeyGen.CreateCacheKey(User, Constants.AuthenticationCacheKey);
-            var loginData = _cacheHelper.Get<LoginResponseDto>(key);
+            var loginDetails = GetLoginDetails();
+            var key = loginDetails.Item1;
+            var loginData = loginDetails.Item2;
             await _authHelper.SignoutAsync(HttpContext);
             if (loginData != null)
             {
@@ -123,13 +127,32 @@ namespace Web.User.Controllers
         public async Task<IActionResult> Profile(CancellationToken cancellationToken)
         {
             string userid = User.FindFirst(Constants.JwtIdKey).Value;
-            var key = _cachekeyGen.CreateCacheKey(User, Constants.AuthenticationCacheKey);
-            var loginData = _cacheHelper.Get<LoginResponseDto>(key);
+            var loginDetails = GetLoginDetails();
+            var loginData = loginDetails.Item2;
             var userDto = await _authService.ProfileAsync(userid, loginData.AccessToken, cancellationToken);
             ProfileModel profileModel = new ProfileModel();
-            _mapper.Map(userDto, profileModel);
+            _mapper.Map(userDto, profileModel);            
             return View(profileModel);
         }
+
+        [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
+        [HttpPost("profile")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Profile(ProfileModel profileModel, CancellationToken cancellationToken)
+        {
+            if(ModelState.IsValid)
+            {
+                string userid = User.FindFirst(Constants.JwtIdKey).Value;
+                var loginDetails = GetLoginDetails();
+                var loginData = loginDetails.Item2;
+                var userDto = await _authService.UpdateProfileAsync(profileModel, loginData.AccessToken, cancellationToken);
+
+                _mapper.Map(userDto, profileModel);
+            }
+           
+            return View(profileModel);
+        }
+
 
         [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
         [HttpGet("changepassword")]
@@ -147,8 +170,9 @@ namespace Web.User.Controllers
         public async Task<IActionResult> PostChangePassword(ChangePasswordModel model, CancellationToken cancellationToken)
         {
             string userid = User.FindFirst(Constants.JwtIdKey).Value;
-            var key = _cachekeyGen.CreateCacheKey(User, Constants.AuthenticationCacheKey);
-            var loginData = _cacheHelper.Get<LoginResponseDto>(key);
+            var loginDetails = GetLoginDetails();
+            var key = loginDetails.Item1;
+            var loginData = loginDetails.Item2;
             if (loginData != null)
             {
                 var result = await _authService.ChangePasswordAsync(model.UserId, model.OldPassword, model.NewPassword, loginData.AccessToken, cancellationToken);
@@ -172,6 +196,21 @@ namespace Web.User.Controllers
             return View("ChangePassword", model);
         }
 
+        
+
+        public IActionResult Privacy()
+        {
+            return View();
+        }
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        #region Api Endpoints
+
         [ValidateAntiForgeryToken]
         [HttpGet("checkuser/{userName}")]
         public async Task<IActionResult> CheckUserExists(string userName, CancellationToken cancellationToken)
@@ -184,15 +223,98 @@ namespace Web.User.Controllers
             return new JsonResult(baseResponseDto);
         }
 
-        public IActionResult Privacy()
+        [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
+        [HttpGet("countries")]
+        public async Task<IActionResult> GetAllCountries(CancellationToken cancellationToken)
         {
-            return View();
+            var countryList = _cacheHelper.Get<CountryLookupResponseDto>(Constants.CountryListCacheKey);
+            if (countryList == null)
+            {
+                var loginDetails = GetLoginDetails();
+                var loginData = loginDetails.Item2;
+                countryList = await _lookupsService.GetAllCountriesAsync(loginData.AccessToken, cancellationToken);
+                if (countryList.Success)
+                {
+                    _cacheHelper.Set<CountryLookupResponseDto>(Constants.CountryListCacheKey, countryList);
+                }
+            }
+            return new JsonResult(countryList);
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
+        [HttpGet("getCallingCode/{countryCode}")]
+        public async Task<IActionResult> GetCallingCode(string countryCode, CancellationToken cancellationToken)
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            var countryList = _cacheHelper.Get<CountryLookupResponseDto>(Constants.CountryListCacheKey);
+            if (countryList != null)
+            {
+                if (countryList.Countries.Any(countryList => countryList.CountryCode == countryCode))
+                {
+                    var callingCode = countryList.Countries.First(countryList => countryList.CountryCode == countryCode).CallingCode;
+                    var response = new GetCallingCodeResponseDto { Success = true, CallingCode = callingCode };
+                    return new JsonResult(response);
+                }
+            }
+            
+            var loginDetails = GetLoginDetails();
+            var loginData = loginDetails.Item2;
+            var result = await _lookupsService.GetCallingCodeAsync(countryCode, loginData.AccessToken, cancellationToken);
+            return new JsonResult(result);            
         }
+
+        [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
+        [HttpGet("states")]
+        public async Task<IActionResult> GetAllStates(CancellationToken cancellationToken)
+        {
+            var stateList = _cacheHelper.Get<StateLookupResponseDto>(Constants.StateListCacheKey);
+            if (stateList == null)
+            {
+                var loginDetails = GetLoginDetails();
+                var loginData = loginDetails.Item2;
+                stateList = await _lookupsService.GetAllStatesAsync(loginData.AccessToken, cancellationToken);
+                if (stateList.Success)
+                {
+                    _cacheHelper.Set<StateLookupResponseDto>(Constants.StateListCacheKey, stateList);
+                }
+            }
+            return new JsonResult(stateList);
+        }
+
+        [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
+        [HttpGet("states/{countryCode}")]
+        public async Task<IActionResult> GetStatesByCountry(string countryCode, CancellationToken cancellationToken)
+        {
+            var stateList = _cacheHelper.Get<StateLookupResponseDto>(Constants.StateListCacheKey);
+            if (stateList == null)
+            {
+                var loginDetails = GetLoginDetails();
+                var loginData = loginDetails.Item2;
+                stateList = await _lookupsService.GetAllStatesAsync(loginData.AccessToken, cancellationToken);
+                if (stateList.Success)
+                {
+                    _cacheHelper.Set<StateLookupResponseDto>(Constants.StateListCacheKey, stateList);
+                }
+            }
+            StateLookupResponseDto stateLookupResponseDto = new StateLookupResponseDto();
+            if (stateList.Success)
+            {
+                stateLookupResponseDto.States = stateList.States.Where(s => s.CountryCode == countryCode).ToList();
+            }
+            else
+            {
+                stateLookupResponseDto.SetError(stateList.Message);
+            }
+            return new JsonResult(stateLookupResponseDto);
+        }
+        #endregion
+
+        #region Helpers
+        private Tuple<string, LoginResponseDto> GetLoginDetails()
+        {
+            var key = _cachekeyGen.CreateCacheKey(User, Constants.AuthenticationCacheKey);
+            var loginData = _cacheHelper.Get<LoginResponseDto>(key);
+            return new Tuple<string, LoginResponseDto>(key, loginData);
+        }
+        #endregion
     }
 }

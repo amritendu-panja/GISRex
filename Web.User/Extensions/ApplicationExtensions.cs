@@ -33,6 +33,7 @@ namespace Web.User.Extensions
             services.AddTransient<AuthHelper>();
             services.AddTransient<AuthService>();
             services.AddTransient<Mapper>();
+            services.AddTransient<LookupsService>();
             return services;
         }
 
@@ -86,12 +87,26 @@ namespace Web.User.Extensions
             services
                 .AddRefitClient<IAuthenticationClient>(provider => new RefitSettings
                 {
-                    ContentSerializer = new NewtonsoftJsonContentSerializer(
-                                new JsonSerializerSettings
-                                {
-                                    ContractResolver = new CamelCasePropertyNamesContractResolver()
-                                }
-                        )
+                    ContentSerializer = new NewtonsoftJsonContentSerializer
+                    (
+                        new JsonSerializerSettings
+                        {
+                            ContractResolver = new CamelCasePropertyNamesContractResolver()
+                        }
+                    )
+                })
+                .ConfigureHttpClient(c => c.BaseAddress = new Uri(settings.Security.Authentication.Issuer));
+
+            services
+                .AddRefitClient<ILookupsClient>(provider => new RefitSettings
+                {
+                    ContentSerializer = new NewtonsoftJsonContentSerializer
+                    (
+                        new JsonSerializerSettings
+                        {
+                            ContractResolver = new CamelCasePropertyNamesContractResolver()
+                        }
+                    )
                 })
                 .ConfigureHttpClient(c => c.BaseAddress = new Uri(settings.Security.Authentication.Issuer));
             return services;

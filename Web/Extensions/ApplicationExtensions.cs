@@ -49,6 +49,9 @@ namespace Web.Extensions
             services.AddTransient<IApplicationUserRepository, ApplicationUserRepository>();
             services.AddTransient<IRepository<ApplicationLayer>, Repository<ApplicationLayer>>();
             services.AddTransient<IRepository<SecurityTokenLog>, Repository<SecurityTokenLog>>();
+            services.AddTransient<IRepository<ApplicationUserDetails>, Repository<ApplicationUserDetails>>();
+            services.AddTransient<IQueryRepository<CountryLookup>, QueryRepository<CountryLookup>>();
+            services.AddTransient<IQueryRepository<StateLookup>, QueryRepository<StateLookup>>();
             return services;
         }
 

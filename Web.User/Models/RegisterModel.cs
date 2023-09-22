@@ -1,11 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Web.User.Validators;
 
 namespace Web.User.Models
 {
     public class RegisterModel
     {
         [Required(ErrorMessage = "Email is mandatory")]
-        [EmailAddress]
+        [EmailAddress(ErrorMessage = "Enter valid email address")]
         [Display(Name = "Email")]        
         public string Email { get; set; }
 
@@ -16,6 +17,8 @@ namespace Web.User.Models
 
         [Required(ErrorMessage = "Password is mandatory")]
         [MinLength(8, ErrorMessage = "Password must be at least 8 characters long")]
+        [RegularExpression(@"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$", 
+            ErrorMessage = "Password must contain 1 uppercase, 1 lowercase, 1 numeric and 1 special character")]
         [Display(Name = "Password")]        
         [DataType(DataType.Password)]
         public string Password { get; set; }
@@ -26,10 +29,11 @@ namespace Web.User.Models
         [DataType(DataType.Password)]
         public string ConfirmPassword { get; set; }
 
-        [Range(typeof(bool), "False", "False", ErrorMessage = "Username already taken")]
+        [CheckboxRequired(false, ErrorMessage = "Username already exists")]
         public bool IsUserExists { get; set; }
 
-        [Range(typeof(bool), "True", "True", ErrorMessage = "Please accept the terms and conditions to proceed")]
+        [Display(Name = "I agree to all terms and conditions")]
+        [CheckboxRequired(true, ErrorMessage = "Please accept the terms and conditions before proceeding")]
         public bool IsAcceptedTermsAndConditions { get; set; }
     }
 }
