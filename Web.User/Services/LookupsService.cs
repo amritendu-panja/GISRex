@@ -26,7 +26,7 @@ namespace Web.User.Services
 
         public async Task<GetCallingCodeResponseDto> GetCallingCodeAsync(string countryCode, string accessToken, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Getting calling code for {0}", countryCode);
+            _logger.LogInformation("Getting calling code for {0}", countryCode.Trim());
             return await _client.GetCallingCode(countryCode, _appSettings.Security.ApiKey, accessToken, cancellationToken);
         }
 
