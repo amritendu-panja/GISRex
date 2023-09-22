@@ -34,6 +34,21 @@ namespace Web.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("profile/update")]
+        public async Task<IActionResult> UpdateUserProfile([FromBody] UpdateProfileCommand request)
+        {
+            var result = await mediator.Send(request);
+            if (result != null)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
+
         [HttpGet]
         [Route("{id}")]
         public async Task<IActionResult> GetUser(Guid id)

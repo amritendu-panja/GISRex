@@ -5,16 +5,16 @@
 }
 @model ProfileModel
 
-<div class="row d-flex justify-content-center align-items-center h-100">
-    <div class="col-xl-4">
+<div class="row d-flex justify-content-center h-100">
+    <div class="col-xl-4 align-top">
         <div class="card mb-4 mb-xl-0">
             <div class="card-header">
                 <h4>Profile Picture</h4>
             </div>
             <div class="card-body text-center">
-                <img class="img-account-profile rounded-circle mb-2" alt="">
-                <div class="small font-italic text-muted mb-4">JPG or PNG no larger than 5 MB</div>
-                <button class="btn btn-primary">Upload new image</button>
+                <img class="img-account-profile rounded-circle mb-2" alt="" src="~/images/userprofiles/@Model.ImagePath">
+                <div class="small font-italic text-muted mb-3">JPG or PNG no larger than 5 MB</div>
+                <button class="btn btn-primary mb-2">Upload new image</button>
             </div>
         </div>
     </div>
@@ -29,22 +29,165 @@
                     @await Html.PartialAsync("Partial/_ValidationSummary")
 
                     @Html.AntiForgeryToken()
-                    <div class="mb-3">
-                        @Html.LabelFor(m=>m.UserName, new { @class = "form-control-label" })
-                        @Html.TextBoxFor(m=>m.UserName, new { @class="form-control" })
+                    @Html.HiddenFor(m=> m.UserId)
+                    @Html.HiddenFor(m=> m.UserName)
+                    @Html.HiddenFor(m=> m.Email)
+                    <div class="row mb-3">
+                        <div class="col">
+                            @Html.LabelFor(m=>m.FirstName, new { @class = "form-label" })
+                            @Html.TextBoxFor(m=>m.FirstName, new { @class="form-control", @placeholder = "Firstname" })
+                        </div>
+                        <div class="col">
+                            @Html.LabelFor(m=>m.LastName, new { @class = "form-label" })
+                            @Html.TextBoxFor(m=>m.LastName, new { @class="form-control", @placeholder = "Lastname" })
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        @Html.LabelFor(m=>m.Email, new { @class = "form-control-label" })
-                        @Html.TextBoxFor(m=>m.Email, new { @class="form-control" })
+                    <div class="col-12 mb-3">
+                        @Html.LabelFor(m=>m.AddressLine1, new { @class = "form-label" })
+                        @Html.TextBoxFor(m=>m.AddressLine1, new { @class="form-control", @placeholder = "1234 Main St" })                        
                     </div>
-                    <div class="d-flex">
+                    <div class="col-12 mb-3">
+                        @Html.LabelFor(m=>m.AddressLine2, new { @class = "form-label" })
+                        @Html.TextBoxFor(m=>m.AddressLine2, new { @class="form-control", @placeholder = "Apartment, studio, or floor" })                        
+                    </div>
+                    <div class="col-12 mb-3">
+                        @Html.LabelFor(m=>m.AlternateEmail, new { @class = "form-label" })
+                        @Html.TextBoxFor(m=>m.AlternateEmail, new { @class="form-control", @placeholder = "alternate@email.com" })
+                    </div>
+                    <div class="col-12 mb-3">
+                        @Html.LabelFor(m=>m.CountryCode, new { @class = "form-label" })
+                        @Html.DropDownListFor(m=>m.CountryCode, 
+                            new List<SelectListItem>{ new SelectListItem(){ Text = "Select...", Disabled = true} },
+                            new { @class="form-select", @onchange = "getCountryDetails()" })
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            @Html.LabelFor(m=>m.Mobile, new { @class = "form-label" })
+                            <div class="input-group">
+                                <span class="input-group-text calling-code"></span>
+                                @Html.TextBoxFor(m=>m.Mobile, new { @class="form-control", @placeholder = "Mobile" })
+                            </div>
+                        </div>
+                        <div class="col">
+                            @Html.LabelFor(m=>m.AlternateMobile, new { @class = "form-label" })
+                            <div class="input-group">
+                                <span class="input-group-text calling-code"></span>
+                                @Html.TextBoxFor(m=>m.AlternateMobile, new { @class="form-control", @placeholder = "Alternate mobile" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3">
+                            @Html.LabelFor(m=>m.City, new { @class = "form-label" })
+                            @Html.TextBoxFor(m=>m.City, new { @class="form-control", @placeholder = "City" })                        
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            @Html.LabelFor(m=>m.StateCode, new { @class = "form-label" })
+                            @Html.DropDownListFor(m=>m.StateCode,
+                                new List<SelectListItem>{ new SelectListItem(){ Text = "Select...", Disabled = true} },
+                                new { @class="form-select" })                        
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            @Html.LabelFor(m=>m.PostCode, new { @class = "form-label" })
+                            @Html.TextBoxFor(m=>m.PostCode, new { @class="form-control", @placeholder = "Postal code" })                        
+                        </div>
+                    </div>
+                    <div class="d-grid mb-3">
                         <input type="submit" class="btn btn-primary" value="Save Changes" />
-                        @Html.ActionLink("Change Password", "changepassword", "home", null, new { @class="btn btn-success ms-auto" })
                     </div>
                 }
             </div>
         </div>
     </div>
 </div>
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+            getCountryList();
+        })
 
+        function getCountryList(){
+            var url = "/countries";
+            $.ajax({
+                type: 'GET',
+                url: url,
+                accept: 'application/json',
+                success: function (response) {
+                    if (response.success) {
+                        var countryListId = '#@Html.IdFor(m => m.CountryCode)';
+                        response.countries.forEach(function(c, index) {
+                            $(countryListId).append('<option value="' + c.countryCode + '">' + c.countryName + '</option>');
+                        });
+                        var selectedCountry = '@Model.CountryCode';
+                        if (selectedCountry.length > 0) {
+                            $(countryListId).val(selectedCountry);
+                            getCountryDetails();
+                        }
+                    }
+                },
+                error: function (xhrError) {
+                    console.log(xhrError);
+                    alert("Something went wrong! Please contact support")
+                }
+            });
+        }
+
+        function getCountryDetails() {
+            var countryCode = $("#@Html.IdFor(m=>m.CountryCode)").val();
+            if (countryCode) {
+                getStates(countryCode);
+                getCountryCallingCode(countryCode);
+            }
+        }
+
+        function getStates(countryCode) {
+            var url = "/states/" + countryCode
+            $.ajax({
+                type: 'GET',
+                url: url,
+                accept: 'application/json',
+                success: function (response) {
+                    if (response.success) {
+                        var stateListId = '#@Html.IdFor(m => m.StateCode)';
+                        $(stateListId).empty();
+                        $(stateListId).append('<option disabled="disabled">Select...</option>');
+                        response.states.forEach(function (s, index) {
+                            $(stateListId).append('<option value="' + s.stateUniqueId + '">' + s.stateName + '</option>');
+                        });
+                        var selectedState = '@Model.StateCode';
+                        if (selectedState.length > 0) {
+                            $(stateListId).val(selectedState);
+                        }
+                    }
+                },
+                error: function (xhrError) {
+                    console.log(xhrError);
+                    alert("Something went wrong! Please contact support")
+                }
+            });
+        }
+
+        function getCountryCallingCode(countryCode) {
+            var token = $('input[name="__RequestVerificationToken"]').val();
+
+            var url = "/getCallingCode/" + countryCode;
+            $.ajax({
+                type: 'GET',
+                url: url,
+                headers: {
+                    "RequestVerificationToken": token
+                },
+                accept: 'application/json',
+                success: function (response) {
+                    var callingCode = "+" + response.callingCode;
+                    $(".calling-code").text(callingCode);
+                },
+                error: function (xhrError) {
+                    console.log(xhrError);
+                    alert("Something went wrong! Please contact support")
+                }
+            });         
+        }
+    </script>
+}
 

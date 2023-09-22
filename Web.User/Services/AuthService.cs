@@ -2,6 +2,7 @@
 using Common.Settings;
 using Microsoft.Extensions.Options;
 using Web.User.Clients;
+using Web.User.Models;
 
 namespace Web.User.Services
 {
@@ -62,6 +63,28 @@ namespace Web.User.Services
         {
             var userGuid = Guid.Parse(userId);
             return await _client.Profile(userGuid, _appSettings.Security.ApiKey, accessToken, cancellationToken);
+        }
+
+        public async Task<ApplicationUserResponseDto> UpdateProfileAsync(ProfileModel model, string accessToken, CancellationToken cancellationToken)
+        {
+            UpdateProfileCommand command = new UpdateProfileCommand
+            {
+                 UserId = model.UserId,
+                 UserName = model.UserName,
+                 ImagePath = model.ImagePath,
+                 FirstName = model.FirstName,
+                 LastName = model.LastName,
+                 AddressLine1 = model.AddressLine1,
+                 AddressLine2 = model.AddressLine2,
+                 City = model.City,
+                 StateCode = model.StateCode,
+                 PostCode = model.PostCode,
+                 CountryCode = model.CountryCode,
+                 Mobile = model.Mobile,
+                 AlternateEmail = model.AlternateEmail,
+                 AlternateMobile = model.AlternateMobile
+            };
+            return await _client.UpdateProfile(command, _appSettings.Security.ApiKey, accessToken, cancellationToken);
         }
 
         public async Task<LogoutResponseDto> ChangePasswordAsync(string userId, string oldPassword, string newPassword, string accessToken, CancellationToken cancellationToken)

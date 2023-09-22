@@ -3,20 +3,20 @@
     public class ApplicationUserDetails
     {
         public int UserId { get; private set; }
-        public string ImagePath { get; private set; }
-        public string FirstName { get; private set; }
-        public string LastName { get; private set; }
-        public string AddressLine1 { get; private set; }
-        public string AddressLine2 { get; private set; }
-        public string City { get; private set; }
-        public string StateCode { get; private set; }
-        public string PostCode { get; private set; }
-        public string Mobile { get; private set; }
-        public string AlternateEmail { get; private set; }
-        public string CountryCode { get; private set; }
-        public string AlternateMobile { get; private set; }
-        public DateTime CreateDate { get; private set; }
-        public DateTime ModifiedDate { get; private set; }
+        public string? ImagePath { get; private set; }
+        public string? FirstName { get; private set; }
+        public string? LastName { get; private set; }
+        public string? AddressLine1 { get; private set; }
+        public string? AddressLine2 { get; private set; }
+        public string? City { get; private set; }
+        public string? StateCode { get; private set; }
+        public string? PostCode { get; private set; }
+        public string? Mobile { get; private set; }
+        public string? AlternateEmail { get; private set; }
+        public string? CountryCode { get; private set; }
+        public string? AlternateMobile { get; private set; }
+        public DateTime? CreateDate { get; private set; }
+        public DateTime? ModifiedDate { get; private set; }
 
         public ApplicationUser User { get; set; }
 

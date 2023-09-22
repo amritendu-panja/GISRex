@@ -20,6 +20,9 @@ namespace Web.User.Clients
         [Get("/api/users/{userId}")]
         Task<ApplicationUserResponseDto> Profile(Guid userId, [Header("XApiKey")] string apiKey, [Authorize("Bearer")] string accessToken, CancellationToken cancellationToken);
 
+        [Post("/api/users/profile/update")]
+        Task<ApplicationUserResponseDto> UpdateProfile(UpdateProfileCommand command, [Header("XApiKey")] string apiKey, [Authorize("Bearer")] string accessToken, CancellationToken cancellationToken);
+
         [Post("/api/auth/changepassword")]
         Task<LogoutResponseDto> ChangePassword([Body] ChangeUserPasswordCommand command, [Header("XApiKey")] string apiKey, [Authorize("Bearer")] string accessToken, CancellationToken cancellationToken);
 
