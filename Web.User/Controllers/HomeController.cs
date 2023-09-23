@@ -19,7 +19,10 @@ namespace Web.User.Controllers
         private readonly CacheHelper _cacheHelper;
         private readonly CacheKeyGenrator _cachekeyGen;
         private readonly LookupsService _lookupsService;
+        private readonly FileHelper _fileHelper;
+        private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly Mapper _mapper;
+        private readonly string _profileImageFolder;
 
         public HomeController(ILogger<HomeController> logger,
             AuthService authService,
@@ -27,6 +30,8 @@ namespace Web.User.Controllers
             CacheHelper cacheHelper,
             CacheKeyGenrator cachekeyGen,
             LookupsService lookupsService,
+            FileHelper fileHelper,
+            IWebHostEnvironment webHostEnvironment,
             Mapper mapper)
         {
             _logger = logger;
@@ -35,7 +40,10 @@ namespace Web.User.Controllers
             _cacheHelper = cacheHelper;
             _cachekeyGen = cachekeyGen;
             _lookupsService = lookupsService;
+            _fileHelper = fileHelper;
+            _webHostEnvironment = webHostEnvironment;
             _mapper = mapper;
+            _profileImageFolder = Path.Combine(_webHostEnvironment.ContentRootPath, "wwwroot", "images", "userprofiles");
         }
 
         public IActionResult Index()
@@ -131,7 +139,11 @@ namespace Web.User.Controllers
             var loginData = loginDetails.Item2;
             var userDto = await _authService.ProfileAsync(userid, loginData.AccessToken, cancellationToken);
             ProfileModel profileModel = new ProfileModel();
-            _mapper.Map(userDto, profileModel);            
+            _mapper.Map(userDto, profileModel);
+            if(!string.IsNullOrEmpty(profileModel.ImagePath) && !_fileHelper.IsProfileImageExists(profileModel.ImagePath, _profileImageFolder))
+            {
+                profileModel.ImagePath = Constants.DefaultProfileImage;
+            }
             return View(profileModel);
         }
 
@@ -143,6 +155,10 @@ namespace Web.User.Controllers
             if(ModelState.IsValid)
             {
                 string userid = User.FindFirst(Constants.JwtIdKey).Value;
+                if(!string.IsNullOrEmpty(profileModel.ImageData) && !string.IsNullOrEmpty(profileModel.ImageFilename))
+                {
+                    profileModel.ImagePath = _fileHelper.UploadImage(profileModel.ImageData, profileModel.ImageFilename, userid, _profileImageFolder);
+                }
                 var loginDetails = GetLoginDetails();
                 var loginData = loginDetails.Item2;
                 var userDto = await _authService.UpdateProfileAsync(profileModel, loginData.AccessToken, cancellationToken);

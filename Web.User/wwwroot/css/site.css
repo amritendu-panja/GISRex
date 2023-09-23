@@ -38,7 +38,31 @@ body {
         list-style: none;
     }
 
-.img-account-profile {
+.img-account-profile, #image-preview {
     width: 150px;
     height: 150px;
 }
+
+.file-drop-area{
+    height: 200px;
+}
+
+.file-drop-area, image-preview-area {
+    border: 1px dashed var(--bs-body-color);
+}
+
+.drop-area-container {
+    margin-top: 13%;
+}
+
+.file-input {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    cursor: pointer;
+    opacity: 0;
+    width: 100%;
+    padding: 1rem;
+}
+

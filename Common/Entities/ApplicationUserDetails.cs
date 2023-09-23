@@ -58,6 +58,35 @@
             ModifiedDate = DateTime.UtcNow;
         }
 
-
+        public void Update(
+            string imagePath,
+            string firstName,
+            string lastName,
+            string addressLine1,
+            string addressLine2,
+            string city,
+            string stateCode,
+            string postCode,
+            string mobile,
+            string alternateEmail,
+            string countryCode,
+            string alternateMobile
+            )
+        {
+            ImagePath = imagePath;
+            FirstName = firstName;
+            LastName = lastName;
+            AddressLine1 = addressLine1;
+            AddressLine2 = addressLine2;
+            City = city;
+            StateCode = stateCode;
+            PostCode = postCode;
+            Mobile = mobile;
+            AlternateEmail = alternateEmail;
+            CountryCode = countryCode;
+            AlternateMobile = alternateMobile;
+            CreateDate = DateTime.UtcNow;
+            ModifiedDate = DateTime.UtcNow;
+        }
     }
 }

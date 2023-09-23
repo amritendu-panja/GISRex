@@ -34,6 +34,7 @@ namespace Web.User.Extensions
             services.AddTransient<AuthService>();
             services.AddTransient<Mapper>();
             services.AddTransient<LookupsService>();
+            services.AddTransient<FileHelper>();
             return services;
         }
 
