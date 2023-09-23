@@ -1,4 +1,4 @@
-# WebGIS - Web-Based Geographical Tool with Vector and Raster Layers
+# GISRex - Web-Based Geographical Tool with Vector and Raster Layers
 
 The Web-Based Geographical Tool is a powerful application that allows users to visualize and analyze geographical data through vector and raster layers. This tool supports various map visualizations, including heatmaps and choropleth maps, providing valuable insights into spatial data. The application is built using a .NET Core backend, PostgreSQL database, and an Angular frontend.
 
