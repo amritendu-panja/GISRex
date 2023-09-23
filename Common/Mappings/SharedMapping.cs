@@ -106,29 +106,47 @@ namespace Common.Mappings
             }
         }
 
-        public ApplicationUserDetails Map(UpdateProfileCommand command)
+        public void Map(UpdateProfileCommand command, ApplicationUserDetails userDetails)
         {
-            if(command != null)
+            if (command != null)
             {
-                ApplicationUserDetails userDetails = new ApplicationUserDetails
-                    (
-                     command.UserId,
-                     command.ImagePath,
-                     command.FirstName,
-                     command.LastName,
-                     command.AddressLine1,
-                     command.AddressLine2,
-                     command.City,
-                     command.StateCode,
-                     command.PostCode,
-                     command.Mobile,
-                     command.AlternateEmail,
-                     command.CountryCode,
-                     command.AlternateMobile
-                     );
-                return userDetails;
+                if (userDetails == null)
+                {
+                    userDetails = new ApplicationUserDetails
+                        (
+                         command.UserId,
+                         command.ImagePath,
+                         command.FirstName,
+                         command.LastName,
+                         command.AddressLine1,
+                         command.AddressLine2,
+                         command.City,
+                         command.StateCode,
+                         command.PostCode,
+                         command.Mobile,
+                         command.AlternateEmail,
+                         command.CountryCode,
+                         command.AlternateMobile
+                         );
+                }
+                else
+                {
+                    userDetails.Update(
+                         command.ImagePath,
+                         command.FirstName,
+                         command.LastName,
+                         command.AddressLine1,
+                         command.AddressLine2,
+                         command.City,
+                         command.StateCode,
+                         command.PostCode,
+                         command.Mobile,
+                         command.AlternateEmail,
+                         command.CountryCode,
+                         command.AlternateMobile
+                         );
+                }
             }
-            return null;
         }
     }
 }

@@ -14,7 +14,7 @@
             <div class="card-body text-center">
                 <img class="img-account-profile rounded-circle mb-2" alt="" src="~/images/userprofiles/@Model.ImagePath">
                 <div class="small font-italic text-muted mb-3">JPG or PNG no larger than 5 MB</div>
-                <button class="btn btn-primary mb-2">Upload new image</button>
+                <button class="btn btn-primary mb-2" onclick="showDialog()">Upload new image</button>
             </div>
         </div>
     </div>
@@ -24,7 +24,7 @@
                 <h4>Account Details</h4>                
             </div>
             <div class="card-body">
-                @using (Html.BeginForm(FormMethod.Post, new { @id = "frmProfile" }))
+                @using (Html.BeginForm(FormMethod.Post, new { @id = "frmProfile", @onchange="formChanged()" }))
                 {
                     @await Html.PartialAsync("Partial/_ValidationSummary")
 
@@ -32,6 +32,8 @@
                     @Html.HiddenFor(m=> m.UserId)
                     @Html.HiddenFor(m=> m.UserName)
                     @Html.HiddenFor(m=> m.Email)
+                    @Html.HiddenFor(m => m.ImageData)
+                    @Html.HiddenFor(m=> m.ImageFilename)
                     <div class="row mb-3">
                         <div class="col">
                             @Html.LabelFor(m=>m.FirstName, new { @class = "form-label" })
@@ -93,18 +95,55 @@
                         </div>
                     </div>
                     <div class="d-grid mb-3">
-                        <input type="submit" class="btn btn-primary" value="Save Changes" />
+                        <input type="submit" disabled class="btn btn-primary" id="submitForm" value="Save Changes" />
                     </div>
                 }
             </div>
         </div>
     </div>
 </div>
+<div class="modal fade" id="fileUploadModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Upload</h5>
+                <button type="button" class="btn-close" onclick="closeDialog()" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="file-drop-area p-4">
+                    <div class="drop-area-container">
+                        <span class="choose-file-button btn btn-primary">Choose Files</span>
+                        <span class="file-message">or drag and drop files here</span>
+                    </div>
+                    <input type="file" class="file-input" accept=".jpg,.jpeg,.png,.svg" onchange="uploadImage()" />
+                </div>
+                <div id="image-preview-area" class="p-4">
+                    <img id="image-preview" class="rounded-circle mb-2" />
+                    <div>
+                        <label>File: <label id="profile-image-file" class="me-2">image.img</label>
+                            <a href="#" onclick="resetUploadImageDialog()">Clear</a>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeDialog()">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="applyImage()">Apply</button>
+            </div>
+        </div>
+    </div>
+</div>
 @section Scripts{
     <script type="text/javascript">
+        var dialog;
         $(function () {
             getCountryList();
-        })
+            initImageUploadDialog();
+        });
+
+        function formChanged(){
+            $("#submitForm").attr("disabled", null);
+        }
 
         function getCountryList(){
             var url = "/countries";
@@ -187,6 +226,71 @@
                     alert("Something went wrong! Please contact support")
                 }
             });         
+        }
+
+        function initImageUploadDialog(){
+            dialog = new bootstrap.Modal("#fileUploadModal");
+            resetUploadImageDialog();
+        }
+
+        function showDialog(){
+            resetUploadImageDialog();
+            dialog.show();
+        }
+
+        function closeDialog(){
+            dialog.hide();
+            resetUploadImageDialog();
+        }
+
+        function applyImage() {
+            var img = $("#image-preview");
+            var imageString = img.attr("src");
+            $(".img-account-profile").attr("src", imageString);
+            $("#@Html.IdFor(m=> m.ImageData)").val(imageString);
+            var fileName = $("#profile-image-file").text();
+            $("#@Html.IdFor(m=> m.ImageFilename)").val(fileName);
+            formChanged();
+            closeDialog();
+        }
+
+        function uploadImage() {
+            var fileUpload = $(".file-input")[0];
+            if (fileUpload.files.length > 0) {
+                var imageFile = fileUpload.files[0];
+                var fileSize = Math.round(imageFile.size / 1024);
+                if (fileSize < 5120) {
+                    var fileName = imageFile.name;
+                    $("#profile-image-file").text(fileName);
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        var img = $("#image-preview");
+                        img.attr("src", e.target.result);
+                        showImagePreviewArea();
+                    }
+                    reader.readAsDataURL(imageFile);
+                }
+                else {
+                    alert("File size too big");
+                }
+            }
+        }
+
+        function resetUploadImageDialog() {
+            var fileUpload = $(".file-input");
+            fileUpload.val('');
+            $("#profile-image-file").text('image.img');
+            showImageUploadArea();
+        }
+
+        function showImagePreviewArea() {
+            $("#image-preview-area").show();
+            $(".file-drop-area").hide();
+        }
+
+        function showImageUploadArea() {
+            $("#image-preview-area").hide();
+            $(".file-drop-area").show();
         }
     </script>
 }

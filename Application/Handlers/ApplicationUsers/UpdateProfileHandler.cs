@@ -29,17 +29,19 @@ namespace Application.Handlers.ApplicationUsers
         public async Task<ApplicationUserResponseDto> Handle(UpdateProfileCommand request, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Saving profile details for {0}", request.UserName);
-            ApplicationUserDetails entity = _mapping.Map(request);
+            
             var currentRecord = _repository.Find(c => c.UserId == request.UserId).FirstOrDefault();
-            if(currentRecord == null)
+            var isNewRecord = currentRecord == null;
+            _mapping.Map(request, currentRecord);
+            if (isNewRecord)
             {
-                var result = await _repository.AddAsync(entity);
+                var result = await _repository.AddAsync(currentRecord);
             }
             else
             {
-                await _repository.UpdateAsync(entity);
+                await _repository.UpdateAsync(currentRecord);
             }
-
+            
             FindByUsernameRequest findByUsernameRequest = new FindByUsernameRequest { Username = request.UserName };
             return await _mediator.Send(findByUsernameRequest, cancellationToken);
         }
