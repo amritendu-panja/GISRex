@@ -59,7 +59,7 @@
                     <div class="col-12 mb-3">
                         @Html.LabelFor(m=>m.CountryCode, new { @class = "form-label" })
                         @Html.DropDownListFor(m=>m.CountryCode, 
-                            new List<SelectListItem>{ new SelectListItem(){ Text = "Select...", Disabled = true} },
+                            new List<SelectListItem>{ new SelectListItem(){ Text = "Select...", Disabled = true, Selected = true } },
                             new { @class="form-select", @onchange = "getCountryDetails()" })
                     </div>
                     <div class="row mb-3">

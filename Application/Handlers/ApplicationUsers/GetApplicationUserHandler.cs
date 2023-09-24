@@ -31,17 +31,15 @@ namespace Application.Handlers.ApplicationUsers
         {
             logger.LogInformation($"Getting user data for {request.UserGuid}");
             var user = repository.Find(u => u.UserGuid == request.UserGuid).FirstOrDefault();
-            if (user == null)
-            {
-                throw new BusinessLogicException($"User not found for {request.UserGuid}");
-            }
-            var details = detailsRepository.Find(u => u.UserId == user.UserId).FirstOrDefault();
-            if(details != null)
-            {
-                user.UserDetails = details;
-            }
             ApplicationUserResponseDto responseDto = new ApplicationUserResponseDto();
-            sharedMapping.Map(user, responseDto);
+            if (user != null)
+            {
+                sharedMapping.Map(user, responseDto);
+            }
+            else
+            {
+                responseDto.SetError($"User not found by UserGuid {request.UserGuid}");
+            }
             return Task.FromResult(responseDto);
         }
     }

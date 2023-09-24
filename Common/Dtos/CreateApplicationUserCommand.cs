@@ -12,5 +12,6 @@ namespace Common.Dtos
         [Required]
         [EmailAddress]
         public string Email { get; set; }
+        public int Role { get; set; }
     }
 }

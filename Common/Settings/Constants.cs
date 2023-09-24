@@ -20,4 +20,20 @@
         AccessToken = 1,
         RefreshToken = 2
     }
+
+    public enum RoleTypes
+    {
+        AppUser = 1,
+        Partner = 2,
+        PartnerUser = 3,
+        Administrator = 4
+    }
+
+    public class RoleTypeNames
+    {
+        public const string AppUser = "AppUser";
+        public const string Partner = "Partner";
+        public const string PartnerUser = "PartnerUser";
+        public const string Administrator = "Administrator";
+    }
 }

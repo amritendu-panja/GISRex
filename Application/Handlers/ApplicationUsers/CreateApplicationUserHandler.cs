@@ -39,7 +39,7 @@ namespace Application.Handlers.ApplicationUsers
             _logger.LogInformation("Started creating new user.");
             string salt = _hashHelper.GenerateSalt();
             string encryptedPassword = _hashHelper.HashPassword(request.PasswordSalt, salt);
-            ApplicationUser applicationUser = new ApplicationUser(request.UserName, salt, encryptedPassword, request.Email);
+            ApplicationUser applicationUser = new ApplicationUser(request.UserName, salt, encryptedPassword, request.Email, request.Role);
             var newUser = await _repository.AddAsync(applicationUser);
             var response = new ApplicationUserResponseDto();
             _mapping.Map(newUser, response);

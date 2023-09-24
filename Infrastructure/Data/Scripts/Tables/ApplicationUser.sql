@@ -15,6 +15,7 @@ CREATE TABLE public."ApplicationUser"
     "IsUserLocked" boolean NOT NULL,
     "Email" character varying(200) COLLATE pg_catalog."default" NOT NULL,
     "IsPasswordExpired" boolean NOT NULL,
+    "RoleId" integer NOT NULL DEFAULT 1,
     CONSTRAINT "ApplicationUser_pkey" PRIMARY KEY ("UserId")
 )
 WITH (
