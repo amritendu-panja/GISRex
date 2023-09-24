@@ -93,7 +93,7 @@ namespace Web.User.Controllers
         {
             if (ModelState.IsValid)
             {
-                var registerResponse = await _authService.RegisterAsync(model.Email, model.Username, model.Password, cancellationToken);
+                var registerResponse = await _authService.RegisterAsync(model.Email, model.Username, model.Password, (int) RoleTypes.AppUser, cancellationToken);
 
                 if (registerResponse.Success)
                 {
@@ -212,8 +212,8 @@ namespace Web.User.Controllers
             return View("ChangePassword", model);
         }
 
-        
 
+        [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme, Roles = RoleTypeNames.Administrator)]
         public IActionResult Privacy()
         {
             return View();

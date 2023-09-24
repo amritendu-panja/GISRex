@@ -22,11 +22,11 @@ namespace Infrastructure.Data.Repository
             await _context.Set<TEntity>().AddRangeAsync(entities);
             await SaveChangesAsync();
         }
-        public IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> expression)
+        public virtual IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> expression)
         {
             return _context.Set<TEntity>().Where(expression);
         }
-        public IEnumerable<TEntity> GetAll()
+        public virtual IEnumerable<TEntity> GetAll()
         {
             return _context.Set<TEntity>().ToList();
         }

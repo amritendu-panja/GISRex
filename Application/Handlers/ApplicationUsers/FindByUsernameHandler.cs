@@ -33,11 +33,6 @@ namespace Application.Handlers.ApplicationUsers
             ApplicationUserResponseDto responseDto = new ApplicationUserResponseDto();
             if (user != null)
             {
-                var details = detailsRepository.Find(u => u.UserId == user.UserId).FirstOrDefault();
-                if (details != null)
-                {
-                    user.UserDetails = details;
-                }
                 sharedMapping.Map(user, responseDto);
             }
             else

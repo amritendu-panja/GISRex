@@ -8,19 +8,21 @@
         public string PasswordSalt { get; private set; }
         public string PasswordEncrypted { get; private set; }
         public string Email { get; private set; }
-        public bool IsEnabled { get; private set; }        
-        public bool IsPasswordExpired { get; private set;}
-        public bool IsUserLocked { get; private set;}
+        public bool IsEnabled { get; private set; }
+        public bool IsPasswordExpired { get; private set; }
+        public bool IsUserLocked { get; private set; }
+        public int RoleId { get; private set; }
         public DateTime CreatedDate { get; private set; }
-        public DateTime ModifiedDate { get; private set;}
+        public DateTime ModifiedDate { get; private set; }
 
         public ICollection<ApplicationLayer> ApplicationLayers { get; set; } = new List<ApplicationLayer>();
         public ICollection<SecurityTokenLog> SecurityTokenLogs { get; set; } = new List<SecurityTokenLog>();
         public ApplicationUserDetails UserDetails { get; set; }
+        public UserRoleLookup Role {  get; set; }
 
         protected ApplicationUser() { }
 
-        public ApplicationUser(string userName, string passwordSalt, string encryptedPassword, string email)
+        public ApplicationUser(string userName, string passwordSalt, string encryptedPassword, string email, int roleId)
         {
             UserName = userName;
             UserGuid = Guid.NewGuid();
@@ -30,6 +32,7 @@
             IsEnabled = true;
             IsPasswordExpired = false;
             IsUserLocked = false;
+            RoleId = roleId;
             CreatedDate = DateTime.UtcNow;
             ModifiedDate = DateTime.UtcNow;
         }

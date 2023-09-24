@@ -27,7 +27,8 @@ namespace Infrastructure.Helpers
             {
                 new Claim(Constants.JwtIdKey, user.UserGuid.ToString()),
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Name, user.UserName)
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.Role, user.Role.Role)
             };
 
             return GenerateToken(appSettings.Security.Authentication.AccessTokenSecret, appSettings.Security.Authentication.AccessTokenTTLInMinutes, claims);
@@ -48,6 +49,7 @@ namespace Infrastructure.Helpers
                 ValidateIssuerSigningKey = true,
                 ValidateIssuer = true,
                 ValidateAudience = true,
+                RoleClaimType = ClaimTypes.Role,
                 ClockSkew = TimeSpan.Zero
             };
 
