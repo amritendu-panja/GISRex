@@ -18,7 +18,7 @@
         public DateTime? CreateDate { get; private set; }
         public DateTime? ModifiedDate { get; private set; }
 
-        public ApplicationUser User { get; set; }
+        public ApplicationUser? User { get; set; }
 
         protected ApplicationUserDetails()
         {

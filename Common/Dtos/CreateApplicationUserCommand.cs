@@ -6,12 +6,12 @@ namespace Common.Dtos
     public class CreateApplicationUserCommand: IRequest<ApplicationUserResponseDto>
     {
         [Required]
-        public string UserName { get; set; }
+        public required string UserName { get; set; }
         [Required]
-        public string PasswordSalt { get; set; }
+        public required string PasswordSalt { get; set; }
         [Required]
         [EmailAddress]
-        public string Email { get; set; }
+        public required string Email { get; set; }
         public int Role { get; set; }
     }
 }
