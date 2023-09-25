@@ -20,6 +20,7 @@ namespace Web.User.Controllers
         private readonly CacheKeyGenrator _cachekeyGen;
         private readonly LookupsService _lookupsService;
         private readonly FileHelper _fileHelper;
+        private readonly ViewHelper _viewHelper;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly Mapper _mapper;
         private readonly string _profileImageFolder;
@@ -32,6 +33,7 @@ namespace Web.User.Controllers
             LookupsService lookupsService,
             FileHelper fileHelper,
             IWebHostEnvironment webHostEnvironment,
+            ViewHelper viewHelper,
             Mapper mapper)
         {
             _logger = logger;
@@ -43,6 +45,7 @@ namespace Web.User.Controllers
             _fileHelper = fileHelper;
             _webHostEnvironment = webHostEnvironment;
             _mapper = mapper;
+            _viewHelper = viewHelper;
             _profileImageFolder = Path.Combine(_webHostEnvironment.ContentRootPath, "wwwroot", "images", "userprofiles");
         }
 
@@ -59,7 +62,7 @@ namespace Web.User.Controllers
 
         [HttpPost("login")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> PostLogin(LoginModel model, CancellationToken cancellationToken)
+        public async Task<IActionResult> Login(LoginModel model, CancellationToken cancellationToken)
         {
             if (ModelState.IsValid)
             {
@@ -71,14 +74,27 @@ namespace Web.User.Controllers
                     _cacheHelper.Set<LoginResponseDto>(key, loginResponse);
                     HttpContext.User = principal;
                     HttpContext.Session.SetString(Constants.AuthenticationCacheKey, key);
-                    return Redirect("/");
+                    var roleType = _viewHelper.GetUserRole(principal);
+                    string controllerName = string.Empty; 
+                    string actionName = "Index";
+                    switch (roleType)
+                    {
+                        case RoleTypes.AppUser:
+                            controllerName = "Home";
+                            break;
+                        case RoleTypes.Administrator:
+                            controllerName = "Admin";
+                            break;
+
+                    }
+                    return RedirectToAction(actionName, controllerName);
                 }
                 else
                 {
                     ModelState.AddModelError("", loginResponse.Message);
                 }
             }
-            return View("Login", model);
+            return View(model);
         }
 
         [HttpGet("register")]
@@ -98,7 +114,7 @@ namespace Web.User.Controllers
                 if (registerResponse.Success)
                 {
                     LoginModel loginModel = new LoginModel { Username = model.Username, Password = model.Password };
-                    return await PostLogin(loginModel, cancellationToken);
+                    return await Login(loginModel, cancellationToken);
                 }
                 else
                 {
@@ -119,7 +135,7 @@ namespace Web.User.Controllers
             await _authHelper.SignoutAsync(HttpContext);
             if (loginData != null)
             {
-                string userid = User.FindFirst(Constants.JwtIdKey).Value;
+                string userid = _viewHelper.GetUserId(User);
                 var logoutResponse = await _authService.LogoutAsync(userid, loginData.AccessToken, cancellationToken);
                 if (logoutResponse.Success)
                 {
@@ -134,7 +150,7 @@ namespace Web.User.Controllers
         [HttpGet("profile")]
         public async Task<IActionResult> Profile(CancellationToken cancellationToken)
         {
-            string userid = User.FindFirst(Constants.JwtIdKey).Value;
+            string userid = _viewHelper.GetUserId(User);
             var loginDetails = GetLoginDetails();
             var loginData = loginDetails.Item2;
             var userDto = await _authService.ProfileAsync(userid, loginData.AccessToken, cancellationToken);
@@ -154,7 +170,7 @@ namespace Web.User.Controllers
         {
             if(ModelState.IsValid)
             {
-                string userid = User.FindFirst(Constants.JwtIdKey).Value;
+                string userid = _viewHelper.GetUserId(User);
                 if(!string.IsNullOrEmpty(profileModel.ImageData) && !string.IsNullOrEmpty(profileModel.ImageFilename))
                 {
                     profileModel.ImagePath = _fileHelper.UploadImage(profileModel.ImageData, profileModel.ImageFilename, userid, _profileImageFolder);
@@ -176,7 +192,7 @@ namespace Web.User.Controllers
         {
             ChangePasswordModel model = new ChangePasswordModel
             {
-                UserId = User.FindFirst(Constants.JwtIdKey).Value
+                UserId = _viewHelper.GetUserId(User)
             };
             return View(model);
         }
@@ -185,7 +201,7 @@ namespace Web.User.Controllers
         [HttpPost("changepassword")]
         public async Task<IActionResult> PostChangePassword(ChangePasswordModel model, CancellationToken cancellationToken)
         {
-            string userid = User.FindFirst(Constants.JwtIdKey).Value;
+            string userid = _viewHelper.GetUserId(User);
             var loginDetails = GetLoginDetails();
             var key = loginDetails.Item1;
             var loginData = loginDetails.Item2;

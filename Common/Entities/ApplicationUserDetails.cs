@@ -24,6 +24,11 @@
         {
         }
 
+        public ApplicationUserDetails(int userId)
+        {
+            UserId = userId;
+        }
+
         public ApplicationUserDetails
             (
             int userId,
