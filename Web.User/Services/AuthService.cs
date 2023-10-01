@@ -30,12 +30,14 @@ namespace Web.User.Services
             return await _client.Login(request, _appSettings.Security.ApiKey, cancellationToken);
         }
 
-        public async Task<ApplicationUserResponseDto> RegisterAsync(string email, string userName, string password, int roleId, CancellationToken cancellationToken)
+        public async Task<ApplicationUserResponseDto> RegisterAsync(string email, string userName, string firstName, string lastName, string password, int roleId, CancellationToken cancellationToken)
         {
             CreateApplicationUserCommand command = new CreateApplicationUserCommand()
             {
                 Email = email,
                 UserName = userName,
+                Firstname = firstName,
+                Lastname = lastName,
                 PasswordSalt = password,
                 Role = roleId
             };

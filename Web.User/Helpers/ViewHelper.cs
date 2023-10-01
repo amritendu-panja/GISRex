@@ -1,4 +1,5 @@
-﻿using Common.Settings;
+﻿using Common.Dtos;
+using Common.Settings;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 
@@ -6,6 +7,13 @@ namespace Web.User.Helpers
 {
     public class ViewHelper
     {
+        private readonly CacheHelper _cacheHelper;
+
+        public ViewHelper(CacheHelper cacheHelper)
+        {
+            _cacheHelper = cacheHelper;
+        }
+
         public bool IsLoggedIn(ClaimsPrincipal principal)
         {
             return principal.Identity?.IsAuthenticated ?? false;
@@ -19,6 +27,20 @@ namespace Web.User.Helpers
         public string GetUsername(ClaimsPrincipal principal)
         {
             return principal.FindFirst(ClaimTypes.Name)?.Value ?? string.Empty;
+        }
+
+        public string GetFullName(ClaimsPrincipal principal, HttpContext context)
+        {
+            var userKey = context.Session.GetString(Constants.LoggedInUserCachekey);
+            if (!string.IsNullOrEmpty(userKey)) 
+            {                
+                var userDetails = _cacheHelper.Get<ApplicationUserResponseDto>(userKey);
+                if (userDetails != null && !string.IsNullOrEmpty(userDetails.FirstName) && !string.IsNullOrEmpty(userDetails.LastName))
+                {
+                    return $"{userDetails.FirstName[0]}{userDetails.LastName[0]}";
+                }
+            }
+            return GetUsername(principal);
         }
 
         public bool ShouldShowLoginRegisterLinks(HttpContext context)

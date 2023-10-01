@@ -1,0 +1,46 @@
+﻿body {
+}
+
+main {
+    
+}
+    main > aside {
+        background: #311a41;
+        color: #c9c9d0;
+    }
+
+    .branding{
+        height: 3rem;
+    }
+
+        .branding a {
+            color: #c9c9d0;
+        }
+
+.panel-menu a {
+    color: #c9c9d0;
+    text-decoration: none;
+}
+
+    .panel-menu a:hover {
+        color: #ffffff;
+        background: rgba(0, 0, 0, 0.2);
+    }    
+
+        /*.panel-menu a:hover::before {
+            content: '';
+            display: block;
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 4px;
+            background: #c9c9d0;
+            height: 100%;
+        }*/
+.link-header {
+    background: #44245b;
+    display: block;
+    padding-top: 5px;
+    padding-bottom: 8px;
+    font-weight: 500;
+}

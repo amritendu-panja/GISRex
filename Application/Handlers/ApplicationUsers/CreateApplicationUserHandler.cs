@@ -48,7 +48,7 @@ namespace Application.Handlers.ApplicationUsers
             string encryptedPassword = _hashHelper.HashPassword(request.PasswordSalt, salt);
             ApplicationUser applicationUser = new ApplicationUser(request.UserName, salt, encryptedPassword, request.Email, request.Role);
             var newUser = await _repository.AddAsync(applicationUser);
-            ApplicationUserDetails userDetails = new ApplicationUserDetails(newUser.UserId);
+            ApplicationUserDetails userDetails = new ApplicationUserDetails(newUser.UserId, request.Firstname, request.Lastname);
             userDetails = await _detailsRepository.AddAsync(userDetails);
             newUser.UserDetails = userDetails;
             var response = new ApplicationUserResponseDto();

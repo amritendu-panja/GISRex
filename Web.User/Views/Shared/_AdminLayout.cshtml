@@ -1,0 +1,111 @@
+﻿@inject Web.User.Helpers.ViewHelper viewHelper
+@{
+    bool isUserLoggedIn = viewHelper.IsLoggedIn(User);
+    var roleType = viewHelper.GetUserRole(User);
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/font-awesome/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/admin.site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Web.User.styles.css" asp-append-version="true" />
+</head>
+<body>
+    
+    <div class="vh-100">
+        <main class="d-flex h-100">
+            <aside class="navbar justify-content-start flex-column col-2 border-end align-items-start">
+                <div class="branding d-flex px-4 col-12 pt-1 border-bottom">
+                    <span>
+                        <img id="map-icon" src="~/images/map_icon.svg" class="align-top me-2" />
+                        <a class="navbar-brand" asp-area="" asp-controller="Admin" asp-action="Index">GISRex Admin Portal</a>
+                    </span>
+                </div>
+                <nav class="panel-menu d-block col-12 pt-2">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a href="dashboard" class="d-flex flex-row w-100 align-items-center ps-4 py-2">
+                                <i class="fa-solid fa-chart-line d-inline-block col-1"></i><span class="col-11">Dashboard</span>
+                            </a>
+                        </li>
+                    </ul>
+                    <span class="ps-3 link-header">Management</span>
+                    <ul class="nav flex-column pt-2">
+                        <li class="nav-item">
+                            <a asp-area="" asp-controller="Admin" asp-action="Partners" class="d-flex flex-row w-100 align-items-center ps-4 py-2">
+                                <i class="fa-solid fa-building d-inline-block col-1"></i><span class="col-11">Partners</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-area="" asp-controller="Admin" asp-action="Users" class="d-flex flex-row w-100 align-items-center ps-4 py-2">
+                                <i class="fa-solid fa-users d-inline-block col-1"></i><span class="col-11">Users</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </aside>
+            <section class="flex-column flex-nowrap col-10">
+                <header>
+                    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+                        <div class="container-fluid">
+                            <div class="collapse d-sm-inline-flex justify-content-end ms-auto">
+                                @if (isUserLoggedIn)
+                                {
+                                    <div class="dropdown input-group">
+                                        <label class="btn btn-outline-secondary">
+                                            <i class="fa-solid fa-user"></i> @viewHelper.GetFullName(User, Context)
+                                        </label>
+                                        <a class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <span class="visually-hidden">Toggle Dropdown</span>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                            <li><a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="profile"><i class="fa-solid fa-user-gear"></i> Profile</a></li>
+                                            <li><a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="changepassword"><i class="fa-solid fa-key"></i> Change Password</a></li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="logout"><i class="fa-solid fa-power-off"></i> Logout</a></li>
+                                        </ul>
+                                    </div>
+                                }
+                                else
+                                {
+                                    if (viewHelper.ShouldShowLoginRegisterLinks(Context))
+                                    {
+                                        <ul class="navbar-nav">
+                                            <li class="nav-item">
+                                                <a class="nav-link text-drak" asp-area="" asp-controller="Home" asp-action="Login"><i class="fa-solid fa-right-to-bracket"></i> Log In</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link text-drak" asp-area="" asp-controller="Home" asp-action="Register"><i class="fa-solid fa-user-plus"></i> Register</a>
+                                            </li>
+                                        </ul>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </nav>
+                </header>
+                <section>
+                    <div>
+                        <main role="main" class="pb-3">
+                            @RenderBody()
+                        </main>
+                    </div>
+                </section>
+                <footer class="border-top footer text-muted">
+                    <div class="container">
+                        &copy; 2023 - Web.User - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                    </div>
+                </footer>
+            </section>
+        </main>        
+    </div>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

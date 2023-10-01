@@ -74,6 +74,15 @@ namespace Web.User.Controllers
                     _cacheHelper.Set<LoginResponseDto>(key, loginResponse);
                     HttpContext.User = principal;
                     HttpContext.Session.SetString(Constants.AuthenticationCacheKey, key);
+
+                    var userDetails = await _authService.CheckUserExists(_viewHelper.GetUsername(principal), cancellationToken);
+                    if (userDetails.Success)
+                    {
+                        var userKey = _cachekeyGen.CreateCacheKey(principal, Constants.LoggedInUserCachekey);
+                        _cacheHelper.Set<ApplicationUserResponseDto>(userKey, userDetails);
+                        HttpContext.Session.SetString(Constants.LoggedInUserCachekey, userKey);
+                    }
+
                     var roleType = _viewHelper.GetUserRole(principal);
                     string controllerName = string.Empty; 
                     string actionName = "Index";
@@ -109,7 +118,7 @@ namespace Web.User.Controllers
         {
             if (ModelState.IsValid)
             {
-                var registerResponse = await _authService.RegisterAsync(model.Email, model.Username, model.Password, (int) RoleTypes.AppUser, cancellationToken);
+                var registerResponse = await _authService.RegisterAsync(model.Email, model.Username, model.FirstName, model.LastName, model.Password, (int) RoleTypes.AppUser, cancellationToken);
 
                 if (registerResponse.Success)
                 {

@@ -20,14 +20,24 @@
 
                     @Html.AntiForgeryToken()
                     @Html.HiddenFor(m=>m.IsUserExists)
+                    <div class="row mb-4">
+                        <div class="col">
+                            @Html.LabelFor(m=>m.FirstName, new { @class = "form-label" })
+                            @Html.TextBoxFor(m=>m.FirstName, new { @class="form-control", @placeholder = "Firstname" })
+                        </div>
+                        <div class="col">
+                            @Html.LabelFor(m=>m.LastName, new { @class = "form-label" })
+                            @Html.TextBoxFor(m=>m.LastName, new { @class="form-control", @placeholder = "Lastname" })
+                        </div>
+                    </div>
                     <div class="mb-4">
                         @Html.LabelFor(m=> m.Email, new { @class = "form-label" })
-                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control form-control-lg input-validation-error", @placeholder = "someone@email.com", @autocomplete = "off" })
+                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control form-control-lg", @placeholder = "someone@email.com", @autocomplete = "off" })
                     </div>
                     <div class="mb-4">
                         @Html.LabelFor(m=> m.Username, new { @class = "form-label" })
                         <div class="input-group">
-                            @Html.TextBoxFor(m => m.Username, new { @class = "form-control form-control-lg input-validation-error", @placeholder = "Username", @onchange = "checkUserExists();", @autocomplete = "off" })
+                            @Html.TextBoxFor(m => m.Username, new { @class = "form-control form-control-lg", @placeholder = "Username", @onchange = "checkUserExists();", @autocomplete = "off" })
                             <span class="input-group-text">
                                 <img src="images/failure_icon.svg" id="username-status">
                             </span>
@@ -38,12 +48,12 @@
                     </div>
                     <div class="mb-4">
                         @Html.LabelFor(m=> m.Password, new { @class = "form-label" })
-                        @Html.PasswordFor(m => m.Password, new { @class = "form-control form-control-lg input-validation-error", @placeholder = "****", @autocomplete = "off" })
+                        @Html.PasswordFor(m => m.Password, new { @class = "form-control form-control-lg", @placeholder = "****", @autocomplete = "off" })
 
                     </div>
                     <div class="mb-4">
                         @Html.LabelFor(m=> m.ConfirmPassword, new { @class = "form-label" })
-                        @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control form-control-lg input-validation-error", @placeholder = "****", @autocomplete = "off" })
+                        @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control form-control-lg", @placeholder = "****", @autocomplete = "off" })
                     </div>
                     <div class="form-check d-flex justify-content-center mb-3">
                         @Html.CheckBoxFor(m=>m.IsAcceptedTermsAndConditions, new { @class = "form-check-input me-2"})

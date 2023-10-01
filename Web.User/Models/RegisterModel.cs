@@ -15,6 +15,16 @@ namespace Web.User.Models
         [Display(Name = "Username")]
         public string Username { get; set; }
 
+        [Required(ErrorMessage = "Firstname is mandatory")]
+        [MinLength(3, ErrorMessage = "Firstname must be at least 3 characters long")]
+        [Display(Name = "Firstname")]
+        public string FirstName { get; set; }
+
+        [Required(ErrorMessage = "Lastname is mandatory")]
+        [MinLength(3, ErrorMessage = "Lastname must be at least 3 characters long")]
+        [Display(Name = "Lastname")]
+        public string LastName { get; set; }
+
         [Required(ErrorMessage = "Password is mandatory")]
         [MinLength(8, ErrorMessage = "Password must be at least 8 characters long")]
         [RegularExpression(@"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$", 

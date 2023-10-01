@@ -7,6 +7,10 @@ namespace Common.Dtos
     {
         [Required]
         public required string UserName { get; set; }
+        [Required] 
+        public required string Firstname { get; set; }
+        [Required] 
+        public required string Lastname { get; set; }
         [Required]
         public required string PasswordSalt { get; set; }
         [Required]

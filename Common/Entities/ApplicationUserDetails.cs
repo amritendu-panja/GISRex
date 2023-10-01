@@ -24,9 +24,13 @@
         {
         }
 
-        public ApplicationUserDetails(int userId)
+        public ApplicationUserDetails(int userId,
+            string firstName,
+            string lastName)
         {
             UserId = userId;
+            FirstName = firstName;
+            LastName = lastName;
         }
 
         public ApplicationUserDetails
