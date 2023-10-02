@@ -52,6 +52,7 @@ namespace Web.Extensions
             services.AddTransient<IRepository<ApplicationUserDetails>, Repository<ApplicationUserDetails>>();
             services.AddTransient<IQueryRepository<CountryLookup>, QueryRepository<CountryLookup>>();
             services.AddTransient<IQueryRepository<StateLookup>, QueryRepository<StateLookup>>();
+            services.AddTransient<IApplicationPartnerOrganizationRepository, ApplicationPartnerOrganizationRepository>();
             return services;
         }
 

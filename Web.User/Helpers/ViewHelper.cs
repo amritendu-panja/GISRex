@@ -33,11 +33,22 @@ namespace Web.User.Helpers
         {
             var userKey = context.Session.GetString(Constants.LoggedInUserCachekey);
             if (!string.IsNullOrEmpty(userKey)) 
-            {                
-                var userDetails = _cacheHelper.Get<ApplicationUserResponseDto>(userKey);
-                if (userDetails != null && !string.IsNullOrEmpty(userDetails.FirstName) && !string.IsNullOrEmpty(userDetails.LastName))
+            {
+                var userRole = GetUserRole(principal);
+                if(userRole == RoleTypes.AppUser || userRole == RoleTypes.Administrator)
                 {
-                    return $"{userDetails.FirstName[0]}{userDetails.LastName[0]}";
+                    var userDetails = _cacheHelper.Get<ApplicationUserResponseDto>(userKey);
+                    if (userDetails != null)
+                    {
+                        if (!string.IsNullOrEmpty(userDetails.FirstName) && !string.IsNullOrEmpty(userDetails.LastName))
+                        {
+                            return $"{userDetails.FirstName[0]}{userDetails.LastName[0]}";
+                        }
+                        if (!string.IsNullOrEmpty(userDetails.FirstName) && string.IsNullOrEmpty(userDetails.LastName))
+                        {
+                            return userDetails.FirstName;
+                        }
+                    }
                 }
             }
             return GetUsername(principal);

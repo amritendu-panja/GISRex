@@ -2,7 +2,6 @@
 using Common.Entities;
 using Infrastructure.Data.Repository;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 using System.Linq.Expressions;
 
 namespace Infrastructure.Data.ApplicationDbContext.Repositories

@@ -13,11 +13,31 @@ namespace Web.User.Controllers
             return View();
         }
 
+        [HttpGet("dashboard")]
+        public async Task<IActionResult> Dashboard()
+        {
+            return View();
+        }
+
+        [HttpGet("partners")]
         public async Task<IActionResult> Partners()
         {
             return View();
         }
 
+        [HttpGet("addpartner")]
+        public async Task<IActionResult> AddPartner()
+        {
+            return View();
+        }
+
+        [HttpGet("groups")]
+        public async Task<IActionResult> Groups()
+        {
+            return View();
+        }
+
+        [HttpGet("users")]
         public async Task<IActionResult> Users()
         {
             return View();

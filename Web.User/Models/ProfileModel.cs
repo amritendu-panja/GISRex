@@ -12,10 +12,10 @@ namespace Web.User.Models
         public string UserName { get; set; }
         public string Email { get; set; }
         public string? ImagePath { get; set; }
-        [Display(Name = "First name")]
-        [MinLength(3, ErrorMessage = "First name must be at least 3 characters")]
         public string? ImageData { get; set; }
         public string? ImageFilename { get; set; }
+        [Display(Name = "First name")]
+        [MinLength(3, ErrorMessage = "First name must be at least 3 characters")]
         public string? FirstName { get; set; }
         [Display(Name = "Last name")]
         [MinLength(3, ErrorMessage = "Last name must be at least 3 characters")]

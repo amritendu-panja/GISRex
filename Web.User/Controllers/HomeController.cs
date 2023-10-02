@@ -187,8 +187,20 @@ namespace Web.User.Controllers
                 var loginDetails = GetLoginDetails();
                 var loginData = loginDetails.Item2;
                 var userDto = await _authService.UpdateProfileAsync(profileModel, loginData.AccessToken, cancellationToken);
-
-                _mapper.Map(userDto, profileModel);
+                if(userDto != null && userDto.Success)
+                {
+                    _mapper.Map(userDto, profileModel);
+                    var userKey = HttpContext.Session.GetString(Constants.LoggedInUserCachekey);
+                    if (!string.IsNullOrEmpty(userKey))
+                    {
+                        _cacheHelper.Set<ApplicationUserResponseDto>(userKey, userDto);
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError("", userDto?.Message ?? "Server error occured, please contact support");
+                }
+                
             }
            
             return View(profileModel);

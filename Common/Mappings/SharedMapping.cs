@@ -39,6 +39,35 @@ namespace Common.Mappings
             }
         }
 
+        /// <summary>
+        /// Maps ApplicationUser to ApplicationPartnerResponseDto
+        /// </summary>
+        /// <param name="user">Map From</param>
+        /// <param name="response">Mapped To</param>
+        public void Map(ApplicationUser user, ApplicationPartnerResponseDto response)
+        {
+            if (user != null && response != null)
+            {
+                response.UserId = user.UserId;
+                response.UserName = user.UserName;
+                response.UserGuid = user.UserGuid;
+                response.Email = user.Email;
+                response.IsLocked = user.IsUserLocked;
+                if (user.PartnerOrganization != null)
+                {
+                    response.OrganizationName = user.PartnerOrganization.OrganizationName;                    
+                    response.Description = user.PartnerOrganization.Description;
+                    response.LogoUrl = user.PartnerOrganization.LogoUrl;
+                    response.AddressLine1 = user.UserDetails.AddressLine1;
+                    response.AddressLine2 = user.UserDetails.AddressLine2;                    
+                    response.City = user.UserDetails.City;
+                    response.StateCode = user.UserDetails.StateCode;
+                    response.PostCode = user.UserDetails.PostCode;
+                    response.CountryCode = user.UserDetails.CountryCode;
+                }
+            }
+        }
+
         public void Map(ApplicationLayer applicationLayer, ApplicationLayerResponseDto response)
         {
             if (applicationLayer != null && response != null)
