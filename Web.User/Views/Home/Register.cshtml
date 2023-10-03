@@ -84,7 +84,7 @@
             var token = $('input[name="__RequestVerificationToken"]').val();
             var userName = $("#@Html.IdFor(m=>m.Username)").val();
             if (userName && userName.length >= 6) {
-                var url = '/checkuser/' + userName;
+                var url = '/api/data/checkuser/' + userName;
 
                 $.ajax({
                     type: 'GET',

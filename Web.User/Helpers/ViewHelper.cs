@@ -8,10 +8,12 @@ namespace Web.User.Helpers
     public class ViewHelper
     {
         private readonly CacheHelper _cacheHelper;
+        private readonly CacheKeyGenrator _cachekeyGen;
 
-        public ViewHelper(CacheHelper cacheHelper)
+        public ViewHelper(CacheHelper cacheHelper, CacheKeyGenrator cachekeyGen)
         {
             _cacheHelper = cacheHelper;
+            _cachekeyGen = cachekeyGen;
         }
 
         public bool IsLoggedIn(ClaimsPrincipal principal)
@@ -88,6 +90,18 @@ namespace Web.User.Helpers
                 }
             }
             return roleType;
+        }
+
+        public Tuple<string, LoginResponseDto> GetLoginDetails(ClaimsPrincipal principal)
+        {
+            var key = _cachekeyGen.CreateCacheKey(principal, Constants.AuthenticationCacheKey);
+            var loginData = _cacheHelper.Get<LoginResponseDto>(key);
+            return new Tuple<string, LoginResponseDto>(key, loginData);
+        }
+
+        public string GetActiveLink(string currentLinkName, string activeLinkName)
+        {
+            return currentLinkName.Equals(activeLinkName, StringComparison.CurrentCultureIgnoreCase) ? "active" : string.Empty;
         }
     }
 }

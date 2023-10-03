@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Common.Settings;
+using Web.User.Models;
 
 namespace Web.User.Controllers
 {
@@ -25,10 +26,11 @@ namespace Web.User.Controllers
             return View();
         }
 
-        [HttpGet("addpartner")]
-        public async Task<IActionResult> AddPartner()
+        [HttpGet("partner")]
+        public async Task<IActionResult> Partner([FromQuery] int? orgId=null)
         {
-            return View();
+            RegisterPartnerModel registerPartnerModel = new RegisterPartnerModel();
+            return View(registerPartnerModel);
         }
 
         [HttpGet("groups")]
