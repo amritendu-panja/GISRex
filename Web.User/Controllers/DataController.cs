@@ -28,7 +28,6 @@ namespace Web.User.Controllers
             _viewHelper = viewHelper;
         }
 
-        [ValidateAntiForgeryToken]
         [HttpGet("checkuser/{userName}")]
         public async Task<IActionResult> CheckUserExists(string userName, CancellationToken cancellationToken)
         {

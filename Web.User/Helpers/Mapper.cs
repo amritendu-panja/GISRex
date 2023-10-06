@@ -47,5 +47,26 @@ namespace Web.User.Helpers
                 }
             }
         }
+
+        public void Map(RegisterPartnerModel partnerModel, CreatePartnerCommand partnerCommand)
+        {
+            if (partnerModel == null) { return; };
+
+            if(partnerCommand == null) partnerCommand = new CreatePartnerCommand();
+
+            partnerCommand.UserName = partnerModel.UserName;
+            partnerCommand.PasswordSalt = partnerModel.Password;
+            partnerCommand.RoleId = (int) RoleTypes.Partner;
+            partnerCommand.OrganizationName = partnerModel.OrganizationName;
+            partnerCommand.Description = partnerModel.Description;
+            partnerCommand.Email = partnerModel.Email;
+            partnerCommand.Phone = partnerModel.Phone;
+            partnerCommand.CountryCode = partnerModel.CountryCode;
+            partnerCommand.AddressLine1 = partnerModel.AddressLine1;
+            partnerCommand.AddressLine2 = partnerModel.AddressLine2;
+            partnerCommand.City = partnerModel.City;
+            partnerCommand.StateCode = partnerModel.StateCode;
+            partnerCommand.PostCode = partnerModel.PostCode;
+        }
     }
 }

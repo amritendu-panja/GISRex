@@ -1,5 +1,7 @@
 ﻿using System.Net;
 using System.Text.Json;
+using System.Web;
+using Web.User.Models;
 
 namespace Web.User.Middlewares
 {
@@ -53,14 +55,15 @@ namespace Web.User.Middlewares
             }
             _logger.LogError(exception, message);
 
-            Common.Dtos.BaseResponseDto responseDto = new Common.Dtos.BaseResponseDto();
+            ApplicationErrorModel responseDto = new ApplicationErrorModel();
+            responseDto.StatusCode = (int) statusCode;
             responseDto.SetError(userMessage);
 
             var exceptionResult = JsonSerializer.Serialize(responseDto);
-            context.Response.ContentType = "application/json";
-            context.Response.StatusCode = (int)statusCode;
 
-            await context.Response.WriteAsync(exceptionResult);
+            var errorString = HttpUtility.UrlEncode(exceptionResult);
+
+            context.Response.Redirect($"/Account/Error?error={errorString}");
         }
     }
 }

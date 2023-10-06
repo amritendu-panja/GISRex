@@ -15,6 +15,9 @@ namespace Web.User.Models
         [Display(Name = "Email")]
         public string Email { get; set; }
 
+		[Display(Name = "Phone number")]
+		public string Phone { get; set; }
+
         [Required(ErrorMessage = "Password is mandatory")]
         [MinLength(8, ErrorMessage = "Password must be at least 8 characters long")]
         [RegularExpression(@"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$",
@@ -36,7 +39,7 @@ namespace Web.User.Models
         [Required]
         [Display(Name = "Organization name")]
         [MinLength(3, ErrorMessage = "Organization name must be at least 3 characters")]
-        public string? OrganizationName { get; set; }
+        public string OrganizationName { get; set; }
 
         public string? Description { get; set; }
         
@@ -47,17 +50,18 @@ namespace Web.User.Models
         public string? City { get; set; }
         [Display(Name = "State / Region")]
         public string? StateCode { get; set; }
+
         [Display(Name = "Postal code")]
         public string? PostCode { get; set; }
+
         [Required(ErrorMessage = "Country is mandatory")]
-        [Display(Name = "Country")]
+        [Display(Name = "Country of Incorporation")]
         public string? CountryCode { get; set; }
 
-        [Display(Name = "I agree to all terms and conditions")]
-        [CheckboxRequired(true, ErrorMessage = "Please accept the terms and conditions before proceeding")]
-        public bool IsAcceptedTermsAndConditions { get; set; }
+		[CheckboxRequired(false, ErrorMessage = "Username already exists")]
+		public bool IsUserExists { get; set; }
 
-        public RegisterPartnerModel()
+		public RegisterPartnerModel()
         {
             LogoPath = Constants.DefaultProfileImage;
         }

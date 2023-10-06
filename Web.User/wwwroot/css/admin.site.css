@@ -45,3 +45,7 @@ main {
     font-weight: 500;
     margin-top: 7px;
 }
+
+#frmPartner .card-header span {
+    font-weight: 600;
+}

@@ -1,284 +1,348 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@model RegisterPartnerModel
+﻿@model RegisterPartnerModel
 @{
-    ViewData["Title"] = "Partner";
-    ViewData["ActiveLink"] = "Partners";
+	ViewData["Title"] = "Partner";
+	ViewData["ActiveLink"] = "Partners";
+}
+@await Html.PartialAsync("_ValidationScriptsPartial")
+
+@using (Html.BeginForm(FormMethod.Post, new { @id = "frmPartner" }))
+{
+	@await Html.PartialAsync("Partial/_ValidationSummary")
+
+	@Html.HiddenFor(m => m.ImageData)
+	@Html.HiddenFor(m=> m.ImageFilename)
+	@Html.AntiForgeryToken()
+
+	<div class="card mb-3">
+		<div class="card-header">
+			<span>Login Information</span>
+		</div>
+		<div class="card-body d-flex adjust-content-center">
+			<div class="text-center col-5">
+				<img class="img-account-profile rounded-circle mb-2" alt="" src="~/images/userprofiles/@Model.LogoPath">
+				<div class="small font-italic text-muted mb-3">JPG or PNG no larger than 5 MB</div>
+				<button type="button" class="btn btn-primary mb-2" onclick="showDialog()">Upload new image</button>
+			</div>
+			<div class="col-7">
+				<div class="mb-3">
+					@Html.LabelFor(m=> m.UserName, new { @class = "form-label" })
+					<div class="input-group">
+						@Html.TextBoxFor(m => m.UserName, new { @class = "form-control", @placeholder = "Username", @onchange = "checkUserExists();", @autocomplete = "off" })
+						<span class="input-group-text">
+							<img src="images/failure_icon.svg" id="username-status">
+						</span>
+						<button type="button" class="btn btn-outline-secondary" onclick="checkUserExists()">
+							<img src="images/refresh_icon.svg" id="refresh-check-username">
+						</button>
+					</div>
+				</div>
+				<div class="mb-3">
+					@Html.LabelFor(m=> m.Password, new { @class = "form-label" })
+					@Html.PasswordFor(m => m.Password, new { @class = "form-control", @placeholder = "****", @autocomplete = "off" })
+
+				</div>
+				<div class="mb-3">
+					@Html.LabelFor(m=> m.ConfirmPassword, new { @class = "form-label" })
+					@Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control", @placeholder = "****", @autocomplete = "off" })
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="card mb-3">
+		<div class="card-header">
+			<span>Organization Information</span>
+		</div>
+		<div class="card-body">
+			<div class="col-12 mb-3">
+				@Html.LabelFor(m=>m.OrganizationName, new { @class = "form-label" })
+				@Html.TextBoxFor(m=>m.OrganizationName, new { @class="form-control", @placeholder = "Acme Inc." })
+			</div>
+			<div class="col-12 mb-3">
+				@Html.LabelFor(m=>m.Description, new { @class = "form-label" })
+				@Html.TextBoxFor(m=>m.Description, new { @class="form-control", @placeholder = "Organization description" })
+			</div>
+			<div class="col-12 mb-3">
+				@Html.LabelFor(m=>m.CountryCode, new { @class = "form-label" })
+				@Html.DropDownListFor(m=>m.CountryCode,
+			new List<SelectListItem>{ new SelectListItem(){ Text = "Select...", Disabled = true, Selected = true } },
+			new { @class="form-select", @onchange = "getCountryDetails()" })
+			</div>
+		</div>
+	</div>
+
+	<div class="card">
+		<div class="card-header">
+			<span>Contact Information</span>
+		</div>
+		<div class="card-body">
+			<div class="mb-3 d-flex gap-3">
+				<div class="col">
+					@Html.LabelFor(m=> m.Email, new { @class = "form-label" })
+					@Html.TextBoxFor(m => m.Email, new { @class = "form-control", @placeholder = "someone@email.com", @autocomplete = "off" })
+				</div>
+				<div class="col">
+					@Html.LabelFor(m=> m.Phone, new { @class = "form-label" })
+					<div class="input-group">
+						<span class="input-group-text calling-code"></span>
+						@Html.TextBoxFor(m => m.Phone, new { @class = "form-control", @placeholder = "Phone number", @autocomplete = "off" })
+					</div>
+				</div>
+			</div>
+			<div class="col-12 mb-3">
+				@Html.LabelFor(m=>m.AddressLine1, new { @class = "form-label" })
+				@Html.TextBoxFor(m=>m.AddressLine1, new { @class="form-control", @placeholder = "1234 Main St" })
+			</div>
+			<div class="col-12 mb-3">
+				@Html.LabelFor(m=>m.AddressLine2, new { @class = "form-label" })
+				@Html.TextBoxFor(m=>m.AddressLine2, new { @class="form-control", @placeholder = "Apartment, studio, or floor" })
+			</div>
+			
+			<div class="row mb-3">
+				<div class="col-md-6 mb-3">
+					@Html.LabelFor(m=>m.City, new { @class = "form-label" })
+					@Html.TextBoxFor(m=>m.City, new { @class="form-control", @placeholder = "City" })
+				</div>
+				<div class="col-md-4 mb-3">
+					@Html.LabelFor(m=>m.StateCode, new { @class = "form-label" })
+					@Html.DropDownListFor(m=>m.StateCode,
+				new List<SelectListItem>{ new SelectListItem(){ Text = "Select...", Disabled = true} },
+				new { @class="form-select" })
+				</div>
+				<div class="col-md-2 mb-3">
+					@Html.LabelFor(m=>m.PostCode, new { @class = "form-label" })
+					@Html.TextBoxFor(m=>m.PostCode, new { @class="form-control", @placeholder = "Postal code" })
+				</div>
+			</div>
+			<div class="d-grid">
+				<input type="submit" class="btn btn-primary text-white" value="Add Organization" />
+			</div>
+		</div>
+	</div>
 }
 
-<div class="card">
-    <div class="card-header">
-        <span class="fw-bold">Create Organization</span>
-    </div>
-    <div class="card-body">
-        @using (Html.BeginForm(FormMethod.Post))
-        {
-            @await Html.PartialAsync("Partial/_ValidationSummary")
-
-            @Html.HiddenFor(m => m.ImageData)
-            @Html.HiddenFor(m=> m.ImageFilename)
-
-            <div class="col-12 mb-3">
-                @Html.LabelFor(m=>m.OrganizationName, new { @class = "form-label" })
-                @Html.TextBoxFor(m=>m.OrganizationName, new { @class="form-control", @placeholder = "Acme Inc." })
-            </div>
-            <div class="col-12 mb-3">
-                @Html.LabelFor(m=>m.Description, new { @class = "form-label" })
-                @Html.TextBoxFor(m=>m.Description, new { @class="form-control", @placeholder = "Organization description" })
-            </div>
-            <div class="mb-4">
-                @Html.LabelFor(m=> m.Email, new { @class = "form-label" })
-                @Html.TextBoxFor(m => m.Email, new { @class = "form-control form-control-lg", @placeholder = "someone@email.com", @autocomplete = "off" })
-            </div>
-            <div class="mb-4">
-                @Html.LabelFor(m=> m.UserName, new { @class = "form-label" })
-                <div class="input-group">
-                    @Html.TextBoxFor(m => m.UserName, new { @class = "form-control form-control-lg", @placeholder = "Username", @onchange = "checkUserExists();", @autocomplete = "off" })
-                    <span class="input-group-text">
-                        <img src="images/failure_icon.svg" id="username-status">
-                    </span>
-                    <button type="button" class="btn btn-outline-secondary" onclick="checkUserExists()">
-                        <img src="images/refresh_icon.svg" id="refresh-check-username">
-                    </button>
-                </div>
-            </div>
-            <div class="mb-4">
-                @Html.LabelFor(m=> m.Password, new { @class = "form-label" })
-                @Html.PasswordFor(m => m.Password, new { @class = "form-control form-control-lg", @placeholder = "****", @autocomplete = "off" })
-
-            </div>
-            <div class="mb-4">
-                @Html.LabelFor(m=> m.ConfirmPassword, new { @class = "form-label" })
-                @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control form-control-lg", @placeholder = "****", @autocomplete = "off" })
-            </div>
-            <div class="col-12 mb-3">
-                @Html.LabelFor(m=>m.AddressLine1, new { @class = "form-label" })
-                @Html.TextBoxFor(m=>m.AddressLine1, new { @class="form-control", @placeholder = "1234 Main St" })
-            </div>
-            <div class="col-12 mb-3">
-                @Html.LabelFor(m=>m.AddressLine2, new { @class = "form-label" })
-                @Html.TextBoxFor(m=>m.AddressLine2, new { @class="form-control", @placeholder = "Apartment, studio, or floor" })
-            </div>
-            <div class="col-12 mb-3">
-                @Html.LabelFor(m=>m.CountryCode, new { @class = "form-label" })
-                @Html.DropDownListFor(m=>m.CountryCode,
-            new List<SelectListItem>{ new SelectListItem(){ Text = "Select...", Disabled = true, Selected = true } },
-            new { @class="form-select", @onchange = "getCountryDetails()" })
-            </div>
-            <div class="row mb-3">
-                <div class="col-md-6 mb-3">
-                    @Html.LabelFor(m=>m.City, new { @class = "form-label" })
-                    @Html.TextBoxFor(m=>m.City, new { @class="form-control", @placeholder = "City" })
-                </div>
-                <div class="col-md-4 mb-3">
-                    @Html.LabelFor(m=>m.StateCode, new { @class = "form-label" })
-                    @Html.DropDownListFor(m=>m.StateCode,
-                new List<SelectListItem>{ new SelectListItem(){ Text = "Select...", Disabled = true} },
-                new { @class="form-select" })
-                </div>
-                <div class="col-md-2 mb-3">
-                    @Html.LabelFor(m=>m.PostCode, new { @class = "form-label" })
-                    @Html.TextBoxFor(m=>m.PostCode, new { @class="form-control", @placeholder = "Postal code" })
-                </div>
-            </div>            
-            <div class="d-grid">
-                <input type="submit" class="btn btn-success text-white" value="Add Organization" />
-            </div>
-        }
-    </div>
-</div>
 <div class="modal fade" id="fileUploadModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="staticBackdropLabel">Upload</h5>
-                <button type="button" class="btn-close" onclick="closeDialog()" aria-label="Close"></button>
-            </div>
-            <div class="modal-body text-center">
-                <div class="file-drop-area p-4">
-                    <div class="drop-area-container">
-                        <span class="choose-file-button btn btn-primary">Choose Files</span>
-                        <span class="file-message">or drag and drop files here</span>
-                    </div>
-                    <input type="file" class="file-input" accept=".jpg,.jpeg,.png,.svg" onchange="uploadImage()" />
-                </div>
-                <div id="image-preview-area" class="p-4">
-                    <img id="image-preview" class="rounded-circle mb-2" />
-                    <div>
-                        <label>
-                            File: <label id="profile-image-file" class="me-2">image.img</label>
-                            <a href="#" onclick="resetUploadImageDialog()">Clear</a>
-                        </label>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeDialog()">Cancel</button>
-                <button type="button" class="btn btn-primary" onclick="applyImage()">Apply</button>
-            </div>
-        </div>
-    </div>
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="staticBackdropLabel">Upload</h5>
+				<button type="button" class="btn-close" onclick="closeDialog()" aria-label="Close"></button>
+			</div>
+			<div class="modal-body text-center">
+				<div class="file-drop-area p-4">
+					<div class="drop-area-container">
+						<span class="choose-file-button btn btn-primary">Choose Files</span>
+						<span class="file-message">or drag and drop files here</span>
+					</div>
+					<input type="file" class="file-input" accept=".jpg,.jpeg,.png,.svg" onchange="uploadImage()" />
+				</div>
+				<div id="image-preview-area" class="p-4">
+					<img id="image-preview" class="rounded-circle mb-2" />
+					<div>
+						<label>
+							File: <label id="profile-image-file" class="me-2">image.img</label>
+							<a href="#" onclick="resetUploadImageDialog()">Clear</a>
+						</label>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" onclick="closeDialog()">Cancel</button>
+				<button type="button" class="btn btn-primary" onclick="applyImage()">Apply</button>
+			</div>
+		</div>
+	</div>
 </div>
 @section Scripts{
-    <script type="text/javascript">
-        var dialog;
-        $(function () {
-            getCountryList();
-            initImageUploadDialog();
-        });
+	<script type="text/javascript">
+		var dialog;
+		$(function () {
+			checkUserExists();
+			getCountryList();
+			initImageUploadDialog();
+		});
 
-        function formChanged() {
-            $("#submitForm").attr("disabled", null);
-        }
+		function checkUserExists() {
+			var token = $('input[name="__RequestVerificationToken"]').val();
+			var userName = $("#@Html.IdFor(m=>m.UserName)").val();
+			if (userName && userName.length >= 6) {
+				var url = '/api/data/checkuser/' + userName;
 
-        function getCountryList() {
-            var url = "/api/data/countries";
-            $.ajax({
-                type: 'GET',
-                url: url,
-                accept: 'application/json',
-                success: function (response) {
-                    if (response.success) {
-                        var countryListId = '#@Html.IdFor(m => m.CountryCode)';
-                        response.countries.forEach(function (c, index) {
-                            $(countryListId).append('<option value="' + c.countryCode + '">' + c.countryName + '</option>');
-                        });
-                        var selectedCountry = '@Model.CountryCode??string.Empty';
-                        if (selectedCountry.length > 0) {
-                            $(countryListId).val(selectedCountry);
-                            getCountryDetails();
-                        }
-                    }
-                },
-                error: function (xhrError) {
-                    console.log(xhrError);
-                    alert("Something went wrong! Please contact support")
-                }
-            });
-        }
+				$.ajax({
+					type: 'GET',
+					url: url,
+					headers: {
+						"RequestVerificationToken": token
+					},
+					accept: 'application/json',
+					success: function (response) {
+						$("#@Html.IdFor(m=>m.IsUserExists)").val(response.success);
+						if (response.success) {
+							$("#username-status").attr("src", "images/failure_icon.svg");
+						}
+						else {
+							$("#username-status").attr("src", "images/tick_icon.svg")
+						}
+					},
+					error: function (xhrError) {
+						console.log(xhrError);
+						alert("Something went wrong! Please contact support")
+					}
+				});
+			}
+		}
 
-        function getCountryDetails() {
-            var countryCode = $("#@Html.IdFor(m=>m.CountryCode)").val();
-            if (countryCode) {
-                getStates(countryCode);
-                getCountryCallingCode(countryCode);
-            }
-        }
+		function formChanged() {
+			$("#submitForm").attr("disabled", null);
+		}
 
-        function getStates(countryCode) {
-            var url = "/api/data/states/" + countryCode
-            $.ajax({
-                type: 'GET',
-                url: url,
-                accept: 'application/json',
-                success: function (response) {
-                    if (response.success) {
-                        var stateListId = '#@Html.IdFor(m => m.StateCode)';
-                        $(stateListId).empty();
-                        $(stateListId).append('<option disabled="disabled">Select...</option>');
-                        response.states.forEach(function (s, index) {
-                            $(stateListId).append('<option value="' + s.stateUniqueId + '">' + s.stateName + '</option>');
-                        });
-                        var selectedState = '@Model.StateCode';
-                        if (selectedState.length > 0) {
-                            $(stateListId).val(selectedState);
-                        }
-                    }
-                },
-                error: function (xhrError) {
-                    console.log(xhrError);
-                    alert("Something went wrong! Please contact support")
-                }
-            });
-        }
+		function getCountryList() {
+			var url = "/api/data/countries";
+			$.ajax({
+				type: 'GET',
+				url: url,
+				accept: 'application/json',
+				success: function (response) {
+					if (response.success) {
+						var countryListId = '#@Html.IdFor(m => m.CountryCode)';
+						response.countries.forEach(function (c, index) {
+							$(countryListId).append('<option value="' + c.countryCode + '">' + c.countryName + '</option>');
+						});
+						var selectedCountry = '@Model.CountryCode??string.Empty';
+						if (selectedCountry.length > 0) {
+							$(countryListId).val(selectedCountry);
+							getCountryDetails();
+						}
+					}
+				},
+				error: function (xhrError) {
+					console.log(xhrError);
+					alert("Something went wrong! Please contact support")
+				}
+			});
+		}
 
-        function getCountryCallingCode(countryCode) {
-            var token = $('input[name="__RequestVerificationToken"]').val();
+		function getCountryDetails() {
+			var countryCode = $("#@Html.IdFor(m=>m.CountryCode)").val();
+			if (countryCode) {
+				getStates(countryCode);
+				getCountryCallingCode(countryCode);
+			}
+		}
 
-            var url = "/api/data/getCallingCode/" + countryCode;
-            $.ajax({
-                type: 'GET',
-                url: url,
-                headers: {
-                    "RequestVerificationToken": token
-                },
-                accept: 'application/json',
-                success: function (response) {
-                    var callingCode = "+" + response.callingCode;
-                    $(".calling-code").text(callingCode);
-                },
-                error: function (xhrError) {
-                    console.log(xhrError);
-                    alert("Something went wrong! Please contact support")
-                }
-            });
-        }
+		function getStates(countryCode) {
+			var url = "/api/data/states/" + countryCode
+			$.ajax({
+				type: 'GET',
+				url: url,
+				accept: 'application/json',
+				success: function (response) {
+					if (response.success) {
+						var stateListId = '#@Html.IdFor(m => m.StateCode)';
+						$(stateListId).empty();
+						$(stateListId).append('<option disabled="disabled">Select...</option>');
+						response.states.forEach(function (s, index) {
+							$(stateListId).append('<option value="' + s.stateUniqueId + '">' + s.stateName + '</option>');
+						});
+						var selectedState = '@Model.StateCode';
+						if (selectedState.length > 0) {
+							$(stateListId).val(selectedState);
+						}
+					}
+				},
+				error: function (xhrError) {
+					console.log(xhrError);
+					alert("Something went wrong! Please contact support")
+				}
+			});
+		}
 
-        function initImageUploadDialog() {
-            dialog = new bootstrap.Modal("#fileUploadModal");
-            resetUploadImageDialog();
-        }
+		function getCountryCallingCode(countryCode) {
+			var token = $('input[name="__RequestVerificationToken"]').val();
 
-        function showDialog() {
-            resetUploadImageDialog();
-            dialog.show();
-        }
+			var url = "/api/data/getCallingCode/" + countryCode;
+			$.ajax({
+				type: 'GET',
+				url: url,
+				headers: {
+					"RequestVerificationToken": token
+				},
+				accept: 'application/json',
+				success: function (response) {
+					var callingCode = "+" + response.callingCode;
+					$(".calling-code").text(callingCode);
+				},
+				error: function (xhrError) {
+					console.log(xhrError);
+					alert("Something went wrong! Please contact support")
+				}
+			});
+		}
 
-        function closeDialog() {
-            dialog.hide();
-            resetUploadImageDialog();
-        }
+		function initImageUploadDialog() {
+			dialog = new bootstrap.Modal("#fileUploadModal");
+			resetUploadImageDialog();
+		}
 
-        function applyImage() {
-            var img = $("#image-preview");
-            var imageString = img.attr("src");
-            $(".img-account-profile").attr("src", imageString);
-            $("#@Html.IdFor(m=> m.ImageData)").val(imageString);
-            var fileName = $("#profile-image-file").text();
-            $("#@Html.IdFor(m=> m.ImageFilename)").val(fileName);
-            formChanged();
-            closeDialog();
-        }
+		function showDialog() {
+			resetUploadImageDialog();
+			dialog.show();
+		}
 
-        function uploadImage() {
-            var fileUpload = $(".file-input")[0];
-            if (fileUpload.files.length > 0) {
-                var imageFile = fileUpload.files[0];
-                var fileSize = Math.round(imageFile.size / 1024);
-                if (fileSize < 5120) {
-                    var fileName = imageFile.name;
-                    $("#profile-image-file").text(fileName);
-                    var reader = new FileReader();
-                    reader.onload = function (e) {
-                        var img = $("#image-preview");
-                        img.attr("src", e.target.result);
-                        showImagePreviewArea();
-                    }
-                    reader.readAsDataURL(imageFile);
-                }
-                else {
-                    alert("File size too big");
-                }
-            }
-        }
+		function closeDialog() {
+			dialog.hide();
+			resetUploadImageDialog();
+		}
 
-        function resetUploadImageDialog() {
-            var fileUpload = $(".file-input");
-            fileUpload.val('');
-            $("#profile-image-file").text('image.img');
-            showImageUploadArea();
-        }
+		function applyImage() {
+			var img = $("#image-preview");
+			var imageString = img.attr("src");
+			$(".img-account-profile").attr("src", imageString);
+			$("#@Html.IdFor(m=> m.ImageData)").val(imageString);
+			var fileName = $("#profile-image-file").text();
+			$("#@Html.IdFor(m=> m.ImageFilename)").val(fileName);
+			formChanged();
+			closeDialog();
+		}
 
-        function showImagePreviewArea() {
-            $("#image-preview-area").show();
-            $(".file-drop-area").hide();
-        }
+		function uploadImage() {
+			var fileUpload = $(".file-input")[0];
+			if (fileUpload.files.length > 0) {
+				var imageFile = fileUpload.files[0];
+				var fileSize = Math.round(imageFile.size / 1024);
+				if (fileSize < 5120) {
+					var fileName = imageFile.name;
+					$("#profile-image-file").text(fileName);
+					var reader = new FileReader();
+					reader.onload = function (e) {
+						var img = $("#image-preview");
+						img.attr("src", e.target.result);
+						showImagePreviewArea();
+					}
+					reader.readAsDataURL(imageFile);
+				}
+				else {
+					alert("File size too big");
+				}
+			}
+		}
 
-        function showImageUploadArea() {
-            $("#image-preview-area").hide();
-            $(".file-drop-area").show();
-        }
-    </script>
+		function resetUploadImageDialog() {
+			var fileUpload = $(".file-input");
+			fileUpload.val('');
+			$("#profile-image-file").text('image.img');
+			showImageUploadArea();
+		}
+
+		function showImagePreviewArea() {
+			$("#image-preview-area").show();
+			$(".file-drop-area").hide();
+		}
+
+		function showImageUploadArea() {
+			$("#image-preview-area").hide();
+			$(".file-drop-area").show();
+		}
+	</script>
 }
 
