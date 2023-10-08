@@ -1,6 +1,7 @@
 ﻿using Application.Repository;
 using Common.Dtos;
 using Common.Entities;
+using Common.Exceptions;
 using Common.Mappings;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -29,21 +30,28 @@ namespace Application.Handlers.ApplicationUsers
         public async Task<ApplicationUserResponseDto> Handle(UpdateProfileCommand request, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Saving profile details for {0}", request.UserName);
-            
-            var currentRecord = _repository.Find(c => c.UserId == request.UserId).FirstOrDefault();
-            var isNewRecord = currentRecord == null;
-            _mapping.Map(request, currentRecord);
-            if (isNewRecord)
+            try
             {
-                var result = await _repository.AddAsync(currentRecord);
+                var currentRecord = _repository.Find(c => c.UserId == request.UserId).FirstOrDefault();
+                var isNewRecord = currentRecord == null;
+                _mapping.Map(request, currentRecord);
+                if (isNewRecord)
+                {
+                    var result = await _repository.AddAsync(currentRecord);
+                }
+                else
+                {
+                    await _repository.UpdateAsync(currentRecord);
+                }
+
+                FindByUsernameRequest findByUsernameRequest = new FindByUsernameRequest { Username = request.UserName };
+                return await _mediator.Send(findByUsernameRequest, cancellationToken);
             }
-            else
+            catch (Exception ex)
             {
-                await _repository.UpdateAsync(currentRecord);
+                _logger.LogError(ex, "Error occured while saving profile for {0}", request.UserName);                
+                throw new DbException(ex.Message);
             }
-            
-            FindByUsernameRequest findByUsernameRequest = new FindByUsernameRequest { Username = request.UserName };
-            return await _mediator.Send(findByUsernameRequest, cancellationToken);
         }
     }
 }

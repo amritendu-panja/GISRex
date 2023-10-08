@@ -14,5 +14,8 @@ namespace Application.Repository
         Task UpdateRangeAsync(IEnumerable<T> entities);
         Task Remove(T entity);
         Task RemoveRange(IEnumerable<T> entities);
+        Task BeginTranscationAsync();
+        Task CommitTransactionAsync();
+        Task RollBackAsync();
     }
 }

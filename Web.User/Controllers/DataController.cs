@@ -14,18 +14,33 @@ namespace Web.User.Controllers
     public class DataController : ControllerBase
     {
         private readonly ILogger<DataController> _logger;
-        private readonly AuthService _authService;        
-        private readonly CacheHelper _cacheHelper;        
+        private readonly AuthService _authService;
+        private readonly CacheHelper _cacheHelper;
         private readonly LookupsService _lookupsService;
+        private readonly PartnerService _partnerService;
         private readonly ViewHelper _viewHelper;
 
-        public DataController(ILogger<DataController> logger, AuthService authService, CacheHelper cacheHelper, LookupsService lookupsService, ViewHelper viewHelper)
+        public DataController(
+            ILogger<DataController> logger, 
+            AuthService authService, 
+            CacheHelper cacheHelper, 
+            LookupsService lookupsService, 
+            PartnerService partnerService,
+            ViewHelper viewHelper)
         {
             _logger = logger;
             _authService = authService;
             _cacheHelper = cacheHelper;
             _lookupsService = lookupsService;
             _viewHelper = viewHelper;
+            _partnerService = partnerService;
+        }
+
+        private string GetAccessToken()
+        {
+            var loginDetails = _viewHelper.GetLoginDetails(User);
+            var loginData = loginDetails.Item2;
+            return loginData.AccessToken;
         }
 
         [HttpGet("checkuser/{userName}")]
@@ -46,9 +61,8 @@ namespace Web.User.Controllers
             var countryList = _cacheHelper.Get<CountryLookupResponseDto>(Constants.CountryListCacheKey);
             if (countryList == null)
             {
-                var loginDetails = _viewHelper.GetLoginDetails(User);
-                var loginData = loginDetails.Item2;
-                countryList = await _lookupsService.GetAllCountriesAsync(loginData.AccessToken, cancellationToken);
+                var accessToken = GetAccessToken();
+                countryList = await _lookupsService.GetAllCountriesAsync(accessToken, cancellationToken);
                 if (countryList.Success)
                 {
                     _cacheHelper.Set<CountryLookupResponseDto>(Constants.CountryListCacheKey, countryList);
@@ -72,9 +86,8 @@ namespace Web.User.Controllers
                 }
             }
 
-            var loginDetails = _viewHelper.GetLoginDetails(User);
-            var loginData = loginDetails.Item2;
-            var result = await _lookupsService.GetCallingCodeAsync(countryCode, loginData.AccessToken, cancellationToken);
+            var accessToken = GetAccessToken();
+            var result = await _lookupsService.GetCallingCodeAsync(countryCode, accessToken, cancellationToken);
             return new JsonResult(result);
         }
 
@@ -85,9 +98,8 @@ namespace Web.User.Controllers
             var stateList = _cacheHelper.Get<StateLookupResponseDto>(Constants.StateListCacheKey);
             if (stateList == null)
             {
-                var loginDetails = _viewHelper.GetLoginDetails(User);
-                var loginData = loginDetails.Item2;
-                stateList = await _lookupsService.GetAllStatesAsync(loginData.AccessToken, cancellationToken);
+                var accessToken = GetAccessToken();
+                stateList = await _lookupsService.GetAllStatesAsync(accessToken, cancellationToken);
                 if (stateList.Success)
                 {
                     _cacheHelper.Set<StateLookupResponseDto>(Constants.StateListCacheKey, stateList);
@@ -103,9 +115,8 @@ namespace Web.User.Controllers
             var stateList = _cacheHelper.Get<StateLookupResponseDto>(Constants.StateListCacheKey);
             if (stateList == null)
             {
-                var loginDetails = _viewHelper.GetLoginDetails(User);
-                var loginData = loginDetails.Item2;
-                stateList = await _lookupsService.GetAllStatesAsync(loginData.AccessToken, cancellationToken);
+                var accessToken = GetAccessToken();
+                stateList = await _lookupsService.GetAllStatesAsync(accessToken, cancellationToken);
                 if (stateList.Success)
                 {
                     _cacheHelper.Set<StateLookupResponseDto>(Constants.StateListCacheKey, stateList);
@@ -121,6 +132,15 @@ namespace Web.User.Controllers
                 stateLookupResponseDto.SetError(stateList.Message);
             }
             return new JsonResult(stateLookupResponseDto);
+        }
+
+        [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
+        [HttpGet("partners/recent")]
+        public async Task<IActionResult> GetRecentPartners(CancellationToken cancellationToken)
+        {
+            var accessToken = GetAccessToken();
+            var partnerDto = await _partnerService.GetRecentPartners(accessToken, cancellationToken);
+            return new JsonResult(partnerDto);
         }
     }
 }

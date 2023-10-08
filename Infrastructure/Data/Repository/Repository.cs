@@ -1,4 +1,5 @@
 ﻿using Application.Repository;
+using Microsoft.EntityFrameworkCore.Storage;
 using System.Linq.Expressions;
 
 namespace Infrastructure.Data.Repository
@@ -7,6 +8,7 @@ namespace Infrastructure.Data.Repository
         where TEntity : class
     {
         protected readonly ApplicationDbContext.ApplicationDbContext _context;
+        protected IDbContextTransaction? _transaction;
         public Repository(ApplicationDbContext.ApplicationDbContext context)
         {
             _context = context;
@@ -22,6 +24,23 @@ namespace Infrastructure.Data.Repository
             await _context.Set<TEntity>().AddRangeAsync(entities);
             await SaveChangesAsync();
         }
+
+        public async Task BeginTranscationAsync()
+        {
+            if(_transaction == null)
+            {
+                _transaction = await _context.Database.BeginTransactionAsync();
+            }            
+        }
+
+        public async Task CommitTransactionAsync()
+        {
+            if(_transaction != null)
+            {
+                await _transaction.CommitAsync();
+            }
+        }
+
         public virtual IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> expression)
         {
             return _context.Set<TEntity>().Where(expression);
@@ -43,6 +62,16 @@ namespace Infrastructure.Data.Repository
         {
             _context.Set<TEntity>().RemoveRange(entities);
             await SaveChangesAsync();
+        }
+
+        public async Task RollBackAsync()
+        {
+            if(_transaction != null)
+            {
+                await _transaction.RollbackAsync();
+                _transaction.Dispose();
+                _transaction = null;
+            }
         }
 
         public async Task<int> SaveChangesAsync()

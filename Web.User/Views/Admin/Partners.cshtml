@@ -1,9 +1,8 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model PartnersDashboardModel
 @{
     ViewData["Title"] = "Partners";
     ViewData["ActiveLink"] = "Partners";
+    var MaxCount = 3;
 }
 <div class="d-flex flex-column">
     <div class="d-flex flex-row pb-3">
@@ -14,32 +13,60 @@
     </div>
     
     <div class="d-flex justify-content-center">
-        <div class="card col me-4">
-            <div class="card-header">
-                <span>Partner 1</span>
-            </div>
-            <div class="card-body">
-                This is description
-            </div>
-        </div>
+        @if(Model.PartnerMruList!= null)
+        {
+            foreach(var partner in Model.PartnerMruList)
+            {
+                var index = Model.PartnerMruList.IndexOf(partner);
+                var cardMarginClass = string.Empty;
+                if(index< MaxCount - 1)
+                {
+                    cardMarginClass = "me-4";
+                }
+                <div class="card col @cardMarginClass">
+                    <div class="card-header">
+                        <span>#@(index+1)</span>
+                    </div>
+                    <div class="card-body">
+                        @partner.OrganizationName
+                    </div>
+                </div>
+            }
+            var placesToPad = MaxCount - Model.PartnerMruList.Count;
+            if (placesToPad> 0)
+            {
+                while (placesToPad > 0)
+                {
+                    var cardMarginClass = string.Empty;
+                    if (placesToPad > 1)
+                    {
+                        cardMarginClass = "me-4";
+                    }
+                    <div class="card col @cardMarginClass">
+                        <div class="card-header">
+                            <span>#@(MaxCount - placesToPad + 1)</span>
+                        </div>
+                        <div class="card-body">
+                            Partner @(MaxCount - placesToPad + 1)
+                        </div>
+                    </div>
+                    
+                    placesToPad = placesToPad - 1;                    
+                }
+            }
 
-        <div class="card col me-4">
-            <div class="card-header">
-                <span>Partner 1</span>
-            </div>
-            <div class="card-body">
-                This is description
-            </div>
-        </div>
-
-        <div class="card col">
-            <div class="card-header">
-                <span>Partner 1</span>
-            </div>
-            <div class="card-body">
-                This is description
-            </div>
-        </div>
+        }        
     </div>
 
 </div>
+
+@section Scripts{
+    <script type="text/javascript">
+
+        function GetMRUList() {
+            
+
+        }
+
+    </script>
+}

@@ -16,7 +16,7 @@ namespace Common.Entities
         public string? AddressLine1 { get; private set; }
         public string? AddressLine2 { get; private set; }
         public string? City { get; private set; }
-        public string? StateCode { get; private set; }
+        public int? StateCode { get; private set; }
         public string? PostCode { get; private set; }
         public string? CountryCode { get; private set; }
         public DateTime? CreateDate { get; private set; }
@@ -31,7 +31,7 @@ namespace Common.Entities
             string? addressLine1, 
             string? addressLine2, 
             string? city, 
-            string? stateCode, 
+            int? stateCode, 
             string? postCode, 
             string? countryCode)
         {

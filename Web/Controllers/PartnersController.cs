@@ -1,8 +1,11 @@
 ﻿using Common.Dtos;
 using Common.Exceptions;
+using Common.Settings;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Web.Controllers
 {
@@ -12,10 +15,12 @@ namespace Web.Controllers
 	public class PartnersController : ControllerBase
 	{
 		private readonly IMediator _mediator;
+		private readonly AppSettings _appSettings;
 
-		public PartnersController(IMediator mediator)
+		public PartnersController(IMediator mediator, IOptions<AppSettings> appSettings)
 		{
 			_mediator = mediator;
+			_appSettings = appSettings.Value;
 		}
 
 		[HttpPost("add")]
@@ -36,5 +41,20 @@ namespace Web.Controllers
 				return BadRequest();
 			}
 		}
-	}
+
+		[HttpGet("recent")]
+        public async Task<IActionResult> GetRecentPartners()
+		{
+			GetMostRecentPartnersRequest request = new GetMostRecentPartnersRequest() { Count = _appSettings.Partners.MruListCount };
+            var result = await _mediator.Send(request);
+            if (result != null)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
+    }
 }

@@ -1,6 +1,7 @@
 ﻿using Application.Repository;
 using Common.Dtos;
 using Common.Entities;
+using Common.Exceptions;
 using Common.Mappings;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -22,19 +23,27 @@ namespace Application.Handlers.Lookups
 
         public Task<CountryLookupResponseDto> Handle(GetAllCountriesRequest request, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Getting countries from DB");
-            var countriesList = _repository.GetAll();
-            var response = new CountryLookupResponseDto();
-            if (countriesList == null)
+            try
             {
-                response.SetError("No countries fetched");
+                _logger.LogInformation("Getting countries from DB");
+                var countriesList = _repository.GetAll();
+                var response = new CountryLookupResponseDto();
+                if (countriesList == null)
+                {
+                    response.SetError("No countries fetched");
+                }
+                else
+                {
+                    _sharedMapping.Map(countriesList, response);
+                }
+
+                return Task.FromResult(response);
             }
-            else
+            catch (Exception ex)
             {
-                _sharedMapping.Map(countriesList, response);
+                _logger.LogError(ex, "Error occured while getting countries");
+                throw new DbException(ex.Message);
             }
-            
-            return Task.FromResult(response);
         }
     }
 }

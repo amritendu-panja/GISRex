@@ -1,11 +1,10 @@
-﻿using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using Common.Settings;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Common.Settings;
+using Web.User.Helpers;
 using Web.User.Models;
 using Web.User.Services;
-using Web.User.Helpers;
-using Microsoft.AspNetCore.Hosting;
 
 namespace Web.User.Controllers
 {
@@ -39,9 +38,17 @@ namespace Web.User.Controllers
         }
 
         [HttpGet("partners")]
-        public async Task<IActionResult> Partners()
+        public async Task<IActionResult> Partners(CancellationToken cancellationToken)
         {
-            return View();
+            PartnersDashboardModel model = new PartnersDashboardModel();
+            var loginDetails = _viewHelper.GetLoginDetails(User);
+            var loginData = loginDetails.Item2;
+            var partnerMruListDto = await _partnerService.GetRecentPartners(loginData.AccessToken, cancellationToken);
+            if (partnerMruListDto.Success)
+            {
+                model.PartnerMruList = partnerMruListDto.Partners;
+            }
+            return View(model);
         }
 
         [HttpGet("partner")]

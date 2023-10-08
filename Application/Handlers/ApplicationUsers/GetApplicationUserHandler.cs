@@ -10,37 +10,42 @@ namespace Application.Handlers.ApplicationUsers
 {
     public class GetApplicationUserHandler : IRequestHandler<GetApplicationUserRequest, ApplicationUserResponseDto>
     {
-        private readonly ILogger<GetApplicationUserHandler> logger;
-        private readonly IApplicationUserRepository repository;
-        private readonly IRepository<ApplicationUserDetails> detailsRepository;
+        private readonly ILogger<GetApplicationUserHandler> _logger;
+        private readonly IApplicationUserRepository _repository;        
         private readonly SharedMapping sharedMapping;
 
         public GetApplicationUserHandler(
             IApplicationUserRepository repository, 
-            SharedMapping sharedMapping, 
-            IRepository<ApplicationUserDetails> detailsRepository,
+            SharedMapping sharedMapping,
             ILogger<GetApplicationUserHandler> logger)
         {
-            this.repository = repository;
+            this._repository = repository;
             this.sharedMapping = sharedMapping;
-            this.logger = logger;
-            this.detailsRepository = detailsRepository;
+            this._logger = logger;
         }
 
         public Task<ApplicationUserResponseDto> Handle(GetApplicationUserRequest request, CancellationToken cancellationToken)
         {
-            logger.LogInformation($"Getting user data for {request.UserGuid}");
-            var user = repository.Find(u => u.UserGuid == request.UserGuid).FirstOrDefault();
-            ApplicationUserResponseDto responseDto = new ApplicationUserResponseDto();
-            if (user != null)
+            try
             {
-                sharedMapping.Map(user, responseDto);
+                _logger.LogInformation($"Getting user data for {request.UserGuid}");
+                var user = _repository.Find(u => u.UserGuid == request.UserGuid).FirstOrDefault();
+                ApplicationUserResponseDto responseDto = new ApplicationUserResponseDto();
+                if (user != null)
+                {
+                    sharedMapping.Map(user, responseDto);
+                }
+                else
+                {
+                    responseDto.SetError($"User not found by UserGuid {request.UserGuid}");
+                }
+                return Task.FromResult(responseDto);
             }
-            else
+            catch (Exception ex)
             {
-                responseDto.SetError($"User not found by UserGuid {request.UserGuid}");
+                _logger.LogError(ex, "Error occured while getting UserGuid {0}", request.UserGuid);
+                throw new DbException(ex.Message);
             }
-            return Task.FromResult(responseDto);
         }
     }
 }

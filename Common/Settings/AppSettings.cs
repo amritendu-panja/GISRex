@@ -4,6 +4,7 @@
     {
         public Security Security { get; set; }
         public Cache Cache { get; set; }
+        public Partners Partners { get; set; }
     }
 
     public class Security
@@ -27,5 +28,10 @@
     {
         public int SessionTimeoutInHours { get; set; }
         public int TimeoutInMinutes { get; set; }
+    }
+
+    public class Partners
+    {
+        public int MruListCount { get; set; }
     }
 }

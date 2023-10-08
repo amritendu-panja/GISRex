@@ -8,10 +8,13 @@
 
   <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="Dapper" Version="2.1.4" />
     <PackageReference Include="MediatR" Version="12.1.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="7.0.11" />
     <PackageReference Include="NLog" Version="5.2.4" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.4" />
+    <PackageReference Include="Npgsql" Version="7.0.6" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.0.0" />
   </ItemGroup>
 
@@ -21,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Data\ApplicationDbContext\DapperQueries\" />
     <Folder Include="Data\Scripts\" />
   </ItemGroup>
 

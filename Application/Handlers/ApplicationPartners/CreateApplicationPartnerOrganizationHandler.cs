@@ -49,30 +49,42 @@ namespace Application.Handlers.ApplicationPartners
             }
 
             _logger.LogInformation("Started creating new user.");
-            string salt = _hashHelper.GenerateSalt();
-            string encryptedPassword = _hashHelper.HashPassword(request.PasswordSalt, salt);
-
-            ApplicationUser applicationUser = new ApplicationUser(request.UserName, salt, encryptedPassword, request.Email, request.RoleId);
-            applicationUser = await _repository.AddAsync(applicationUser);
-
-            ApplicationPartnerOrganization organization = new ApplicationPartnerOrganization(
-                applicationUser.UserId,
-                request.OrganizationName,
-                request.Description,
-                request.LogoUrl,
-                request.AddressLine1,
-                request.AddressLine2,
-                request.City,
-                request.StateCode,
-                request.PostCode,
-                request.CountryCode
-                );
-            organization = await _organizationRepository.AddAsync(organization);
-
-            applicationUser.PartnerOrganization = organization;
-
             ApplicationPartnerResponseDto responseDto = new ApplicationPartnerResponseDto();
-            _mapping.Map(applicationUser, responseDto);
+            try
+            {
+                await _repository.BeginTranscationAsync();
+                string salt = _hashHelper.GenerateSalt();
+                string encryptedPassword = _hashHelper.HashPassword(request.PasswordSalt, salt);
+
+                ApplicationUser applicationUser = new ApplicationUser(request.UserName, salt, encryptedPassword, request.Email, request.RoleId);
+                applicationUser = await _repository.AddAsync(applicationUser);
+
+                ApplicationPartnerOrganization organization = new ApplicationPartnerOrganization(
+                    applicationUser.UserId,
+                    request.OrganizationName,
+                    request.Description,
+                    request.LogoUrl,
+                    request.AddressLine1,
+                    request.AddressLine2,
+                    request.City,
+                    request.StateCode,
+                    request.PostCode,
+                    request.CountryCode
+                    );
+                organization = await _organizationRepository.AddAsync(organization);
+
+                applicationUser.PartnerOrganization = organization;
+
+
+                _mapping.Map(applicationUser, responseDto);
+                await _repository.CommitTransactionAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occured while creating Partner with username: {0}", request.UserName);
+                await _repository.RollBackAsync();
+                throw new DbException(ex.Message);
+            }
             return responseDto;
         }
     }

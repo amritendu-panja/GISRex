@@ -49,7 +49,7 @@ namespace Web.User.Models
         public string? AddressLine2 { get; set; }
         public string? City { get; set; }
         [Display(Name = "State / Region")]
-        public string? StateCode { get; set; }
+        public int? StateCode { get; set; }
 
         [Display(Name = "Postal code")]
         public string? PostCode { get; set; }

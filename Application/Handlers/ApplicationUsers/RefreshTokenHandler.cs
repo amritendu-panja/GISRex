@@ -36,41 +36,53 @@ namespace Application.Handlers.ApplicationUsers
 
         public async Task<LoginResponseDto> Handle(RefreshRequest request, CancellationToken cancellationToken)
         {
-            bool isRefreshTokenValid = _tokenHelper.ValidateRefreshToken(request.RefreshToken);
-            var errorMessage = "Invalid refresh token";
-            if (!isRefreshTokenValid)
+            try
             {
-                throw new InvalidModelException(errorMessage);
-            }
-
-            LoginResponseDto response = new LoginResponseDto();
-            var securityTokenLog = _securityLogRepository.Find(u => u.Token == request.RefreshToken && u.IsEnabled == true).FirstOrDefault();
-            if (securityTokenLog == null)
-            {
-                throw new InvalidModelException(errorMessage);
-            }
-            else
-            {
-                var user = _repository.Find(u => u.UserId == securityTokenLog.UserId && u.IsEnabled == true).FirstOrDefault();
-                if (user == null)
+                bool isRefreshTokenValid = _tokenHelper.ValidateRefreshToken(request.RefreshToken);
+                var errorMessage = "Invalid refresh token";
+                if (!isRefreshTokenValid)
                 {
                     throw new InvalidModelException(errorMessage);
                 }
 
-                //Generate new tokens
-                response.AccessToken = _tokenHelper.GenerateAccessToken(user);
-                response.RefreshToken = _tokenHelper.GenerateRefreshToken();
-                response.ExpiresAt = DateTime.Now.AddMinutes(_appSettings.Security.Authentication.AccessTokenTTLInMinutes);
-                DateTime accessTokenExpiration = DateTime.UtcNow.AddMinutes(_appSettings.Security.Authentication.AccessTokenTTLInMinutes);
-                await _securityLogRepository.AddAsync(new SecurityTokenLog(response.AccessToken, TokenTypes.AccessToken, user.UserId, accessTokenExpiration));
-                DateTime refreshTokenExpiration = DateTime.UtcNow.AddMinutes(_appSettings.Security.Authentication.RefreshTokenTTLInMinutes);
-                await _securityLogRepository.AddAsync(new SecurityTokenLog(response.RefreshToken, TokenTypes.RefreshToken, user.UserId, refreshTokenExpiration));
+                LoginResponseDto response = new LoginResponseDto();
+                var securityTokenLog = _securityLogRepository.Find(u => u.Token == request.RefreshToken && u.IsEnabled == true).FirstOrDefault();
+                if (securityTokenLog == null)
+                {
+                    throw new InvalidModelException(errorMessage);
+                }
+                else
+                {
+                    var user = _repository.Find(u => u.UserId == securityTokenLog.UserId && u.IsEnabled == true).FirstOrDefault();
+                    if (user == null)
+                    {
+                        throw new InvalidModelException(errorMessage);
+                    }
 
-                //Disable the existing token so that it cannot be used again
-                securityTokenLog.Disable();
-                await _securityLogRepository.UpdateAsync(securityTokenLog);
+                    //Generate new tokens
+                    response.AccessToken = _tokenHelper.GenerateAccessToken(user);
+                    response.RefreshToken = _tokenHelper.GenerateRefreshToken();
+                    response.ExpiresAt = DateTime.Now.AddMinutes(_appSettings.Security.Authentication.AccessTokenTTLInMinutes);
+                    DateTime accessTokenExpiration = DateTime.UtcNow.AddMinutes(_appSettings.Security.Authentication.AccessTokenTTLInMinutes);
+                    await _securityLogRepository.AddAsync(new SecurityTokenLog(response.AccessToken, TokenTypes.AccessToken, user.UserId, accessTokenExpiration));
+                    DateTime refreshTokenExpiration = DateTime.UtcNow.AddMinutes(_appSettings.Security.Authentication.RefreshTokenTTLInMinutes);
+                    await _securityLogRepository.AddAsync(new SecurityTokenLog(response.RefreshToken, TokenTypes.RefreshToken, user.UserId, refreshTokenExpiration));
+
+                    //Disable the existing token so that it cannot be used again
+                    securityTokenLog.Disable();
+                    await _securityLogRepository.UpdateAsync(securityTokenLog);
+                }
+                return response;
             }
-            return response;
+            catch (InvalidModelException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occured while generating AccessToken");
+                throw new DbException(ex.Message);
+            }
         }
     }
 }

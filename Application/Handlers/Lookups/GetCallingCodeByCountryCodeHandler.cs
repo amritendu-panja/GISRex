@@ -1,6 +1,7 @@
 ﻿using Application.Repository;
 using Common.Dtos;
 using Common.Entities;
+using Common.Exceptions;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -19,17 +20,25 @@ namespace Application.Handlers.Lookups
 
         public async Task<GetCallingCodeResponseDto> Handle(GetCallingCodeByCountryRequest request, CancellationToken cancellationToken)
         {
-            var countryLookup = _respository.Find(c => c.ISO3Code == request.CountryCode).FirstOrDefault();
-            GetCallingCodeResponseDto response = new GetCallingCodeResponseDto();
-            if (countryLookup == null)
+            try
             {
-                response.SetError($"Calling code not found for country {request.CountryCode} ");
+                var countryLookup = _respository.Find(c => c.ISO3Code == request.CountryCode).FirstOrDefault();
+                GetCallingCodeResponseDto response = new GetCallingCodeResponseDto();
+                if (countryLookup == null)
+                {
+                    response.SetError($"Calling code not found for country {request.CountryCode} ");
+                }
+                else
+                {
+                    response.CallingCode = countryLookup.CallingCode;
+                }
+                return response;
             }
-            else
+            catch (Exception ex)
             {
-                response.CallingCode = countryLookup.CallingCode;
+                _logger.LogError(ex, "Error occured while getting calling code for country {0}", request.CountryCode);
+                throw new DbException(ex.Message);
             }
-            return response;
         }
     }
 }

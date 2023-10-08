@@ -2,6 +2,7 @@
 using Application.Repository;
 using Common.Dtos;
 using Common.Entities;
+using Common.Exceptions;
 using Common.Settings;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -52,14 +53,22 @@ namespace Application.Handlers.ApplicationUsers
                 }
                 else
                 {
-                    _logger.LogInformation("Generating tokens");
-                    response.AccessToken = _tokenHelper.GenerateAccessToken(user);
-                    response.RefreshToken = _tokenHelper.GenerateRefreshToken();
-                    response.ExpiresAt = DateTime.Now.AddMinutes(_appSettings.Security.Authentication.AccessTokenTTLInMinutes);
-                    DateTime accessTokenExpiration = DateTime.UtcNow.AddMinutes(_appSettings.Security.Authentication.AccessTokenTTLInMinutes);
-                    await _securityLogRepository.AddAsync(new SecurityTokenLog(response.AccessToken, TokenTypes.AccessToken, user.UserId, accessTokenExpiration));
-                    DateTime refreshTokenExpiration = DateTime.UtcNow.AddMinutes(_appSettings.Security.Authentication.RefreshTokenTTLInMinutes);
-                    await _securityLogRepository.AddAsync(new SecurityTokenLog(response.RefreshToken, TokenTypes.RefreshToken, user.UserId, refreshTokenExpiration));
+                    try
+                    {
+                        _logger.LogInformation("Generating tokens");
+                        response.AccessToken = _tokenHelper.GenerateAccessToken(user);
+                        response.RefreshToken = _tokenHelper.GenerateRefreshToken();
+                        response.ExpiresAt = DateTime.Now.AddMinutes(_appSettings.Security.Authentication.AccessTokenTTLInMinutes);
+                        DateTime accessTokenExpiration = DateTime.UtcNow.AddMinutes(_appSettings.Security.Authentication.AccessTokenTTLInMinutes);
+                        await _securityLogRepository.AddAsync(new SecurityTokenLog(response.AccessToken, TokenTypes.AccessToken, user.UserId, accessTokenExpiration));
+                        DateTime refreshTokenExpiration = DateTime.UtcNow.AddMinutes(_appSettings.Security.Authentication.RefreshTokenTTLInMinutes);
+                        await _securityLogRepository.AddAsync(new SecurityTokenLog(response.RefreshToken, TokenTypes.RefreshToken, user.UserId, refreshTokenExpiration));
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Failed to Login user: {0}", request.Username);
+                        throw new DbException(ex.Message);
+                    }
                 }
             }
             return response;

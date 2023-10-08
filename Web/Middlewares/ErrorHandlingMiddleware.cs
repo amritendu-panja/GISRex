@@ -28,7 +28,7 @@ namespace Web.Middlewares
 
         private async Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
-            HttpStatusCode statusCode;
+            HttpStatusCode statusCode = HttpStatusCode.OK;
             string userMessage;
             string message;
 
@@ -37,23 +37,24 @@ namespace Web.Middlewares
             {
                 userMessage = "ApiKey not found";
                 message = userMessage;
-                statusCode = HttpStatusCode.BadRequest;
             }
             else if (exceptionType == typeof(Common.Exceptions.BusinessLogicException))
             {
                 userMessage = exception.Message;
                 message = exception.Message;
-                statusCode = HttpStatusCode.PreconditionFailed;
             }
             else if (exceptionType == typeof(Common.Exceptions.InvalidModelException))
             {
                 userMessage = exception.Message;
                 message = exception.Message;
-                statusCode = HttpStatusCode.BadRequest;
+            }
+            else if (exceptionType == typeof(Common.Exceptions.DbException))
+            {
+                userMessage = "A server error has occured.";
+                message = exception.Message;
             }
             else
             {
-                statusCode = HttpStatusCode.InternalServerError;
                 userMessage = "A server error has occured.";
                 message = exception.Message;
             }

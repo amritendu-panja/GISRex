@@ -28,5 +28,10 @@ namespace Web.User.Services
 			mapper.Map(partnerModel, command);
 			return await _partnerApiClient.Add(command, appSettings.Security.ApiKey, accessToken, cancellationToken);
 		}
+
+		public async Task<ApplicationPartnerListResponseDto> GetRecentPartners(string accessToken, CancellationToken cancellationToken)
+		{
+			return await _partnerApiClient.GetRecentpartners(appSettings.Security.ApiKey, accessToken, cancellationToken);
+		}
 	}
 }

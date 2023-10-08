@@ -44,16 +44,28 @@ namespace Application.Handlers.ApplicationUsers
             }
 
             _logger.LogInformation("Started creating new user.");
-            string salt = _hashHelper.GenerateSalt();
-            string encryptedPassword = _hashHelper.HashPassword(request.PasswordSalt, salt);
-            ApplicationUser applicationUser = new ApplicationUser(request.UserName, salt, encryptedPassword, request.Email, request.Role);
-            var newUser = await _repository.AddAsync(applicationUser);
-            ApplicationUserDetails userDetails = new ApplicationUserDetails(newUser.UserId, request.Firstname, request.Lastname);
-            userDetails = await _detailsRepository.AddAsync(userDetails);
-            newUser.UserDetails = userDetails;
+            await _repository.BeginTranscationAsync();
             var response = new ApplicationUserResponseDto();
-            _mapping.Map(newUser, response);
-            _logger.LogInformation("New user created.");
+            try
+            {
+                string salt = _hashHelper.GenerateSalt();
+                string encryptedPassword = _hashHelper.HashPassword(request.PasswordSalt, salt);
+                ApplicationUser applicationUser = new ApplicationUser(request.UserName, salt, encryptedPassword, request.Email, request.Role);
+                var newUser = await _repository.AddAsync(applicationUser);
+                ApplicationUserDetails userDetails = new ApplicationUserDetails(newUser.UserId, request.Firstname, request.Lastname);
+                userDetails = await _detailsRepository.AddAsync(userDetails);
+                newUser.UserDetails = userDetails;
+                
+                _mapping.Map(newUser, response);
+                _logger.LogInformation("New user created.");
+                await _repository.CommitTransactionAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occured while creating user with username {0}", request.UserName);
+                await _repository.RollBackAsync();
+                throw new DbException(ex.Message);
+            }
             return response;
         }
 

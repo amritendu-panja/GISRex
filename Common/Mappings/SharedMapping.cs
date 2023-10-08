@@ -58,12 +58,12 @@ namespace Common.Mappings
                     response.OrganizationName = user.PartnerOrganization.OrganizationName;                    
                     response.Description = user.PartnerOrganization.Description;
                     response.LogoUrl = user.PartnerOrganization.LogoUrl;
-                    response.AddressLine1 = user.UserDetails.AddressLine1;
-                    response.AddressLine2 = user.UserDetails.AddressLine2;                    
-                    response.City = user.UserDetails.City;
+                    response.AddressLine1 = user.PartnerOrganization.AddressLine1;
+                    response.AddressLine2 = user.PartnerOrganization.AddressLine2;                    
+                    response.City = user.PartnerOrganization.City;
                     response.StateCode = user.UserDetails.StateCode;
-                    response.PostCode = user.UserDetails.PostCode;
-                    response.CountryCode = user.UserDetails.CountryCode;
+                    response.PostCode = user.PartnerOrganization.PostCode;
+                    response.CountryCode = user.PartnerOrganization.CountryCode;
                 }
             }
         }
@@ -174,6 +174,32 @@ namespace Common.Mappings
                          command.CountryCode,
                          command.AlternateMobile
                          );
+                }
+            }
+        }
+
+        public void Map(ApplicationPartnerListItemBase entity, BaseApplicationPartnerListItemDto dto)
+        {
+            if (entity != null)
+            {
+                if (dto == null) dto = new BaseApplicationPartnerListItemDto();
+                dto.OrganizationId = entity.OrganizationId;
+                dto.OrganizationName = entity.OrganizationName;
+                dto.LogoUrl = entity.LogoUrl;
+                dto.CountryCode = entity.CountryCode;
+            }
+        }
+
+        public void Map(IEnumerable<ApplicationPartnerListItemBase> applicationPartners, ApplicationPartnerListResponseDto responseDto)
+        {
+            if (applicationPartners != null && applicationPartners.Any())
+            {
+                responseDto.Partners = new List<BaseApplicationPartnerListItemDto>();
+                foreach (var partner in applicationPartners)
+                {
+                    BaseApplicationPartnerListItemDto dto = new BaseApplicationPartnerListItemDto();
+                    Map(partner, dto);
+                    responseDto.Partners.Add(dto);
                 }
             }
         }
