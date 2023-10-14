@@ -25,7 +25,7 @@
 
   <ItemGroup>
     <Folder Include="Data\ApplicationDbContext\DapperQueries\" />
-    <Folder Include="Data\Scripts\" />
+    <Folder Include="Data\Scripts\Functions\" />
   </ItemGroup>
 
 </Project>

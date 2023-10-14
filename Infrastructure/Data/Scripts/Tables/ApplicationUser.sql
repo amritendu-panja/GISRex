@@ -16,7 +16,13 @@ CREATE TABLE public."ApplicationUser"
     "Email" character varying(200) COLLATE pg_catalog."default" NOT NULL,
     "IsPasswordExpired" boolean NOT NULL,
     "RoleId" integer NOT NULL DEFAULT 1,
-    CONSTRAINT "ApplicationUser_pkey" PRIMARY KEY ("UserId")
+    "OrganizationId" bigint,
+    CONSTRAINT "ApplicationUser_pkey" PRIMARY KEY ("UserId"),
+    CONSTRAINT "F-Key-Organization" FOREIGN KEY ("OrganizationId")
+        REFERENCES public."ApplicationPartnerOrganization" ("OrganizationId") MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID
 )
 WITH (
     OIDS = FALSE
