@@ -38,7 +38,7 @@ namespace Application.Handlers.ApplicationUsers
         {
             var errorMessage = "Invalid username / password";
             LoginResponseDto response = new LoginResponseDto();
-            var user = _repository.Find(u => u.UserName == request.Username).FirstOrDefault();
+            var user = _repository.FindWithDetails(u => u.UserName == request.Username).FirstOrDefault();
             if (user == null)
             {
                 response.SetError(errorMessage);

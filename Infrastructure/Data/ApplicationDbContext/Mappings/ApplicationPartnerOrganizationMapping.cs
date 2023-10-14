@@ -17,7 +17,15 @@ namespace Infrastructure.Data.ApplicationDbContext.Mappings
             builder
                 .HasOne(u => u.User)
                 .WithOne(u => u.PartnerOrganization)
-                .HasForeignKey<ApplicationPartnerOrganization>(u => u.PartnerId);
+                .HasForeignKey<ApplicationPartnerOrganization>(u => u.UserId);
+            //builder
+            //    .HasOne(u => u.Country)
+            //    .WithMany(u => u.ApplicationPartners)
+            //    .HasForeignKey(u => u.CountryCode);
+            //builder
+            //    .HasOne(u => u.State)
+            //    .WithMany(u => u.ApplicationPartners)
+            //    .HasForeignKey(u => u.StateCode);
         }
     }
 }

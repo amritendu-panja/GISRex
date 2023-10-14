@@ -29,14 +29,14 @@
                 <div class="branding d-flex px-4 col-12 pt-1 border-bottom">
                     <span>
                         <img id="map-icon" src="~/images/map_icon.svg" class="align-top me-2" />
-                        <a class="navbar-brand" asp-area="" asp-controller="Admin" asp-action="Index">GeoSense Admin</a>
+                        <a class="navbar-brand text-wrap" asp-area="" asp-controller="Admin" asp-action="Index">GeoSense Admin</a>
                     </span>
                 </div>
                 <nav class="panel-menu d-block col-12 pt-2">
                     <ul class="nav flex-column">
                         <li class="nav-item">
                             <a asp-controller="Admin" asp-action="Dashboard" class="d-flex flex-row w-100 align-items-center ps-4 py-2 @viewHelper.GetActiveLink(activeLink, "Dashboard")">
-                                <i class="fa-solid fa-chart-line d-inline-block col-1"></i><span class="col-11">Dashboard</span>
+                                <i class="fa-solid fa-chart-line d-inline-block col-1"></i><span class="col-9 ms-2">Dashboard</span>
                             </a>
                         </li>
                     </ul>
@@ -44,23 +44,23 @@
                     <ul class="nav flex-column pt-2">
                         <li class="nav-item">
                             <a asp-area="" asp-controller="Admin" asp-action="Partners" class="d-flex flex-row w-100 align-items-center ps-4 py-2 @viewHelper.GetActiveLink(activeLink, "Partners")">
-                                <i class="fa-solid fa-briefcase d-inline-block col-1"></i><span class="col-11">Partners</span>
+                                <i class="fa-solid fa-briefcase d-inline-block col-1"></i><span class="col-9 ms-2">Partners</span>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a asp-area="" asp-controller="Admin" asp-action="Groups" class="d-flex flex-row w-100 align-items-center ps-4 py-2 @viewHelper.GetActiveLink(activeLink, "Groups")">
-                                <i class="fa-solid fa-user-group d-inline-block col-1"></i><span class="col-11">Groups</span>
+                                <i class="fa-solid fa-user-group d-inline-block col-1"></i><span class="col-9 ms-2">Groups</span>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a asp-area="" asp-controller="Admin" asp-action="Users" class="d-flex flex-row w-100 align-items-center ps-4 py-2 @viewHelper.GetActiveLink(activeLink, "Users")">
-                                <i class="fa-solid fa-users d-inline-block col-1"></i><span class="col-11">Users</span>
+                                <i class="fa-solid fa-users d-inline-block col-1"></i><span class="col-9 ms-2">Users</span>
                             </a>
                         </li>
                     </ul>
                 </nav>
             </aside>
-            <section class="flex-column flex-nowrap col-10">
+            <section class="d-flex flex-column flex-nowrap col-10">
                 <header>
                     <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
                         <div class="container-fluid">
@@ -125,7 +125,7 @@
                         </main>
                     </div>
                 </section>
-                <footer class="border-top footer text-muted">
+                <footer class="mt-auto border-top footer text-muted">
                     <div class="container">
                         &copy; 2023 - Web.User - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                     </div>

@@ -3,7 +3,7 @@
 *@
 @{
 }
-@model ProfileModel
+@model AppUserProfileModel
 
 <div class="row d-flex justify-content-center h-100">
     <div class="col-xl-4 align-top">
@@ -134,6 +134,9 @@
     </div>
 </div>
 @section Scripts{
+    
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
     <script type="text/javascript">
         var dialog;
         $(function () {

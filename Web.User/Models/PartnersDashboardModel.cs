@@ -6,9 +6,9 @@ namespace Web.User.Models
     {
         public PartnersDashboardModel()
         {
-            PartnerMruList = new List<BaseApplicationPartnerListItemDto>();
+            PartnerMruList = new List<BaseApplicationOrganizationListItemDto>();
         }
 
-        public List<BaseApplicationPartnerListItemDto> PartnerMruList { get; set; }
+        public List<BaseApplicationOrganizationListItemDto> PartnerMruList { get; set; }
     }
 }

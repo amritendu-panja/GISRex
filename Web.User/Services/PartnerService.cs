@@ -22,16 +22,21 @@ namespace Web.User.Services
 			this.mapper = mapper;
 		}
 
-		public async Task<ApplicationPartnerResponseDto> AddAsync(RegisterPartnerModel partnerModel, string accessToken, CancellationToken cancellationToken)
+		public async Task<ApplicationOrganizationResponseDto> AddAsync(RegisterPartnerModel partnerModel, string accessToken, CancellationToken cancellationToken)
 		{
-			CreatePartnerCommand command = new CreatePartnerCommand();
+			CreateApplicationOrganizationCommand command = new CreateApplicationOrganizationCommand();
 			mapper.Map(partnerModel, command);
 			return await _partnerApiClient.Add(command, appSettings.Security.ApiKey, accessToken, cancellationToken);
 		}
 
-		public async Task<ApplicationPartnerListResponseDto> GetRecentPartners(string accessToken, CancellationToken cancellationToken)
+		public async Task<ApplicationOrganizationListResponseDto> GetRecentPartners(string accessToken, CancellationToken cancellationToken)
 		{
-			return await _partnerApiClient.GetRecentpartners(appSettings.Security.ApiKey, accessToken, cancellationToken);
+			return await _partnerApiClient.GetRecentPartners(appSettings.Security.ApiKey, accessToken, cancellationToken);
 		}
-	}
+
+        public async Task<ApplicationOrganizationResponseDto> GetByIdAsync(int id, string accessToken, CancellationToken cancellationToken)
+        {
+            return await _partnerApiClient.GetOrganizationbyId(id, appSettings.Security.ApiKey, accessToken, cancellationToken);
+        }
+    }
 }

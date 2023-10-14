@@ -114,7 +114,7 @@ namespace Web.User.Controllers
 
         [HttpPost("register")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(RegisterModel model, CancellationToken cancellationToken)
+        public async Task<IActionResult> Register(RegisterAppUserModel model, CancellationToken cancellationToken)
         {
             if (ModelState.IsValid)
             {
@@ -163,7 +163,7 @@ namespace Web.User.Controllers
             var loginDetails = _viewHelper.GetLoginDetails(User);
             var loginData = loginDetails.Item2;
             var userDto = await _authService.ProfileAsync(userid, loginData.AccessToken, cancellationToken);
-            ProfileModel profileModel = new ProfileModel();
+            AppUserProfileModel profileModel = new AppUserProfileModel();
             _mapper.Map(userDto, profileModel);
             if(!string.IsNullOrEmpty(profileModel.ImagePath) && !_fileHelper.IsProfileImageExists(profileModel.ImagePath, _profileImageFolder))
             {
@@ -175,7 +175,7 @@ namespace Web.User.Controllers
         [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
         [HttpPost("profile")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Profile(ProfileModel profileModel, CancellationToken cancellationToken)
+        public async Task<IActionResult> Profile(AppUserProfileModel profileModel, CancellationToken cancellationToken)
         {
             if(ModelState.IsValid)
             {

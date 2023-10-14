@@ -3,7 +3,7 @@ using Web.User.Validators;
 
 namespace Web.User.Models
 {
-    public class RegisterModel
+    public class RegisterAppUserModel
     {
         [Required(ErrorMessage = "Email is mandatory")]
         [EmailAddress(ErrorMessage = "Enter valid email address")]

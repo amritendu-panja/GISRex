@@ -8,26 +8,31 @@ namespace Common.Entities
         /// <summary>
         /// Refers to UserId in ApplicationUser
         /// </summary>
-        public int PartnerId { get; private set; }
+        public int UserId { get; private set; }
         [Required]
         public string OrganizationName { get; private set;}
         public string? LogoUrl { get; private set; }
         public string? Description { get; private set;}
+        public string? Phone {  get; private set; }
         public string? AddressLine1 { get; private set; }
         public string? AddressLine2 { get; private set; }
         public string? City { get; private set; }
         public int? StateCode { get; private set; }
         public string? PostCode { get; private set; }
-        public string? CountryCode { get; private set; }
+        [Required]
+        public string CountryCode { get; private set; }
         public DateTime? CreateDate { get; private set; }
         public DateTime? ModifiedDate { get; private set; }
 
         public ApplicationUser? User { get; set; }
+        //public CountryLookup? Country {  get; set; }
+        //public StateLookup? State { get; set; }
 
-        public ApplicationPartnerOrganization(int partnerId, 
+        public ApplicationPartnerOrganization(int userId, 
             string organizationName, 
             string? description,
             string? logoUrl,
+            string? phone,
             string? addressLine1, 
             string? addressLine2, 
             string? city, 
@@ -35,10 +40,11 @@ namespace Common.Entities
             string? postCode, 
             string? countryCode)
         {
-            PartnerId = partnerId;
+            UserId = userId;
             OrganizationName = organizationName;
             Description = description;
             LogoUrl = logoUrl;
+            Phone = phone;
             AddressLine1 = addressLine1;
             AddressLine2 = addressLine2;
             City = city;

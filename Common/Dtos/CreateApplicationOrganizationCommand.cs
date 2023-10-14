@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Common.Dtos
 {
-    public class CreatePartnerCommand: IRequest<ApplicationPartnerResponseDto>
+    public class CreateApplicationOrganizationCommand: IRequest<ApplicationOrganizationResponseDto>
     {
         [Required]
         public string UserName { get; set; }

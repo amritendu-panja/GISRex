@@ -1,4 +1,5 @@
 ﻿using Common.Entities;
+using System.Linq.Expressions;
 
 namespace Application.Repository
 {
@@ -6,5 +7,6 @@ namespace Application.Repository
     {
         bool IsEmailExists(string email);
         bool IsUsernameExists(string username);
+        IEnumerable<ApplicationUser> FindWithDetails(Expression<Func<ApplicationUser, bool>> expression);
     }
 }

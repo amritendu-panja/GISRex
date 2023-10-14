@@ -3,6 +3,8 @@ using Common.Entities;
 using Dapper;
 using Infrastructure.Data.Repository;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
+using static Dapper.SqlMapper;
 
 namespace Infrastructure.Data.ApplicationDbContext.Repositories
 {
@@ -14,7 +16,7 @@ namespace Infrastructure.Data.ApplicationDbContext.Repositories
 
         public bool IsPartnerNameExists(string organizationName)
         {
-            return Find(u => u.OrganizationName == organizationName).Any();
+            return base.Find(u => u.OrganizationName == organizationName).Any();
         }
 
         public async Task<List<ApplicationPartnerListItemBase>> GetMostRecentPartners(int count)
@@ -26,6 +28,13 @@ namespace Infrastructure.Data.ApplicationDbContext.Repositories
                 var records = await conn.QueryAsync<ApplicationPartnerListItemBase>("Select * from public.\"get_most_recent_partners\"(@p_count)", parameters);
                 return records.ToList();
             }
+        }
+
+        public IEnumerable<ApplicationPartnerOrganization> FindWithDetails(Expression<Func<ApplicationPartnerOrganization, bool>> expression)
+        {
+            return _context.Set<ApplicationPartnerOrganization>()
+                .Where(expression)
+                .Include(u => u.User);
         }
     }
 }

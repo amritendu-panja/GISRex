@@ -1,9 +1,25 @@
 ﻿@model RegisterPartnerModel
 @{
-	ViewData["Title"] = "Partner";
+	ViewData["Title"] = "Add Partner";
 	ViewData["ActiveLink"] = "Partners";
+
+	var uploadImageModel = new UploadImagePartialModel()
+			{
+				ImageDataStorageId = Html.IdFor(m => m.ImageData),
+				ImageFilenameId = Html.IdFor(m => m.ImageFilename),
+				JsCallBackFunctionName = "formChanged"
+			};
+
+	var countryStateJsModel = new CountryStatePartialModel()
+			{
+				CountrySelectId = Html.IdFor(m => m.CountryCode),
+				StateSelectId = Html.IdFor(m => m.StateCode),
+				SelectedCountryCode = Model.CountryCode,
+				SelectedStateCode = Model.StateCode != null ? Model.StateCode.Value.ToString() : string.Empty,
+				CountryCallingCodeId = "callingCode",
+				NeedCountryCallingCode = true
+			};
 }
-@await Html.PartialAsync("_ValidationScriptsPartial")
 
 @using (Html.BeginForm(FormMethod.Post, new { @id = "frmPartner" }))
 {
@@ -84,7 +100,7 @@
 				<div class="col">
 					@Html.LabelFor(m=> m.Phone, new { @class = "form-label" })
 					<div class="input-group">
-						<span class="input-group-text calling-code"></span>
+						<span class="input-group-text calling-code" id="callingCode"></span>
 						@Html.TextBoxFor(m => m.Phone, new { @class = "form-control", @placeholder = "Phone number", @autocomplete = "off" })
 					</div>
 				</div>
@@ -121,45 +137,16 @@
 	</div>
 }
 
-<div class="modal fade" id="fileUploadModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title" id="staticBackdropLabel">Upload</h5>
-				<button type="button" class="btn-close" onclick="closeDialog()" aria-label="Close"></button>
-			</div>
-			<div class="modal-body text-center">
-				<div class="file-drop-area p-4">
-					<div class="drop-area-container">
-						<span class="choose-file-button btn btn-primary">Choose Files</span>
-						<span class="file-message">or drag and drop files here</span>
-					</div>
-					<input type="file" class="file-input" accept=".jpg,.jpeg,.png,.svg" onchange="uploadImage()" />
-				</div>
-				<div id="image-preview-area" class="p-4">
-					<img id="image-preview" class="rounded-circle mb-2" />
-					<div>
-						<label>
-							File: <label id="profile-image-file" class="me-2">image.img</label>
-							<a href="#" onclick="resetUploadImageDialog()">Clear</a>
-						</label>
-					</div>
-				</div>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" onclick="closeDialog()">Cancel</button>
-				<button type="button" class="btn btn-primary" onclick="applyImage()">Apply</button>
-			</div>
-		</div>
-	</div>
-</div>
+
 @section Scripts{
-	<script type="text/javascript">
-		var dialog;
+	
+	@await Html.PartialAsync("Partial/_UploadImagePartial", uploadImageModel)
+	@await Html.PartialAsync("Partial/_CountryStateJSPartial", countryStateJsModel)
+	@await Html.PartialAsync("_ValidationScriptsPartial")
+
+	<script type="text/javascript">		
 		$(function () {
 			checkUserExists();
-			getCountryList();
-			initImageUploadDialog();
 		});
 
 		function checkUserExists() {
@@ -194,154 +181,6 @@
 
 		function formChanged() {
 			$("#submitForm").attr("disabled", null);
-		}
-
-		function getCountryList() {
-			var url = "/api/data/countries";
-			$.ajax({
-				type: 'GET',
-				url: url,
-				accept: 'application/json',
-				success: function (response) {
-					if (response.success) {
-						var countryListId = '#@Html.IdFor(m => m.CountryCode)';
-						response.countries.forEach(function (c, index) {
-							$(countryListId).append('<option value="' + c.countryCode + '">' + c.countryName + '</option>');
-						});
-						var selectedCountry = '@Model.CountryCode??string.Empty';
-						if (selectedCountry.length > 0) {
-							$(countryListId).val(selectedCountry);
-							getCountryDetails();
-						}
-					}
-				},
-				error: function (xhrError) {
-					console.log(xhrError);
-					alert("Something went wrong! Please contact support")
-				}
-			});
-		}
-
-		function getCountryDetails() {
-			var countryCode = $("#@Html.IdFor(m=>m.CountryCode)").val();
-			if (countryCode) {
-				getStates(countryCode);
-				getCountryCallingCode(countryCode);
-			}
-		}
-
-		function getStates(countryCode) {
-			var url = "/api/data/states/" + countryCode
-			$.ajax({
-				type: 'GET',
-				url: url,
-				accept: 'application/json',
-				success: function (response) {
-					if (response.success) {
-						var stateListId = '#@Html.IdFor(m => m.StateCode)';
-						$(stateListId).empty();
-						$(stateListId).append('<option disabled="disabled">Select...</option>');
-						response.states.forEach(function (s, index) {
-							$(stateListId).append('<option value="' + s.stateUniqueId + '">' + s.stateName + '</option>');
-						});
-						var selectedState = '@Model.StateCode';
-						if (selectedState.length > 0) {
-							$(stateListId).val(selectedState);
-						}
-					}
-				},
-				error: function (xhrError) {
-					console.log(xhrError);
-					alert("Something went wrong! Please contact support")
-				}
-			});
-		}
-
-		function getCountryCallingCode(countryCode) {
-			var token = $('input[name="__RequestVerificationToken"]').val();
-
-			var url = "/api/data/getCallingCode/" + countryCode;
-			$.ajax({
-				type: 'GET',
-				url: url,
-				headers: {
-					"RequestVerificationToken": token
-				},
-				accept: 'application/json',
-				success: function (response) {
-					var callingCode = "+" + response.callingCode;
-					$(".calling-code").text(callingCode);
-				},
-				error: function (xhrError) {
-					console.log(xhrError);
-					alert("Something went wrong! Please contact support")
-				}
-			});
-		}
-
-		function initImageUploadDialog() {
-			dialog = new bootstrap.Modal("#fileUploadModal");
-			resetUploadImageDialog();
-		}
-
-		function showDialog() {
-			resetUploadImageDialog();
-			dialog.show();
-		}
-
-		function closeDialog() {
-			dialog.hide();
-			resetUploadImageDialog();
-		}
-
-		function applyImage() {
-			var img = $("#image-preview");
-			var imageString = img.attr("src");
-			$(".img-account-profile").attr("src", imageString);
-			$("#@Html.IdFor(m=> m.ImageData)").val(imageString);
-			var fileName = $("#profile-image-file").text();
-			$("#@Html.IdFor(m=> m.ImageFilename)").val(fileName);
-			formChanged();
-			closeDialog();
-		}
-
-		function uploadImage() {
-			var fileUpload = $(".file-input")[0];
-			if (fileUpload.files.length > 0) {
-				var imageFile = fileUpload.files[0];
-				var fileSize = Math.round(imageFile.size / 1024);
-				if (fileSize < 5120) {
-					var fileName = imageFile.name;
-					$("#profile-image-file").text(fileName);
-					var reader = new FileReader();
-					reader.onload = function (e) {
-						var img = $("#image-preview");
-						img.attr("src", e.target.result);
-						showImagePreviewArea();
-					}
-					reader.readAsDataURL(imageFile);
-				}
-				else {
-					alert("File size too big");
-				}
-			}
-		}
-
-		function resetUploadImageDialog() {
-			var fileUpload = $(".file-input");
-			fileUpload.val('');
-			$("#profile-image-file").text('image.img');
-			showImageUploadArea();
-		}
-
-		function showImagePreviewArea() {
-			$("#image-preview-area").show();
-			$(".file-drop-area").hide();
-		}
-
-		function showImageUploadArea() {
-			$("#image-preview-area").hide();
-			$(".file-drop-area").show();
 		}
 	</script>
 }

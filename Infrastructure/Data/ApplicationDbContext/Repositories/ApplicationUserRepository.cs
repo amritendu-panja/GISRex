@@ -22,7 +22,7 @@ namespace Infrastructure.Data.ApplicationDbContext.Repositories
             return Find(u => u.UserName.ToLower() == username).Any();
         }
 
-        public override IEnumerable<ApplicationUser> Find(Expression<Func<ApplicationUser, bool>> expression)
+        public IEnumerable<ApplicationUser> FindWithDetails(Expression<Func<ApplicationUser, bool>> expression)
         {
             return _context.Set<ApplicationUser>()
                 .Where(expression)

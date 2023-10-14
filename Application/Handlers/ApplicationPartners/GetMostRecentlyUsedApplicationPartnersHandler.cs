@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.Handlers.ApplicationPartners
 {
-    public class GetMostRecentlyUsedApplicationPartnersHandler : IRequestHandler<GetMostRecentPartnersRequest, ApplicationPartnerListResponseDto>
+    public class GetMostRecentlyUsedApplicationPartnersHandler : IRequestHandler<GetMostRecentPartnersRequest, ApplicationOrganizationListResponseDto>
     {
         private readonly IApplicationPartnerOrganizationRepository _repository;
         private readonly ILogger<GetMostRecentlyUsedApplicationPartnersHandler> _logger;
@@ -23,9 +23,9 @@ namespace Application.Handlers.ApplicationPartners
             _sharedMapping = mapping;
         }
 
-        public async Task<ApplicationPartnerListResponseDto> Handle(GetMostRecentPartnersRequest request, CancellationToken cancellationToken)
+        public async Task<ApplicationOrganizationListResponseDto> Handle(GetMostRecentPartnersRequest request, CancellationToken cancellationToken)
         {
-            ApplicationPartnerListResponseDto responseDto = new ApplicationPartnerListResponseDto();
+            ApplicationOrganizationListResponseDto responseDto = new ApplicationOrganizationListResponseDto();
             try
             {
                 var partnerList = await _repository.GetMostRecentPartners(request.Count);
@@ -35,7 +35,7 @@ namespace Application.Handlers.ApplicationPartners
                 }
                 else
                 {
-                    responseDto.Partners = new List<BaseApplicationPartnerListItemDto>();
+                    responseDto.Organizations = new List<BaseApplicationOrganizationListItemDto>();
                 }
             }
             catch (Exception ex)

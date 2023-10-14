@@ -24,7 +24,7 @@ namespace Web.Controllers
 		}
 
 		[HttpPost("add")]
-		public async Task<IActionResult> CreatePartner([FromBody] CreatePartnerCommand command)
+		public async Task<IActionResult> CreatePartner([FromBody] CreateApplicationOrganizationCommand command)
 		{
 			if (!ModelState.IsValid)
 			{
@@ -46,6 +46,25 @@ namespace Web.Controllers
         public async Task<IActionResult> GetRecentPartners()
 		{
 			GetMostRecentPartnersRequest request = new GetMostRecentPartnersRequest() { Count = _appSettings.Partners.MruListCount };
+            var result = await _mediator.Send(request);
+            if (result != null)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
+
+		[HttpGet("{Id:int}")]
+		public async Task<IActionResult> GetPartnerById(int Id)
+		{
+			GetApplicationOrganizationByIdRequest request = new GetApplicationOrganizationByIdRequest()
+			{
+				OrganizationId = Id
+			};
+
             var result = await _mediator.Send(request);
             if (result != null)
             {

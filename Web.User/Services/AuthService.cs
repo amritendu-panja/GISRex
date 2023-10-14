@@ -68,7 +68,7 @@ namespace Web.User.Services
             return await _client.Profile(userGuid, _appSettings.Security.ApiKey, accessToken, cancellationToken);
         }
 
-        public async Task<ApplicationUserResponseDto> UpdateProfileAsync(ProfileModel model, string accessToken, CancellationToken cancellationToken)
+        public async Task<ApplicationUserResponseDto> UpdateProfileAsync(AppUserProfileModel model, string accessToken, CancellationToken cancellationToken)
         {
             UpdateProfileCommand command = new UpdateProfileCommand
             {

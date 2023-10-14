@@ -11,7 +11,7 @@ main {
     }
 
 .branding {
-    height: 3rem;
+    min-height: 3rem;
 }
 
     .branding a {

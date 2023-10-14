@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Web.User.Models
 {
-    public class ProfileModel
+    public class AppUserProfileModel
     {
         [Required]
         public int UserId { get; set; }
@@ -39,7 +39,7 @@ namespace Web.User.Models
         [Display(Name = "Alternate mobile")]
         public string? AlternateMobile { get; set; }        
 
-        public ProfileModel()
+        public AppUserProfileModel()
         {
             ImagePath = Constants.DefaultProfileImage;
         }

@@ -13,10 +13,10 @@
         public bool IsUserLocked { get; private set; }
         public int RoleId { get; private set; }
         /// <summary>
-        /// When ApplicationUser.Role = 'Partner' then PartnerId is a foreign key
-        /// When ApplicationUser.Role = 'PartnerUser' then Partnerid is the organization under which the user is registered
+        /// When ApplicationUser.Role = 'Partner' then OrganizationId is a foreign key
+        /// When ApplicationUser.Role = 'PartnerUser' then OrganizationId is the organization under which the user is registered
         /// </summary>
-        public int? PartnerId { get; private set; }
+        public int? OrganizationId { get; private set; }
         public DateTime CreatedDate { get; private set; }
         public DateTime ModifiedDate { get; private set; }
 
@@ -39,7 +39,7 @@
             IsPasswordExpired = false;
             IsUserLocked = false;
             RoleId = roleId;
-            PartnerId = partnerId;
+            OrganizationId = partnerId;
             CreatedDate = DateTime.UtcNow;
             ModifiedDate = DateTime.UtcNow;
         }
@@ -74,9 +74,9 @@
             ModifiedDate = DateTime.UtcNow;
         }
 
-        public void SetPartnerId(int partnerId)
+        public void SetOrganizationId(int partnerId)
         {
-            PartnerId = partnerId;
+            OrganizationId = partnerId;
         }
     }
 }

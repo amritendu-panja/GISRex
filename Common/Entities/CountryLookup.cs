@@ -15,11 +15,14 @@ namespace Common.Entities
         public bool HasLevel2 { get; private set; }
         public bool HasLevel3 { get; private set; }
         public bool HasLevel4 { get; private set; }
-        public bool HasLevel5 { get;  private set; }
+        public bool HasLevel5 { get; private set; }
         public string? Level1Name { get; private set; }
         public string? Level2Name { get; private set; }
         public string? Level3Name { get; private set; }
         public string? Level4Name { get; private set; }
-        public string? Level5Name { get; private set; }        
+        public string? Level5Name { get; private set; }
+
+        //public List<ApplicationUserDetails>? ApplicationUsersDetails { get; set; }
+        //public List<ApplicationPartnerOrganization>? ApplicationPartners { get; set; }
     }
 }

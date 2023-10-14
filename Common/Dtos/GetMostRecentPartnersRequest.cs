@@ -2,7 +2,7 @@
 
 namespace Common.Dtos
 {
-    public class GetMostRecentPartnersRequest : IRequest<ApplicationPartnerListResponseDto>
+    public class GetMostRecentPartnersRequest : IRequest<ApplicationOrganizationListResponseDto>
     {
         public int Count { get; set; } = 3;
     }

@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.Handlers.ApplicationPartners
 {
-    public class CreateApplicationPartnerOrganizationHandler : IRequestHandler<CreatePartnerCommand, ApplicationPartnerResponseDto>
+    public class CreateApplicationPartnerOrganizationHandler : IRequestHandler<CreateApplicationOrganizationCommand, ApplicationOrganizationResponseDto>
     {
         private readonly ILogger<CreateApplicationPartnerOrganizationHandler> _logger;
         private readonly IApplicationUserRepository _repository;
@@ -31,7 +31,7 @@ namespace Application.Handlers.ApplicationPartners
             _hashHelper = hashHelper;
         }
 
-        public async Task<ApplicationPartnerResponseDto> Handle(CreatePartnerCommand request, CancellationToken cancellationToken)
+        public async Task<ApplicationOrganizationResponseDto> Handle(CreateApplicationOrganizationCommand request, CancellationToken cancellationToken)
         {
             if (_repository.IsEmailExists(request.Email))
             {
@@ -49,7 +49,7 @@ namespace Application.Handlers.ApplicationPartners
             }
 
             _logger.LogInformation("Started creating new user.");
-            ApplicationPartnerResponseDto responseDto = new ApplicationPartnerResponseDto();
+            ApplicationOrganizationResponseDto responseDto = new ApplicationOrganizationResponseDto();
             try
             {
                 await _repository.BeginTranscationAsync();
@@ -64,6 +64,7 @@ namespace Application.Handlers.ApplicationPartners
                     request.OrganizationName,
                     request.Description,
                     request.LogoUrl,
+                    request.Phone,
                     request.AddressLine1,
                     request.AddressLine2,
                     request.City,
@@ -73,9 +74,10 @@ namespace Application.Handlers.ApplicationPartners
                     );
                 organization = await _organizationRepository.AddAsync(organization);
 
+                applicationUser.SetOrganizationId(organization.OrganizationId);
+                await _repository.UpdateAsync(applicationUser);
+
                 applicationUser.PartnerOrganization = organization;
-
-
                 _mapping.Map(applicationUser, responseDto);
                 await _repository.CommitTransactionAsync();
             }

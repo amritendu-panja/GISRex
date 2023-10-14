@@ -1,0 +1,93 @@
+﻿@model CountryStatePartialModel
+
+
+<script type="text/javascript">
+	var countrySelectId = "#@Model.CountrySelectId";
+	var stateSelectid = "#@Model.StateSelectId";
+	var selectedCountry = "@Model.SelectedCountryCode";
+	var selectedState = "@Model.SelectedStateCode";
+	var needCallingCode = @(Model.NeedCountryCallingCode ? "true" : "false");
+	var callingCodeId = "#@Model.CountryCallingCodeId";
+	$(function () {
+		getCountryList();
+	});
+
+	function getCountryList() {
+		var url = "/api/data/countries";
+		$.ajax({
+			type: 'GET',
+			url: url,
+			accept: 'application/json',
+			success: function (response) {
+				if (response.success) {
+					$(countrySelectId).append('<option disabled="disabled">Select...</option>');
+					response.countries.forEach(function (c, index) {
+						$(countrySelectId).append('<option value="' + c.countryCode + '">' + c.countryName + '</option>');
+					});
+					if (selectedCountry.length > 0) {
+						$(countrySelectId).val(selectedCountry);
+						getCountryDetails();
+					}
+				}
+			},
+			error: function (xhrError) {
+				console.log(xhrError);
+				alert("Something went wrong! Please contact support")
+			}
+		});
+	}
+
+	function getCountryDetails() {
+		var countryCode = $(countrySelectId).val();
+		if (countryCode) {
+			getStates(countryCode);
+			if (needCallingCode) {
+				getCountryCallingCode(countryCode);
+			}
+		}
+	}
+
+	function getStates(countryCode) {
+		var url = "/api/data/states/" + countryCode
+		$.ajax({
+			type: 'GET',
+			url: url,
+			accept: 'application/json',
+			success: function (response) {
+				if (response.success) {
+
+					$(stateSelectid).empty();
+					$(stateSelectid).append('<option disabled="disabled">Select...</option>');
+					response.states.forEach(function (s, index) {
+						$(stateSelectid).append('<option value="' + s.stateUniqueId + '">' + s.stateName + '</option>');
+					});
+					if (selectedState.length > 0) {
+						$(stateSelectid).val(selectedState);
+					}
+				}
+			},
+			error: function (xhrError) {
+				console.log(xhrError);
+				alert("Something went wrong! Please contact support")
+			}
+		});
+	}
+
+	function getCountryCallingCode(countryCode) {
+		var url = "/api/data/getCallingCode/" + countryCode;
+		$.ajax({
+			type: 'GET',
+			url: url,
+			accept: 'application/json',
+			success: function (response) {
+				var callingCode = "+" + response.callingCode;
+				$(callingCodeId).text(callingCode);
+			},
+			error: function (xhrError) {
+				console.log(xhrError);
+				alert("Something went wrong! Please contact support")
+			}
+		});
+	}
+</script>
+

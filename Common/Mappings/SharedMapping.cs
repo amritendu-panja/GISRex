@@ -44,7 +44,7 @@ namespace Common.Mappings
         /// </summary>
         /// <param name="user">Map From</param>
         /// <param name="response">Mapped To</param>
-        public void Map(ApplicationUser user, ApplicationPartnerResponseDto response)
+        public void Map(ApplicationUser user, ApplicationOrganizationResponseDto response)
         {
             if (user != null && response != null)
             {
@@ -58,10 +58,11 @@ namespace Common.Mappings
                     response.OrganizationName = user.PartnerOrganization.OrganizationName;                    
                     response.Description = user.PartnerOrganization.Description;
                     response.LogoUrl = user.PartnerOrganization.LogoUrl;
+                    response.Phone = user.PartnerOrganization.Phone;
                     response.AddressLine1 = user.PartnerOrganization.AddressLine1;
                     response.AddressLine2 = user.PartnerOrganization.AddressLine2;                    
                     response.City = user.PartnerOrganization.City;
-                    response.StateCode = user.UserDetails.StateCode;
+                    response.StateCode = user.PartnerOrganization.StateCode;
                     response.PostCode = user.PartnerOrganization.PostCode;
                     response.CountryCode = user.PartnerOrganization.CountryCode;
                 }
@@ -178,11 +179,11 @@ namespace Common.Mappings
             }
         }
 
-        public void Map(ApplicationPartnerListItemBase entity, BaseApplicationPartnerListItemDto dto)
+        public void Map(ApplicationPartnerListItemBase entity, BaseApplicationOrganizationListItemDto dto)
         {
             if (entity != null)
             {
-                if (dto == null) dto = new BaseApplicationPartnerListItemDto();
+                if (dto == null) dto = new BaseApplicationOrganizationListItemDto();
                 dto.OrganizationId = entity.OrganizationId;
                 dto.OrganizationName = entity.OrganizationName;
                 dto.LogoUrl = entity.LogoUrl;
@@ -190,16 +191,44 @@ namespace Common.Mappings
             }
         }
 
-        public void Map(IEnumerable<ApplicationPartnerListItemBase> applicationPartners, ApplicationPartnerListResponseDto responseDto)
+        public void Map(IEnumerable<ApplicationPartnerListItemBase> applicationPartners, ApplicationOrganizationListResponseDto responseDto)
         {
             if (applicationPartners != null && applicationPartners.Any())
             {
-                responseDto.Partners = new List<BaseApplicationPartnerListItemDto>();
+                responseDto.Organizations = new List<BaseApplicationOrganizationListItemDto>();
                 foreach (var partner in applicationPartners)
                 {
-                    BaseApplicationPartnerListItemDto dto = new BaseApplicationPartnerListItemDto();
+                    BaseApplicationOrganizationListItemDto dto = new BaseApplicationOrganizationListItemDto();
                     Map(partner, dto);
-                    responseDto.Partners.Add(dto);
+                    responseDto.Organizations.Add(dto);
+                }
+            }
+        }
+
+        public void Map(ApplicationPartnerOrganization entity, ApplicationOrganizationResponseDto dto)
+        {
+            if (entity != null)
+            {
+                if (dto == null) dto = new ApplicationOrganizationResponseDto();
+
+                dto.OrganizationId = entity.OrganizationId;
+                dto.OrganizationName = entity.OrganizationName;
+                dto.Description = entity.Description;
+                dto.LogoUrl = entity.LogoUrl;
+                dto.Phone = entity.Phone;
+                dto.AddressLine1 = entity.AddressLine1;
+                dto.AddressLine2 = entity.AddressLine2;
+                dto.City = entity.City;
+                dto.StateCode = entity.StateCode;
+                dto.CountryCode = entity.CountryCode;
+                dto.PostCode = entity.PostCode;
+                if(entity.User != null)
+                {
+                    dto.UserId = entity.User.UserId;
+                    dto.UserName = entity.User.UserName;
+                    dto.Email = entity.User.Email;
+                    dto.IsLocked = entity.User.IsUserLocked;
+                    dto.UserGuid = entity.User.UserGuid;
                 }
             }
         }

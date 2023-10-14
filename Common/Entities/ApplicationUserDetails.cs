@@ -19,6 +19,8 @@
         public DateTime? ModifiedDate { get; private set; }
 
         public ApplicationUser? User { get; set; }
+        //public CountryLookup? Country { get; set; }
+        //public StateLookup? State { get; set; }
 
         protected ApplicationUserDetails()
         {
