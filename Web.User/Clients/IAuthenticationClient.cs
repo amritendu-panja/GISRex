@@ -28,5 +28,7 @@ namespace Web.User.Clients
 
         [Get("/api/users/findname/{userName}")]
         Task<ApplicationUserResponseDto> FindByUsername(string userName, [Header("XApiKey")] string apiKey, CancellationToken cancellationToken);
+        [Post("/api/users/datatable/all")]
+        Task<DataTableResponseBase<GetUserResponseRowDto>> GetUserDataTable(GetUsersDataTableRequest request, [Header("XApiKey")] string apiKey, [Authorize("Bearer")] string accessToken, CancellationToken cancellationToken);
     }
 }

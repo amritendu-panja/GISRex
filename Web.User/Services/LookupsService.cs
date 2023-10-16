@@ -41,5 +41,23 @@ namespace Web.User.Services
             _logger.LogInformation("Getting states data by country");
             return await _client.GetStatesByCountry(countryCode, _appSettings.Security.ApiKey, accessToken, cancellationToken);
         }
+
+        public async Task<GroupLookupResponseDto> GetAllGroupsAsync(string accessToken, CancellationToken cancellationToken)
+        {
+			_logger.LogInformation("Getting groups data");
+			return await _client.GetAllGroups(_appSettings.Security.ApiKey, accessToken, cancellationToken);
+		}
+
+		public async Task<DataTableResponseBase<GroupLookupRowDto>> GetGroupsDataTableAsync(GetGroupsDataTableRequest request, string accessToken, CancellationToken cancellationToken)
+		{
+			_logger.LogInformation("Getting groups data");
+			return await _client.GetGroupDataTable(request, _appSettings.Security.ApiKey, accessToken, cancellationToken);
+		}
+
+		public async Task<GroupLookupResponseDto> GetGroupByIdAsync(int id,string accessToken, CancellationToken cancellationToken)
+        {
+            _logger.LogInformation("Getting group data for id: {0}", id);
+            return await _client.GetGroupById(id, _appSettings.Security.ApiKey, accessToken, cancellationToken);
+        }
     }
 }

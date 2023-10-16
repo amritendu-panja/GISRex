@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Web.User.Helpers;
+using Web.User.Models;
 using Web.User.Services;
 
 namespace Web.User.Controllers
@@ -19,6 +20,7 @@ namespace Web.User.Controllers
         private readonly LookupsService _lookupsService;
         private readonly PartnerService _partnerService;
         private readonly ViewHelper _viewHelper;
+        private readonly Mapper _mapper;
 
         public DataController(
             ILogger<DataController> logger, 
@@ -26,7 +28,8 @@ namespace Web.User.Controllers
             CacheHelper cacheHelper, 
             LookupsService lookupsService, 
             PartnerService partnerService,
-            ViewHelper viewHelper)
+            ViewHelper viewHelper,
+            Mapper mapper)
         {
             _logger = logger;
             _authService = authService;
@@ -34,6 +37,7 @@ namespace Web.User.Controllers
             _lookupsService = lookupsService;
             _viewHelper = viewHelper;
             _partnerService = partnerService;
+            _mapper = mapper;
         }
 
         private string GetAccessToken()
@@ -141,6 +145,34 @@ namespace Web.User.Controllers
             var accessToken = GetAccessToken();
             var partnerDto = await _partnerService.GetRecentPartners(accessToken, cancellationToken);
             return new JsonResult(partnerDto);
+        }
+
+        [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
+        [HttpPost("groups/table")]
+        public async Task<IActionResult> GetAllGroups(CancellationToken cancellationToken)
+        {
+            var accessToken = GetAccessToken();
+            DataTableRequestModel requestModel = new DataTableRequestModel();
+            _mapper.Map(Request.Form, requestModel);
+            GetGroupsDataTableRequest request = new GetGroupsDataTableRequest();
+            _mapper.Map(requestModel, request);
+
+            var groupList = await _lookupsService.GetGroupsDataTableAsync(request, accessToken, cancellationToken);
+			return new JsonResult(groupList);
+        }
+
+        [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
+        [HttpPost("users/table")]
+        public async Task<IActionResult> GetAllUsers(CancellationToken cancellationToken)
+        {
+            var accessToken = GetAccessToken();
+            DataTableRequestModel requestModel = new DataTableRequestModel();
+            _mapper.Map(Request.Form, requestModel);
+            GetUsersDataTableRequest request = new GetUsersDataTableRequest();
+            _mapper.Map(requestModel, request);
+
+            var userList = await _authService.GetUserDataTableAsync(request, accessToken, cancellationToken);
+            return new JsonResult(userList);
         }
     }
 }

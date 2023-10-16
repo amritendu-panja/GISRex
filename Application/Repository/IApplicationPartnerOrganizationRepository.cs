@@ -8,6 +8,6 @@ namespace Application.Repository
         bool IsPartnerNameExists(string organizationName);
         Task<List<ApplicationPartnerListItemBase>> GetMostRecentPartners(int count);
 
-       IEnumerable<ApplicationPartnerOrganization> FindWithDetails(Expression<Func<ApplicationPartnerOrganization, bool>> expression);
+       IQueryable<ApplicationPartnerOrganization> FindWithDetails(Expression<Func<ApplicationPartnerOrganization, bool>> expression);
     }
 }

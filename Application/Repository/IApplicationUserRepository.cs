@@ -7,6 +7,6 @@ namespace Application.Repository
     {
         bool IsEmailExists(string email);
         bool IsUsernameExists(string username);
-        IEnumerable<ApplicationUser> FindWithDetails(Expression<Func<ApplicationUser, bool>> expression);
+        IQueryable<ApplicationUser> FindWithDetails(Expression<Func<ApplicationUser, bool>> expression);
     }
 }

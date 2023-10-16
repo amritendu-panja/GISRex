@@ -69,7 +69,29 @@ namespace Common.Mappings
             }
         }
 
-        public void Map(ApplicationLayer applicationLayer, ApplicationLayerResponseDto response)
+		public void Map(ApplicationUser user, GetUserResponseRowDto dto)
+		{
+			if (user != null && dto != null)
+			{
+				dto.UserId = user.UserId;
+				dto.UserName = user.UserName;
+				dto.UserGuid = user.UserGuid;
+				dto.Email = user.Email;
+				dto.IsUserLocked = user.IsUserLocked;
+				if (user.UserDetails != null)
+				{
+					dto.FirstName = user.UserDetails.FirstName;
+					dto.LastName = user.UserDetails.LastName;					
+					dto.CountryCode = user.UserDetails.CountryCode;
+				}
+                if(user.Role != null)
+                {
+                    dto.RoleName = user.Role.Role;
+                }
+			}
+		}
+
+		public void Map(ApplicationLayer applicationLayer, ApplicationLayerResponseDto response)
         {
             if (applicationLayer != null && response != null)
             {
@@ -231,6 +253,32 @@ namespace Common.Mappings
                     dto.UserGuid = entity.User.UserGuid;
                 }
             }
+        }
+
+        public void Map(ApplicationGroupLookup entity, GroupLookupRowDto dto)
+        {
+            if (entity != null)
+            {
+                if (dto == null) dto = new GroupLookupRowDto();
+                dto.GroupId = entity.GroupId;
+                dto.GroupName = entity.GroupName;
+                dto.Description = entity.Description;
+            }
+        }
+
+        public void Map(IEnumerable<ApplicationGroupLookup> entities, GroupLookupResponseDto dto)
+        {
+            if ( dto == null)
+            {
+                dto = new GroupLookupResponseDto();
+            }
+            dto.Groups = new List<GroupLookupRowDto>(); 
+            foreach (var entity in entities)
+            {
+				GroupLookupRowDto row= new GroupLookupRowDto();
+                Map(entity, row);
+                dto.Groups.Add(row);
+			}
         }
     }
 }

@@ -41,7 +41,7 @@ namespace Infrastructure.Data.Repository
             }
         }
 
-        public virtual IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> expression)
+        public virtual IQueryable<TEntity> Find(Expression<Func<TEntity, bool>> expression)
         {
             return _context.Set<TEntity>().Where(expression);
         }

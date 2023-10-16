@@ -106,5 +106,10 @@ namespace Web.User.Services
         {
             return await _client.FindByUsername(userName, _appSettings.Security.ApiKey, cancellationToken);
         }
+
+        public async Task<DataTableResponseBase<GetUserResponseRowDto>> GetUserDataTableAsync(GetUsersDataTableRequest request, string accessToken, CancellationToken cancellationToken)
+        {
+            return await _client.GetUserDataTable(request, _appSettings.Security.ApiKey, accessToken, cancellationToken);
+        }
     }
 }

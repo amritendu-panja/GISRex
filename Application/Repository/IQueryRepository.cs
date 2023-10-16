@@ -7,6 +7,6 @@ namespace Application.Repository
     {
         Task<T> GetByIdAsync(int id);
         IEnumerable<T> GetAll();
-        IEnumerable<T> Find(Expression<Func<T, bool>> expression);
+        IQueryable<T> Find(Expression<Func<T, bool>> expression);
     }
 }

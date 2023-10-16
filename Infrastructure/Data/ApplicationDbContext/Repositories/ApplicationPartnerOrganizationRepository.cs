@@ -30,7 +30,7 @@ namespace Infrastructure.Data.ApplicationDbContext.Repositories
             }
         }
 
-        public IEnumerable<ApplicationPartnerOrganization> FindWithDetails(Expression<Func<ApplicationPartnerOrganization, bool>> expression)
+        public IQueryable<ApplicationPartnerOrganization> FindWithDetails(Expression<Func<ApplicationPartnerOrganization, bool>> expression)
         {
             return _context.Set<ApplicationPartnerOrganization>()
                 .Where(expression)

@@ -14,6 +14,9 @@
         public const string DefaultProfileImage = "profile-user.svg";
         public const string CountryListCacheKey = "country-cache";
         public const string StateListCacheKey = "state-country-cache";
+
+        //Groups
+        public const string SuperAdminGroupName = "SuperAdmin";
     }
 
     public enum TokenTypes

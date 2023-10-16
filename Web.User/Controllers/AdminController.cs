@@ -13,6 +13,7 @@ namespace Web.User.Controllers
     public class AdminController : Controller
     {
         private readonly PartnerService _partnerService;
+        private readonly LookupsService _lookupsService;
         private readonly ViewHelper _viewHelper;
 		private readonly string _profileImageFolder;
 		private readonly IWebHostEnvironment _webHostEnvironment;
@@ -20,6 +21,7 @@ namespace Web.User.Controllers
         private readonly Mapper _mapper;
 
 		public AdminController(PartnerService partnerService, 
+            LookupsService lookupsService,
             ViewHelper viewHelper, 
             IWebHostEnvironment webHostEnvironment, 
             FileHelper fileHelper,
@@ -27,6 +29,7 @@ namespace Web.User.Controllers
             )
 		{
 			this._partnerService = partnerService;
+            this._lookupsService = lookupsService;
 			this._viewHelper = viewHelper;
 			_webHostEnvironment = webHostEnvironment;
 			_profileImageFolder = Path.Combine(_webHostEnvironment.ContentRootPath, "wwwroot", "images", "userprofiles");
@@ -120,11 +123,29 @@ namespace Web.User.Controllers
         }
 
         #endregion Partners
+
+        #region Groups
         [HttpGet("groups")]
         public async Task<IActionResult> Groups()
         {
             return View();
         }
+
+        [HttpGet("group/{id}")]
+        public async Task<IActionResult> Group(int id, CancellationToken cancellationToken)
+        {
+            ApplicationGroupModel model = new ApplicationGroupModel();
+			var loginDetails = _viewHelper.GetLoginDetails(User);
+			var loginData = loginDetails.Item2;
+            var result = await _lookupsService.GetGroupByIdAsync(id, loginData.AccessToken, cancellationToken);
+            if (result.Success)
+            {
+                _mapper.Map(result, model);
+            }
+            return View(model);
+        }
+
+        #endregion Groups
 
         [HttpGet("users")]
         public async Task<IActionResult> Users()

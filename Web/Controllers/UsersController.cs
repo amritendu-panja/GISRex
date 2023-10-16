@@ -81,5 +81,19 @@ namespace Web.Controllers
                 return BadRequest();
             }
         }
+
+        [HttpPost("datatable/all")]
+        public async Task<IActionResult> GetUsersDataTable(GetUsersDataTableRequest request)
+        {
+            var result = await mediator.Send(request);
+            if (result != null)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
     }
 }
