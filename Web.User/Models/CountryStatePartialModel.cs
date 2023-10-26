@@ -18,8 +18,8 @@ namespace Web.User.Models
 		public string? SelectedStateCode { get; set;}
 		public bool NeedCountryCallingCode { get; set; }
 		/// <summary>
-		/// Id of country calling code show component
+		/// class for country calling code show component
 		/// </summary>
-		public string? CountryCallingCodeId { get; set; }
+		public string? CountryCallingCodeClassName { get; set; }
 	}
 }

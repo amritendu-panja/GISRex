@@ -55,7 +55,8 @@ namespace Common.Mappings
                 response.IsLocked = user.IsUserLocked;
                 if (user.PartnerOrganization != null)
                 {
-                    response.OrganizationName = user.PartnerOrganization.OrganizationName;                    
+                    response.OrganizationName = user.PartnerOrganization.OrganizationName;
+                    response.Domain = user.PartnerOrganization.DomainName;
                     response.Description = user.PartnerOrganization.Description;
                     response.LogoUrl = user.PartnerOrganization.LogoUrl;
                     response.Phone = user.PartnerOrganization.Phone;
@@ -235,6 +236,7 @@ namespace Common.Mappings
 
                 dto.OrganizationId = entity.OrganizationId;
                 dto.OrganizationName = entity.OrganizationName;
+                dto.Domain = entity.DomainName;
                 dto.Description = entity.Description;
                 dto.LogoUrl = entity.LogoUrl;
                 dto.Phone = entity.Phone;
@@ -280,5 +282,36 @@ namespace Common.Mappings
                 dto.Groups.Add(row);
 			}
         }
-    }
+
+		public void Map(ApplicationUserListItemBase entity, ApplicationUserListItemBaseDto dto)
+		{
+			if (entity != null)
+			{
+				if (dto == null) dto = new ApplicationUserListItemBaseDto();
+				dto.UserId = entity.UserId;
+				dto.UserGuid = entity.UserGuid;
+				dto.UserName = entity.UserName;
+                dto.FirstName = entity.FirstName;
+                dto.LastName = entity.LastName;
+                dto.ImagePath = entity.ImagePath;
+                dto.RoleId = entity.RoleId;
+                dto.RoleName = entity.Role;
+				dto.CountryCode = entity.CountryCode;
+			}
+		}
+
+		public void Map(IEnumerable<ApplicationUserListItemBase> applicationUsers, ApplicationUserListResponseDto responseDto)
+		{
+			if (applicationUsers != null && applicationUsers.Any())
+			{
+                responseDto.Users = new List<ApplicationUserListItemBaseDto>();
+				foreach (var partner in applicationUsers)
+				{
+					ApplicationUserListItemBaseDto dto = new ApplicationUserListItemBaseDto();
+					Map(partner, dto);
+					responseDto.Users.Add(dto);
+				}
+			}
+		}
+	}
 }

@@ -56,12 +56,13 @@ namespace Application.Handlers.ApplicationPartners
                 string salt = _hashHelper.GenerateSalt();
                 string encryptedPassword = _hashHelper.HashPassword(request.PasswordSalt, salt);
 
-                ApplicationUser applicationUser = new ApplicationUser(request.UserName, salt, encryptedPassword, request.Email, request.RoleId);
+                ApplicationUser applicationUser = new ApplicationUser(request.UserName, salt, encryptedPassword, request.Email, (int) Common.Settings.Groups.OrganizationAdmin, request.RoleId);
                 applicationUser = await _repository.AddAsync(applicationUser);
 
                 ApplicationPartnerOrganization organization = new ApplicationPartnerOrganization(
                     applicationUser.UserId,
                     request.OrganizationName,
+                    request.Domain,
                     request.Description,
                     request.LogoUrl,
                     request.Phone,

@@ -111,5 +111,10 @@ namespace Web.User.Services
         {
             return await _client.GetUserDataTable(request, _appSettings.Security.ApiKey, accessToken, cancellationToken);
         }
+
+        public async Task<ApplicationUserListResponseDto> GetRecentUsersAsync(string accessToken, CancellationToken cancellationToken)
+        {
+            return await _client.GetRecentUsers(_appSettings.Security.ApiKey, accessToken, cancellationToken);
+        }
     }
 }

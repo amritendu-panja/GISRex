@@ -22,6 +22,10 @@ namespace Web.User.Models
         [Display(Name = "Organization Name")]
 		[MinLength(3, ErrorMessage = "Organization name must be at least 3 characters")]
 		public string OrganizationName { get; set; }
+
+        [Required]
+		[RegularExpression(@"^((?!-)[A-Za-z0-9-]{1, 63}(?<!-)\\.)+[A-Za-z]{2, 6}$", ErrorMessage = "Invalid domain name")]
+		public string Domain { get; set; }
         public string? Description { get; set; }
 
 		[Display(Name = "Address line 1")]

@@ -1,5 +1,6 @@
 ﻿using Application.Repository;
 using Common.Entities;
+using Dapper;
 using Infrastructure.Data.Repository;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
@@ -27,7 +28,19 @@ namespace Infrastructure.Data.ApplicationDbContext.Repositories
             return _context.Set<ApplicationUser>()
                 .Where(expression)
                 .Include(u => u.UserDetails)
-                .Include(u => u.Role);
+                .Include(u => u.Role)
+                .Include(u => u.Group);
         }
-    }
+
+		public async Task<List<ApplicationUserListItemBase>> GetMostRecentUsedUsers(string query, int count)
+		{
+			using (var conn = _context.Database.GetDbConnection())
+			{
+				DynamicParameters parameters = new DynamicParameters();
+				parameters.Add("p_count", count);
+				var records = await conn.QueryAsync<ApplicationUserListItemBase>(query, parameters);
+				return records.ToList();
+			}
+		}
+	}
 }

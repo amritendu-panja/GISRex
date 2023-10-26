@@ -7,7 +7,7 @@
 	var selectedCountry = "@Model.SelectedCountryCode";
 	var selectedState = "@Model.SelectedStateCode";
 	var needCallingCode = @(Model.NeedCountryCallingCode ? "true" : "false");
-	var callingCodeId = "#@Model.CountryCallingCodeId";
+	var callingCodeId = ".@Model.CountryCallingCodeClassName";
 	$(function () {
 		getCountryList();
 	});

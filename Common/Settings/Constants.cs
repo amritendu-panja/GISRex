@@ -40,4 +40,14 @@
         public const string PartnerUser = "PartnerUser";
         public const string Administrator = "Administrator";
     }
+
+    public enum Groups
+    {
+        OrganizationAdmin = 67843,
+        GroupAdmin = 67844,
+        GroupMember = 67845,
+        Guest = 67846,
+        SuperAdmin = 67847,
+        ApplicationUser = 67848
+	}
 }

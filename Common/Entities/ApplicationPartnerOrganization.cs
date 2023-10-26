@@ -23,6 +23,8 @@ namespace Common.Entities
         public string CountryCode { get; private set; }
         public DateTime? CreateDate { get; private set; }
         public DateTime? ModifiedDate { get; private set; }
+        [Required]
+        public string DomainName { get; private set; }
 
         public ApplicationUser? User { get; set; }
         //public CountryLookup? Country {  get; set; }
@@ -30,6 +32,7 @@ namespace Common.Entities
 
         public ApplicationPartnerOrganization(int userId, 
             string organizationName, 
+            string domainName,
             string? description,
             string? logoUrl,
             string? phone,
@@ -42,6 +45,7 @@ namespace Common.Entities
         {
             UserId = userId;
             OrganizationName = organizationName;
+            DomainName = domainName;
             Description = description;
             LogoUrl = logoUrl;
             Phone = phone;

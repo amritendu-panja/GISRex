@@ -50,7 +50,7 @@ namespace Application.Handlers.ApplicationUsers
             {
                 string salt = _hashHelper.GenerateSalt();
                 string encryptedPassword = _hashHelper.HashPassword(request.PasswordSalt, salt);
-                ApplicationUser applicationUser = new ApplicationUser(request.UserName, salt, encryptedPassword, request.Email, request.Role);
+                ApplicationUser applicationUser = new ApplicationUser(request.UserName, salt, encryptedPassword, request.Email, request.Role, (int)Common.Settings.Groups.ApplicationUser);
                 var newUser = await _repository.AddAsync(applicationUser);
                 ApplicationUserDetails userDetails = new ApplicationUserDetails(newUser.UserId, request.Firstname, request.Lastname);
                 userDetails = await _detailsRepository.AddAsync(userDetails);

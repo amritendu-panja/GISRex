@@ -1,4 +1,5 @@
-﻿using Application.Repository;
+﻿using Application.Helpers;
+using Application.Repository;
 using Common.Dtos;
 using Common.Exceptions;
 using Common.Mappings;
@@ -12,15 +13,18 @@ namespace Application.Handlers.ApplicationPartners
         private readonly IApplicationPartnerOrganizationRepository _repository;
         private readonly ILogger<GetMostRecentlyUsedApplicationPartnersHandler> _logger;
         private readonly SharedMapping _sharedMapping;
+        private readonly IFileHelper _fileHelper;
 
         public GetMostRecentlyUsedApplicationPartnersHandler(
             IApplicationPartnerOrganizationRepository repository, 
             ILogger<GetMostRecentlyUsedApplicationPartnersHandler> logger,
-            SharedMapping mapping)
+            SharedMapping mapping,
+            IFileHelper fileHelper)
         {
             _repository = repository;
             _logger = logger;
             _sharedMapping = mapping;
+            _fileHelper = fileHelper;
         }
 
         public async Task<ApplicationOrganizationListResponseDto> Handle(GetMostRecentPartnersRequest request, CancellationToken cancellationToken)
@@ -28,7 +32,8 @@ namespace Application.Handlers.ApplicationPartners
             ApplicationOrganizationListResponseDto responseDto = new ApplicationOrganizationListResponseDto();
             try
             {
-                var partnerList = await _repository.GetMostRecentPartners(request.Count);
+                var query = await _fileHelper.GetFileContent("PartnerMruList");
+                var partnerList = await _repository.GetMostRecentPartners(query, request.Count);
                 if (partnerList != null)
                 {
                     _sharedMapping.Map(partnerList, responseDto);

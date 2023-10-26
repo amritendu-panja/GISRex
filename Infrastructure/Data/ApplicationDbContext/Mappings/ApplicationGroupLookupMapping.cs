@@ -12,8 +12,11 @@ namespace Infrastructure.Data.ApplicationDbContext.Mappings
 				.HasKey(u => u.GroupId);
 			builder
 				.Property(u => u.GroupId)
-				.ValueGeneratedOnAdd();			
-				
+				.ValueGeneratedOnAdd();
+			builder
+				.HasMany(u => u.Users)
+				.WithOne(u => u.Group)
+				.HasForeignKey(u => u.GroupId);
 		}
 	}
 }

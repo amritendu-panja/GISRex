@@ -16,6 +16,8 @@ namespace Common.Dtos
 		public int RoleId { get;  set; }
         [Required]
         public string OrganizationName { get;  set; }
+        [Required]
+        public string Domain { get; set; }
         public string? Description { get;  set; }
         public string? LogoUrl { get; set; }
         public string? AddressLine1 { get;  set; }

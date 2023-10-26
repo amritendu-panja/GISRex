@@ -32,7 +32,14 @@
                 columns: [                    
                     {
                         data: "userName",
-                        name: "User name"
+                        name: "User name",
+                        render: function (data, type, row, meta) {
+                            if (type === "display") {
+                                let link = '/User/' + row.userGuid;
+                                return '<a href="' + link + '">' + data + '</a>';
+                            }
+                            return data;
+                        }
                     },
                     {
                         data: "email",

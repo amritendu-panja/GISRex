@@ -6,7 +6,8 @@ namespace Application.Repository
     public interface IApplicationPartnerOrganizationRepository: IRepository<ApplicationPartnerOrganization>
     {
         bool IsPartnerNameExists(string organizationName);
-        Task<List<ApplicationPartnerListItemBase>> GetMostRecentPartners(int count);
+        bool IsDomainExists(string domainName);
+        Task<List<ApplicationPartnerListItemBase>> GetMostRecentPartners(string query, int count);
 
        IQueryable<ApplicationPartnerOrganization> FindWithDetails(Expression<Func<ApplicationPartnerOrganization, bool>> expression);
     }

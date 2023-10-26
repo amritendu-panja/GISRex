@@ -2,72 +2,64 @@
 @{
     ViewData["Title"] = "Partners";
     ViewData["ActiveLink"] = "Partners";
-    var MaxCount = 3;
 }
-<div class="d-flex flex-column">
-    <div class="d-flex flex-row pb-3">
-        <h4>Most recently opened Partners</h4>
-        <div class="ms-auto">
-            <a asp-controller="Admin" asp-action="AddPartner" class="btn btn-primary">Add new Partner <i class="fa-solid fa-plus"></i></a>
-        </div>
-    </div>
-    
-    <div class="d-flex justify-content-center">
-        @if(Model.PartnerMruList!= null)
-        {
-            foreach(var partner in Model.PartnerMruList)
-            {
-                var index = Model.PartnerMruList.IndexOf(partner);
-                var cardMarginClass = string.Empty;
-                if(index< MaxCount - 1)
-                {
-                    cardMarginClass = "me-4";
-                }
-                <div class="card col @cardMarginClass">
-                    <div class="card-header">
-                        <span>#@(index+1)</span>
-                    </div>
-                    <div class="card-body">
-                        @partner.OrganizationName
-                        <a href="Partner/@partner.OrganizationId">Open</a>
-                    </div>
-                </div>
-            }
-            var placesToPad = MaxCount - Model.PartnerMruList.Count;
-            if (placesToPad> 0)
-            {
-                while (placesToPad > 0)
-                {
-                    var cardMarginClass = string.Empty;
-                    if (placesToPad > 1)
-                    {
-                        cardMarginClass = "me-4";
-                    }
-                    <div class="card col @cardMarginClass">
-                        <div class="card-header">
-                            <span>#@(MaxCount - placesToPad + 1)</span>
-                        </div>
-                        <div class="card-body">
-                            Partner @(MaxCount - placesToPad + 1)
-                        </div>
-                    </div>
-                    
-                    placesToPad = placesToPad - 1;                    
-                }
-            }
-
-        }        
-    </div>
-
+<div class="col-12">
+    <table id="userTable" class="table table-striped" style="width: 100%">
+        <thead>
+            <tr>
+                <th>Organization</th>
+                <th>User name</th>
+                <th>Email</th>
+                <th>Domain</th>
+                <th>Country</th>
+            </tr>
+        </thead>
+    </table>
 </div>
 
 @section Scripts{
+    <script src="~/datatables.net/jquery.dataTables.min.js"></script>
     <script type="text/javascript">
-
-        function GetMRUList() {
-            
-
-        }
-
+        $(function () {
+            $("#userTable").DataTable({
+                ajax: {
+                    url: "/api/data/partners/table",
+                    type: "POST"
+                },
+                processing: true,
+                serverSide: true,
+                filter: true,
+                columns: [
+                    {
+                        data: "organizationName",
+                        name: "Organization",
+                        render: function (data, type, row, meta) {
+                            if (type === "display") {
+                                let link = '/Partner/' + row.organizationId;
+                                return '<a href="' + link + '">' + data + '</a>';
+                            }
+                            return data;
+                        }
+                    },
+                    {
+                        data: "userName",
+                        name: "User name"
+                    },
+                    {
+                        data: "email",
+                        name: "Email"
+                    },
+                    {
+                        data: "domainName",
+                        name: "Domain"
+                    },
+                    {
+                        data: "countryCode",
+                        name: "Country"
+                    }
+                ]
+            });
+        });
     </script>
 }
+<link href="~/css/jquery.dataTables.min.css" rel="stylesheet" />

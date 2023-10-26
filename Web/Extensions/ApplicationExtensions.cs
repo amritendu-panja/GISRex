@@ -1,5 +1,6 @@
 ﻿using Application.Helpers;
 using Application.Repository;
+using Common.Dtos;
 using Common.Entities;
 using Common.Mappings;
 using Common.Settings;
@@ -54,6 +55,8 @@ namespace Web.Extensions
             services.AddTransient<IQueryRepository<StateLookup>, QueryRepository<StateLookup>>();
             services.AddTransient<IApplicationPartnerOrganizationRepository, ApplicationPartnerOrganizationRepository>();
             services.AddTransient<IQueryRepository<ApplicationGroupLookup>, QueryRepository<ApplicationGroupLookup>>();
+            services.AddTransient<IDataTableRepository<GetUserResponseRowDto>, DataTableRepository<GetUserResponseRowDto>>();
+            services.AddTransient<IDataTableRepository<GetOrganizationResponseRowDto>, DataTableRepository<GetOrganizationResponseRowDto>>();
             return services;
         }
 
@@ -72,6 +75,8 @@ namespace Web.Extensions
             services.AddTransient<SharedMapping>();
             services.AddTransient<IHashHelper, HashHelper>();
             services.AddTransient<ITokenHelper, JwtTokenHelper>();
+            services.AddTransient<IFileHelper, FileHelper>();
+            services.AddTransient<IEntityHelper, EntityHelper>();
             return services;
         }
 

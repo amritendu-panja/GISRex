@@ -1,1 +1,0 @@
-Select * from public."get_most_recent_partners"(@p_count);

@@ -60,6 +60,7 @@ namespace Web.User.Helpers
 			partnerCommand.PasswordSalt = partnerModel.Password;
 			partnerCommand.RoleId = (int)RoleTypes.Partner;
 			partnerCommand.OrganizationName = partnerModel.OrganizationName;
+			partnerCommand.Domain = partnerModel.Domain;
 			partnerCommand.Description = partnerModel.Description;
 			partnerCommand.Email = partnerModel.Email;
 			partnerCommand.Phone = partnerModel.Phone;

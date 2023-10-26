@@ -19,13 +19,13 @@ namespace Infrastructure.Data.ApplicationDbContext.Repositories
             return base.Find(u => u.OrganizationName == organizationName).Any();
         }
 
-        public async Task<List<ApplicationPartnerListItemBase>> GetMostRecentPartners(int count)
+        public async Task<List<ApplicationPartnerListItemBase>> GetMostRecentPartners(string query, int count)
         {
             using (var conn = _context.Database.GetDbConnection())
             {
                 DynamicParameters parameters = new DynamicParameters();
                 parameters.Add("p_count", count);
-                var records = await conn.QueryAsync<ApplicationPartnerListItemBase>("Select * from public.\"get_most_recent_partners\"(@p_count)", parameters);
+                var records = await conn.QueryAsync<ApplicationPartnerListItemBase>(query, parameters);
                 return records.ToList();
             }
         }
@@ -36,5 +36,10 @@ namespace Infrastructure.Data.ApplicationDbContext.Repositories
                 .Where(expression)
                 .Include(u => u.User);
         }
-    }
+
+		public bool IsDomainExists(string domainName)
+		{
+			return base.Find(u => u.DomainName == domainName).Any();
+		}
+	}
 }

@@ -5,6 +5,7 @@
         public Security Security { get; set; }
         public Cache Cache { get; set; }
         public Partners Partners { get; set; }
+        public Users Users { get; set; }
     }
 
     public class Security
@@ -31,6 +32,11 @@
     }
 
     public class Partners
+    {
+        public int MruListCount { get; set; }
+    }
+
+    public class Users
     {
         public int MruListCount { get; set; }
     }

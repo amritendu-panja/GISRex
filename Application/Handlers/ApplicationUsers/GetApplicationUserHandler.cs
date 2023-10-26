@@ -29,7 +29,7 @@ namespace Application.Handlers.ApplicationUsers
             try
             {
                 _logger.LogInformation($"Getting user data for {request.UserGuid}");
-                var user = _repository.Find(u => u.UserGuid == request.UserGuid).FirstOrDefault();
+                var user = _repository.FindWithDetails(u => u.UserGuid == request.UserGuid).FirstOrDefault();
                 ApplicationUserResponseDto responseDto = new ApplicationUserResponseDto();
                 if (user != null)
                 {

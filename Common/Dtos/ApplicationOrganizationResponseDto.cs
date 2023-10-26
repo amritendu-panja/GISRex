@@ -10,6 +10,7 @@
         public string? LogoUrl { get; set; }
         public int OrganizationId { get; set; }
         public string OrganizationName { get; set; }
+        public string Domain { get; set; }
         public string? Description { get; set; }
         public string? AddressLine1 { get; set; }
         public string? AddressLine2 { get; set; }

@@ -10,5 +10,7 @@ namespace Common.Entities
 		public string? Description { get; private set; }
 		public DateTime? CreatedDate { get; private set; }
 		public DateTime? ModifiedDate { get; private set; }
+
+		public List<ApplicationUser> Users { get; set; }
 	}
 }

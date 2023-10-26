@@ -16,7 +16,7 @@
 				StateSelectId = Html.IdFor(m => m.StateCode),
 				SelectedCountryCode = Model.CountryCode,
 				SelectedStateCode = Model.StateCode != null ? Model.StateCode.Value.ToString() : string.Empty,
-				CountryCallingCodeId = "callingCode",
+				CountryCallingCodeClassName = "calling-code",
 				NeedCountryCallingCode = true
 			};
 }
@@ -27,6 +27,8 @@
 
 	@Html.HiddenFor(m => m.ImageData)
 	@Html.HiddenFor(m=> m.ImageFilename)
+	@Html.HiddenFor(m=> m.IsUserExists)
+	@Html.HiddenFor(m=> m.IsDomainExists)
 	@Html.AntiForgeryToken()
 
 	<div class="card mb-3">
@@ -45,10 +47,11 @@
 					<div class="input-group">
 						@Html.TextBoxFor(m => m.UserName, new { @class = "form-control", @placeholder = "Username", @onchange = "checkUserExists();", @autocomplete = "off" })
 						<span class="input-group-text">
-							<img src="images/failure_icon.svg" id="username-status">
+							<i class="fa-solid fa-xmark" id="username-na"></i>
+							<i class="fa-solid fa-check" id="username-ok"></i>
 						</span>
 						<button type="button" class="btn btn-outline-secondary" onclick="checkUserExists()">
-							<img src="images/refresh_icon.svg" id="refresh-check-username">
+							<i class="fa-solid fa-rotate"></i>
 						</button>
 					</div>
 				</div>
@@ -73,6 +76,19 @@
 			<div class="col-12 mb-3">
 				@Html.LabelFor(m=>m.OrganizationName, new { @class = "form-label" })
 				@Html.TextBoxFor(m=>m.OrganizationName, new { @class="form-control", @placeholder = "Acme Inc." })
+			</div>
+			<div class="col-12 mb-3">
+				@Html.LabelFor(m=>m.Domain, new { @class = "form-label" })
+				<div class="input-group">
+					@Html.TextBoxFor(m=>m.Domain, new { @class="form-control", @placeholder = "example.com" })
+					<span class="input-group-text">
+						<i class="fa-solid fa-xmark" id="domain-na"></i>
+						<i class="fa-solid fa-check" id="domain-ok"></i>
+					</span>
+					<button type="button" class="btn btn-outline-secondary" onclick="checkDomainExists()">
+						<i class="fa-solid fa-rotate"></i>
+					</button>
+				</div>
 			</div>
 			<div class="col-12 mb-3">
 				@Html.LabelFor(m=>m.Description, new { @class = "form-label" })
@@ -165,10 +181,12 @@
 					success: function (response) {
 						$("#@Html.IdFor(m=>m.IsUserExists)").val(response.success);
 						if (response.success) {
-							$("#username-status").attr("src", "images/failure_icon.svg");
+							$("#username-na").show();
+							$("#username-ok").hide();
 						}
 						else {
-							$("#username-status").attr("src", "images/tick_icon.svg")
+							$("#username-na").hide();
+							$("#username-ok").show();
 						}
 					},
 					error: function (xhrError) {
@@ -177,7 +195,50 @@
 					}
 				});
 			}
+			else {
+				$("#@Html.IdFor(m=>m.IsUserExists)").val(false);
+				$("#username-na").show();
+				$("#username-ok").hide();
+			}
 		}
+
+		function checkDomainExists() {
+			var token = $('input[name="__RequestVerificationToken"]').val();
+			var domain = $("#@Html.IdFor(m=>m.Domain)").val();
+			if (domain && domain.length >= 6) {
+				var url = '/api/data/checkdomain/' + domain;
+
+				$.ajax({
+					type: 'GET',
+					url: url,
+					headers: {
+						"RequestVerificationToken": token
+					},
+					accept: 'application/json',
+					success: function (response) {
+						$("#@Html.IdFor(m=>m.IsDomainExists)").val(response.success);
+						if (response.success) {
+							$("#domain-na").show();
+							$("#domain-ok").hide();
+						}
+						else {
+							$("#domain-na").hide();
+							$("#domain-ok").show();
+						}
+					},
+					error: function (xhrError) {
+						console.log(xhrError);
+						alert("Something went wrong! Please contact support")
+					}
+				});
+			}
+			else {
+				$("#@Html.IdFor(m=>m.IsDomainExists)").val(false);
+				$("#domain-na").show();
+				$("#domain-ok").hide();
+			}
+		}
+
 
 		function formChanged() {
 			$("#submitForm").attr("disabled", null);

@@ -5,7 +5,6 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Web.Controllers
 {
@@ -65,6 +64,39 @@ namespace Web.Controllers
 				OrganizationId = Id
 			};
 
+            var result = await _mediator.Send(request);
+            if (result != null)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
+
+		[HttpGet("checkdomain/{domain}")]
+		public async Task<IActionResult> CheckDomainExists(string domain)
+		{
+			CheckDomainExistsRequest request = new CheckDomainExistsRequest()
+			{
+				Domain = domain
+			};
+
+			var result = await _mediator.Send(request);
+			if (result != null)
+			{
+				return Ok(result);
+			}
+			else
+			{
+				return BadRequest();
+			}
+		}
+
+        [HttpPost("datatable/all")]
+        public async Task<IActionResult> GetUsersDataTable(GetOrganizationsDataTableRequest request)
+        {
             var result = await _mediator.Send(request);
             if (result != null)
             {

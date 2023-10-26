@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Reflection;
 using System.Threading;
 using Web.User.Helpers;
 using Web.User.Models;
@@ -14,6 +15,7 @@ namespace Web.User.Controllers
     {
         private readonly PartnerService _partnerService;
         private readonly LookupsService _lookupsService;
+        private readonly AuthService _authService;
         private readonly ViewHelper _viewHelper;
 		private readonly string _profileImageFolder;
 		private readonly IWebHostEnvironment _webHostEnvironment;
@@ -22,24 +24,42 @@ namespace Web.User.Controllers
 
 		public AdminController(PartnerService partnerService, 
             LookupsService lookupsService,
+            AuthService authService,
             ViewHelper viewHelper, 
             IWebHostEnvironment webHostEnvironment, 
             FileHelper fileHelper,
             Mapper mapper
             )
 		{
-			this._partnerService = partnerService;
-            this._lookupsService = lookupsService;
-			this._viewHelper = viewHelper;
+			_partnerService = partnerService;
+            _lookupsService = lookupsService;
+            _authService = authService;
+			_viewHelper = viewHelper;
 			_webHostEnvironment = webHostEnvironment;
 			_profileImageFolder = Path.Combine(_webHostEnvironment.ContentRootPath, "wwwroot", "images", "userprofiles");
 			_fileHelper = fileHelper;
             _mapper = mapper;
 		}
 
-		public async Task<IActionResult> Index()
+		public async Task<IActionResult> Index(CancellationToken cancellationToken)
         {
-            return View();
+            AdminLandingModel model = new AdminLandingModel();
+            var loginDetails = _viewHelper.GetLoginDetails(User);
+            var loginData = loginDetails.Item2;
+
+            var partnerMruListDto = await _partnerService.GetRecentPartners(loginData.AccessToken, cancellationToken);
+            if (partnerMruListDto.Success)
+            {
+                model.PartnerMruList = partnerMruListDto.Organizations;
+            }
+
+            var userListDto = await _authService.GetRecentUsersAsync(loginData.AccessToken, cancellationToken);
+            if (userListDto.Success)
+            {
+                model.UserMruList = userListDto.Users;
+            }
+
+            return View(model);
         }
 
         [HttpGet("dashboard")]
@@ -53,13 +73,7 @@ namespace Web.User.Controllers
         public async Task<IActionResult> Partners(CancellationToken cancellationToken)
         {
             PartnersDashboardModel model = new PartnersDashboardModel();
-            var loginDetails = _viewHelper.GetLoginDetails(User);
-            var loginData = loginDetails.Item2;
-            var partnerMruListDto = await _partnerService.GetRecentPartners(loginData.AccessToken, cancellationToken);
-            if (partnerMruListDto.Success)
-            {
-                model.PartnerMruList = partnerMruListDto.Organizations;
-            }
+            
             return View(model);
         }
 
@@ -152,5 +166,21 @@ namespace Web.User.Controllers
         {
             return View();
         }
+
+        [HttpGet("user/{userGuid}")]
+        public async Task<IActionResult> GetUser(string userGuid, CancellationToken cancellationToken)
+        {            
+            var loginDetails = _viewHelper.GetLoginDetails(User);
+            var loginData = loginDetails.Item2;
+            var userDto = await _authService.ProfileAsync(userGuid, loginData.AccessToken, cancellationToken);
+            AppUserProfileModel profileModel = new AppUserProfileModel();
+            _mapper.Map(userDto, profileModel);
+            if (!string.IsNullOrEmpty(profileModel.ImagePath) && !_fileHelper.IsProfileImageExists(profileModel.ImagePath, _profileImageFolder))
+            {
+                profileModel.ImagePath = Constants.DefaultProfileImage;
+            }
+            return View(profileModel);
+        }
+
     }
 }

@@ -38,5 +38,15 @@ namespace Web.User.Services
         {
             return await _partnerApiClient.GetOrganizationbyId(id, appSettings.Security.ApiKey, accessToken, cancellationToken);
         }
+
+		public async Task<BaseResponseDto> CheckDomainExistsAsync(string domain, string accessToken, CancellationToken cancellationToken)
+		{
+			return await _partnerApiClient.CheckDomainExists(domain, appSettings.Security.ApiKey, accessToken, cancellationToken);
+		}
+
+        public async Task<DataTableResponseBase<GetOrganizationResponseRowDto>> GetPartnerDataTableAsync(GetOrganizationsDataTableRequest request, string accessToken, CancellationToken cancellationToken)
+        {
+            return await _partnerApiClient.GetPartnerDataTable(request, appSettings.Security.ApiKey, accessToken, cancellationToken);
+        }
     }
 }

@@ -4,15 +4,10 @@ using Common.Exceptions;
 using Common.Mappings;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.Handlers.ApplicationPartners
 {
-    public class GetApplicationOrganizationByIdHandler : IRequestHandler<GetApplicationOrganizationByIdRequest, ApplicationOrganizationResponseDto>
+	public class GetApplicationOrganizationByIdHandler : IRequestHandler<GetApplicationOrganizationByIdRequest, ApplicationOrganizationResponseDto>
     {
         private readonly IApplicationPartnerOrganizationRepository _organizationRepository;
         private readonly SharedMapping _mapping;

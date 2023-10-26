@@ -58,7 +58,16 @@ namespace Web.User.Controllers
             return new JsonResult(baseResponseDto);
         }
 
-        [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
+		[Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
+		[HttpGet("checkdomain/{domain}")]
+		public async Task<IActionResult> CheckDomainExists(string domain, CancellationToken cancellationToken)
+		{
+			var accessToken = GetAccessToken();
+			var result = await _partnerService.CheckDomainExistsAsync(domain, accessToken, cancellationToken);			
+			return new JsonResult(result);
+		}
+
+		[Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
         [HttpGet("countries")]
         public async Task<IActionResult> GetAllCountries(CancellationToken cancellationToken)
         {
@@ -148,6 +157,15 @@ namespace Web.User.Controllers
         }
 
         [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
+        [HttpGet("users/recent")]
+        public async Task<IActionResult> GetRecentUsers(CancellationToken cancellationToken)
+        {
+            var accessToken = GetAccessToken();
+            var partnerDto = await _authService.GetRecentUsersAsync(accessToken, cancellationToken);
+            return new JsonResult(partnerDto);
+        }
+
+        [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
         [HttpPost("groups/table")]
         public async Task<IActionResult> GetAllGroups(CancellationToken cancellationToken)
         {
@@ -172,6 +190,20 @@ namespace Web.User.Controllers
             _mapper.Map(requestModel, request);
 
             var userList = await _authService.GetUserDataTableAsync(request, accessToken, cancellationToken);
+            return new JsonResult(userList);
+        }
+
+        [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
+        [HttpPost("partners/table")]
+        public async Task<IActionResult> GetAllPartners(CancellationToken cancellationToken)
+        {
+            var accessToken = GetAccessToken();
+            DataTableRequestModel requestModel = new DataTableRequestModel();
+            _mapper.Map(Request.Form, requestModel);
+            GetOrganizationsDataTableRequest request = new GetOrganizationsDataTableRequest();
+            _mapper.Map(requestModel, request);
+
+            var userList = await _partnerService.GetPartnerDataTableAsync(request, accessToken, cancellationToken);
             return new JsonResult(userList);
         }
     }
