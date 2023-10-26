@@ -4,8 +4,6 @@
 @model LoginModel
 @{
 }
-@await Html.PartialAsync("_ValidationScriptsPartial")
-
 <div class="justify-content-center d-flex">
     <div class="col-12 col-md-9 col-lg-7 col-xl-6">
         <div class="card mb-4 mb-xl-0">
@@ -37,3 +35,6 @@
         </div>
     </div>
 </div>
+@section Scripts{
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

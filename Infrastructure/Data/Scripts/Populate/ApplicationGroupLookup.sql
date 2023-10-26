@@ -1,0 +1,5 @@
+INSERT INTO lookups."ApplicationGroupLookup"("GroupName", "Description", "CreatedDate", "ModifiedDate")	VALUES ("OrganizationAdmin", "Organization Administrator", CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO lookups."ApplicationGroupLookup"("GroupName", "Description", "CreatedDate", "ModifiedDate")	VALUES ("GroupAdmin", "Group Administrator", CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO lookups."ApplicationGroupLookup"("GroupName", "Description", "CreatedDate", "ModifiedDate")	VALUES ("GroupMember", "Group Member", CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO lookups."ApplicationGroupLookup"("GroupName", "Description", "CreatedDate", "ModifiedDate")	VALUES ("Guest", "Guest", CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO lookups."ApplicationGroupLookup"("GroupName", "Description", "CreatedDate", "ModifiedDate")	VALUES ("SuperAdmin", "Super Administrator", CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);

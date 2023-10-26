@@ -20,6 +20,7 @@ namespace Web.User.Controllers
         private readonly CacheKeyGenrator _cachekeyGen;
         private readonly LookupsService _lookupsService;
         private readonly FileHelper _fileHelper;
+        private readonly ViewHelper _viewHelper;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly Mapper _mapper;
         private readonly string _profileImageFolder;
@@ -32,6 +33,7 @@ namespace Web.User.Controllers
             LookupsService lookupsService,
             FileHelper fileHelper,
             IWebHostEnvironment webHostEnvironment,
+            ViewHelper viewHelper,
             Mapper mapper)
         {
             _logger = logger;
@@ -43,6 +45,7 @@ namespace Web.User.Controllers
             _fileHelper = fileHelper;
             _webHostEnvironment = webHostEnvironment;
             _mapper = mapper;
+            _viewHelper = viewHelper;
             _profileImageFolder = Path.Combine(_webHostEnvironment.ContentRootPath, "wwwroot", "images", "userprofiles");
         }
 
@@ -59,7 +62,7 @@ namespace Web.User.Controllers
 
         [HttpPost("login")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> PostLogin(LoginModel model, CancellationToken cancellationToken)
+        public async Task<IActionResult> Login(LoginModel model, CancellationToken cancellationToken)
         {
             if (ModelState.IsValid)
             {
@@ -71,14 +74,36 @@ namespace Web.User.Controllers
                     _cacheHelper.Set<LoginResponseDto>(key, loginResponse);
                     HttpContext.User = principal;
                     HttpContext.Session.SetString(Constants.AuthenticationCacheKey, key);
-                    return Redirect("/");
+
+                    var userDetails = await _authService.CheckUserExists(_viewHelper.GetUsername(principal), cancellationToken);
+                    if (userDetails.Success)
+                    {
+                        var userKey = _cachekeyGen.CreateCacheKey(principal, Constants.LoggedInUserCachekey);
+                        _cacheHelper.Set<ApplicationUserResponseDto>(userKey, userDetails);
+                        HttpContext.Session.SetString(Constants.LoggedInUserCachekey, userKey);
+                    }
+
+                    var roleType = _viewHelper.GetUserRole(principal);
+                    string controllerName = string.Empty; 
+                    string actionName = "Index";
+                    switch (roleType)
+                    {
+                        case RoleTypes.AppUser:
+                            controllerName = "Home";
+                            break;
+                        case RoleTypes.Administrator:
+                            controllerName = "Admin";
+                            break;
+
+                    }
+                    return RedirectToAction(actionName, controllerName);
                 }
                 else
                 {
                     ModelState.AddModelError("", loginResponse.Message);
                 }
             }
-            return View("Login", model);
+            return View(model);
         }
 
         [HttpGet("register")]
@@ -89,16 +114,16 @@ namespace Web.User.Controllers
 
         [HttpPost("register")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(RegisterModel model, CancellationToken cancellationToken)
+        public async Task<IActionResult> Register(RegisterAppUserModel model, CancellationToken cancellationToken)
         {
             if (ModelState.IsValid)
             {
-                var registerResponse = await _authService.RegisterAsync(model.Email, model.Username, model.Password, (int) RoleTypes.AppUser, cancellationToken);
+                var registerResponse = await _authService.RegisterAsync(model.Email, model.Username, model.FirstName, model.LastName, model.Password, (int) RoleTypes.AppUser, cancellationToken);
 
                 if (registerResponse.Success)
                 {
                     LoginModel loginModel = new LoginModel { Username = model.Username, Password = model.Password };
-                    return await PostLogin(loginModel, cancellationToken);
+                    return await Login(loginModel, cancellationToken);
                 }
                 else
                 {
@@ -113,13 +138,13 @@ namespace Web.User.Controllers
         [HttpGet("logout")]
         public async Task<IActionResult> Logout(CancellationToken cancellationToken)
         {
-            var loginDetails = GetLoginDetails();
+            var loginDetails = _viewHelper.GetLoginDetails(User);
             var key = loginDetails.Item1;
             var loginData = loginDetails.Item2;
             await _authHelper.SignoutAsync(HttpContext);
             if (loginData != null)
             {
-                string userid = User.FindFirst(Constants.JwtIdKey).Value;
+                string userid = _viewHelper.GetUserId(User);
                 var logoutResponse = await _authService.LogoutAsync(userid, loginData.AccessToken, cancellationToken);
                 if (logoutResponse.Success)
                 {
@@ -134,11 +159,11 @@ namespace Web.User.Controllers
         [HttpGet("profile")]
         public async Task<IActionResult> Profile(CancellationToken cancellationToken)
         {
-            string userid = User.FindFirst(Constants.JwtIdKey).Value;
-            var loginDetails = GetLoginDetails();
+            string userid = _viewHelper.GetUserId(User);
+            var loginDetails = _viewHelper.GetLoginDetails(User);
             var loginData = loginDetails.Item2;
             var userDto = await _authService.ProfileAsync(userid, loginData.AccessToken, cancellationToken);
-            ProfileModel profileModel = new ProfileModel();
+            AppUserProfileModel profileModel = new AppUserProfileModel();
             _mapper.Map(userDto, profileModel);
             if(!string.IsNullOrEmpty(profileModel.ImagePath) && !_fileHelper.IsProfileImageExists(profileModel.ImagePath, _profileImageFolder))
             {
@@ -150,20 +175,32 @@ namespace Web.User.Controllers
         [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
         [HttpPost("profile")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Profile(ProfileModel profileModel, CancellationToken cancellationToken)
+        public async Task<IActionResult> Profile(AppUserProfileModel profileModel, CancellationToken cancellationToken)
         {
             if(ModelState.IsValid)
             {
-                string userid = User.FindFirst(Constants.JwtIdKey).Value;
+                string userid = _viewHelper.GetUserId(User);
                 if(!string.IsNullOrEmpty(profileModel.ImageData) && !string.IsNullOrEmpty(profileModel.ImageFilename))
                 {
                     profileModel.ImagePath = _fileHelper.UploadImage(profileModel.ImageData, profileModel.ImageFilename, userid, _profileImageFolder);
                 }
-                var loginDetails = GetLoginDetails();
+                var loginDetails = _viewHelper.GetLoginDetails(User);
                 var loginData = loginDetails.Item2;
                 var userDto = await _authService.UpdateProfileAsync(profileModel, loginData.AccessToken, cancellationToken);
-
-                _mapper.Map(userDto, profileModel);
+                if(userDto != null && userDto.Success)
+                {
+                    _mapper.Map(userDto, profileModel);
+                    var userKey = HttpContext.Session.GetString(Constants.LoggedInUserCachekey);
+                    if (!string.IsNullOrEmpty(userKey))
+                    {
+                        _cacheHelper.Set<ApplicationUserResponseDto>(userKey, userDto);
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError("", userDto?.Message ?? "Server error occured, please contact support");
+                }
+                
             }
            
             return View(profileModel);
@@ -176,7 +213,7 @@ namespace Web.User.Controllers
         {
             ChangePasswordModel model = new ChangePasswordModel
             {
-                UserId = User.FindFirst(Constants.JwtIdKey).Value
+                UserId = _viewHelper.GetUserId(User)
             };
             return View(model);
         }
@@ -185,8 +222,8 @@ namespace Web.User.Controllers
         [HttpPost("changepassword")]
         public async Task<IActionResult> PostChangePassword(ChangePasswordModel model, CancellationToken cancellationToken)
         {
-            string userid = User.FindFirst(Constants.JwtIdKey).Value;
-            var loginDetails = GetLoginDetails();
+            string userid = _viewHelper.GetUserId(User);
+            var loginDetails = _viewHelper.GetLoginDetails(User);
             var key = loginDetails.Item1;
             var loginData = loginDetails.Item2;
             if (loginData != null)
@@ -224,113 +261,5 @@ namespace Web.User.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
-
-        #region Api Endpoints
-
-        [ValidateAntiForgeryToken]
-        [HttpGet("checkuser/{userName}")]
-        public async Task<IActionResult> CheckUserExists(string userName, CancellationToken cancellationToken)
-        {
-            var result = await _authService.CheckUserExists(userName, cancellationToken);
-            BaseResponseDto baseResponseDto = new BaseResponseDto
-            {
-                Success = result.Success
-            };
-            return new JsonResult(baseResponseDto);
-        }
-
-        [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
-        [HttpGet("countries")]
-        public async Task<IActionResult> GetAllCountries(CancellationToken cancellationToken)
-        {
-            var countryList = _cacheHelper.Get<CountryLookupResponseDto>(Constants.CountryListCacheKey);
-            if (countryList == null)
-            {
-                var loginDetails = GetLoginDetails();
-                var loginData = loginDetails.Item2;
-                countryList = await _lookupsService.GetAllCountriesAsync(loginData.AccessToken, cancellationToken);
-                if (countryList.Success)
-                {
-                    _cacheHelper.Set<CountryLookupResponseDto>(Constants.CountryListCacheKey, countryList);
-                }
-            }
-            return new JsonResult(countryList);
-        }
-
-        [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
-        [HttpGet("getCallingCode/{countryCode}")]
-        public async Task<IActionResult> GetCallingCode(string countryCode, CancellationToken cancellationToken)
-        {
-            var countryList = _cacheHelper.Get<CountryLookupResponseDto>(Constants.CountryListCacheKey);
-            if (countryList != null)
-            {
-                if (countryList.Countries.Any(countryList => countryList.CountryCode == countryCode))
-                {
-                    var callingCode = countryList.Countries.First(countryList => countryList.CountryCode == countryCode).CallingCode;
-                    var response = new GetCallingCodeResponseDto { Success = true, CallingCode = callingCode };
-                    return new JsonResult(response);
-                }
-            }
-            
-            var loginDetails = GetLoginDetails();
-            var loginData = loginDetails.Item2;
-            var result = await _lookupsService.GetCallingCodeAsync(countryCode, loginData.AccessToken, cancellationToken);
-            return new JsonResult(result);            
-        }
-
-        [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
-        [HttpGet("states")]
-        public async Task<IActionResult> GetAllStates(CancellationToken cancellationToken)
-        {
-            var stateList = _cacheHelper.Get<StateLookupResponseDto>(Constants.StateListCacheKey);
-            if (stateList == null)
-            {
-                var loginDetails = GetLoginDetails();
-                var loginData = loginDetails.Item2;
-                stateList = await _lookupsService.GetAllStatesAsync(loginData.AccessToken, cancellationToken);
-                if (stateList.Success)
-                {
-                    _cacheHelper.Set<StateLookupResponseDto>(Constants.StateListCacheKey, stateList);
-                }
-            }
-            return new JsonResult(stateList);
-        }
-
-        [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
-        [HttpGet("states/{countryCode}")]
-        public async Task<IActionResult> GetStatesByCountry(string countryCode, CancellationToken cancellationToken)
-        {
-            var stateList = _cacheHelper.Get<StateLookupResponseDto>(Constants.StateListCacheKey);
-            if (stateList == null)
-            {
-                var loginDetails = GetLoginDetails();
-                var loginData = loginDetails.Item2;
-                stateList = await _lookupsService.GetAllStatesAsync(loginData.AccessToken, cancellationToken);
-                if (stateList.Success)
-                {
-                    _cacheHelper.Set<StateLookupResponseDto>(Constants.StateListCacheKey, stateList);
-                }
-            }
-            StateLookupResponseDto stateLookupResponseDto = new StateLookupResponseDto();
-            if (stateList.Success)
-            {
-                stateLookupResponseDto.States = stateList.States.Where(s => s.CountryCode == countryCode).ToList();
-            }
-            else
-            {
-                stateLookupResponseDto.SetError(stateList.Message);
-            }
-            return new JsonResult(stateLookupResponseDto);
-        }
-        #endregion
-
-        #region Helpers
-        private Tuple<string, LoginResponseDto> GetLoginDetails()
-        {
-            var key = _cachekeyGen.CreateCacheKey(User, Constants.AuthenticationCacheKey);
-            var loginData = _cacheHelper.Get<LoginResponseDto>(key);
-            return new Tuple<string, LoginResponseDto>(key, loginData);
-        }
-        #endregion
     }
 }

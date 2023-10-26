@@ -32,9 +32,11 @@ namespace Web.User.Extensions
             services.AddTransient<CacheKeyGenrator>();
             services.AddTransient<AuthHelper>();
             services.AddTransient<AuthService>();
+            services.AddTransient<PartnerService>();
             services.AddTransient<Mapper>();
             services.AddTransient<LookupsService>();
             services.AddTransient<FileHelper>();
+            services.AddTransient<ViewHelper>();
             return services;
         }
 
@@ -110,7 +112,20 @@ namespace Web.User.Extensions
                     )
                 })
                 .ConfigureHttpClient(c => c.BaseAddress = new Uri(settings.Security.Authentication.Issuer));
-            return services;
+
+			services
+				.AddRefitClient<IPartnerApiClient>(provider => new RefitSettings
+				{
+					ContentSerializer = new NewtonsoftJsonContentSerializer
+					(
+						new JsonSerializerSettings
+						{
+							ContractResolver = new CamelCasePropertyNamesContractResolver()
+						}
+					)
+				})
+				.ConfigureHttpClient(c => c.BaseAddress = new Uri(settings.Security.Authentication.Issuer));
+			return services;
         }
     }
 }

@@ -21,10 +21,21 @@ namespace Infrastructure.Data.ApplicationDbContext.Mappings
                 .HasMany(u => u.SecurityTokenLogs)
                 .WithOne(u => u.User)
                 .HasForeignKey(u => u.UserId);
+
+            builder
+                .HasOne(u => u.UserDetails)
+                .WithOne(u => u.User)
+                .HasForeignKey<ApplicationUser>(u => u.UserId);
+
             builder
                 .HasOne(u => u.Role)
                 .WithMany(u => u.ApplicationUsers)
                 .HasForeignKey(u => u.RoleId);
+
+            builder
+                .HasOne(u => u.Group)
+                .WithMany(u => u.Users)
+                .HasForeignKey(u => u.GroupId);
         }
     }
 }

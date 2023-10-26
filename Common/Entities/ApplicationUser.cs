@@ -12,17 +12,25 @@
         public bool IsPasswordExpired { get; private set; }
         public bool IsUserLocked { get; private set; }
         public int RoleId { get; private set; }
+        /// <summary>
+        /// When ApplicationUser.Role = 'Partner' then OrganizationId is a foreign key
+        /// When ApplicationUser.Role = 'PartnerUser' then OrganizationId is the organization under which the user is registered
+        /// </summary>
+        public int? OrganizationId { get; private set; }
+        public int GroupId { get; private set; }
         public DateTime CreatedDate { get; private set; }
         public DateTime ModifiedDate { get; private set; }
 
         public ICollection<ApplicationLayer> ApplicationLayers { get; set; } = new List<ApplicationLayer>();
         public ICollection<SecurityTokenLog> SecurityTokenLogs { get; set; } = new List<SecurityTokenLog>();
-        public ApplicationUserDetails UserDetails { get; set; }
-        public UserRoleLookup Role {  get; set; }
+        public ApplicationUserDetails? UserDetails { get; set; }
+        public UserRoleLookup? Role {  get; set; }
+        public ApplicationGroupLookup Group { get; set; }
+        public ApplicationPartnerOrganization? PartnerOrganization { get; set; }
 
         protected ApplicationUser() { }
 
-        public ApplicationUser(string userName, string passwordSalt, string encryptedPassword, string email, int roleId)
+        public ApplicationUser(string userName, string passwordSalt, string encryptedPassword, string email, int roleId, int groupId, int? partnerId = null)
         {
             UserName = userName;
             UserGuid = Guid.NewGuid();
@@ -33,6 +41,8 @@
             IsPasswordExpired = false;
             IsUserLocked = false;
             RoleId = roleId;
+            GroupId = groupId;
+            OrganizationId = partnerId;
             CreatedDate = DateTime.UtcNow;
             ModifiedDate = DateTime.UtcNow;
         }
@@ -65,6 +75,11 @@
             IsEnabled = isEnabled;
             CreatedDate = CreatedDate.ToUniversalTime();
             ModifiedDate = DateTime.UtcNow;
+        }
+
+        public void SetOrganizationId(int partnerId)
+        {
+            OrganizationId = partnerId;
         }
     }
 }

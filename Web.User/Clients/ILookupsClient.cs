@@ -16,5 +16,13 @@ namespace Web.User.Clients
 
         [Get("/api/states/{countryCode}")]
         Task<StateLookupResponseDto> GetStatesByCountry(string countryCode, [Header("XApiKey")] string apiKey, [Authorize("Bearer")] string accessToken, CancellationToken cancellationToken);
+
+		[Post("/api/groups/all")]
+		Task<GroupLookupResponseDto> GetAllGroups([Header("XApiKey")] string apiKey, [Authorize("Bearer")] string accessToken, CancellationToken cancellationToken);
+		[Post("/api/groups/datatable/all")]
+		Task<DataTableResponseBase<GroupLookupRowDto>> GetGroupDataTable(GetGroupsDataTableRequest request, [Header("XApiKey")] string apiKey, [Authorize("Bearer")] string accessToken, CancellationToken cancellationToken);
+
+		[Get("/api/groups/{id}")]
+        Task<GroupLookupResponseDto> GetGroupById(int id,[Header("XApiKey")] string apiKey, [Authorize("Bearer")] string accessToken, CancellationToken cancellationToken);
     }
 }

@@ -1,0 +1,51 @@
+﻿body {
+    margin: 0px;
+}
+
+main {
+}
+
+    main > aside {
+        background: #311a41;
+        color: #c9c9d0;
+    }
+
+.branding {
+    min-height: 3rem;
+}
+
+    .branding a {
+        color: #c9c9d0;
+    }
+
+.panel-menu a {
+    color: #c9c9d0;
+    text-decoration: none;
+}
+
+    .panel-menu a:hover, .panel-menu a.active {
+        color: #ffffff;
+        background: rgba(0, 0, 0, 0.2);
+    }
+
+        .panel-menu a:hover::before {
+            content: '';
+            width: 4px;
+            height: 2.4rem;
+            background: white;
+            position: absolute;
+            left: 0;
+        }
+
+.link-header {
+    background: #44245b;
+    display: block;
+    padding-top: 5px;
+    padding-bottom: 8px;
+    font-weight: 500;
+    margin-top: 7px;
+}
+
+#frmPartner .card-header span {
+    font-weight: 600;
+}

@@ -1,0 +1,46 @@
+﻿@{
+    ViewData["Title"] = "Groups";
+    ViewData["ActiveLink"] = "Groups";
+}
+<div class="col-12">
+    <table id="groupTable" class="table table-striped" style="width: 100%">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+
+@section Scripts{
+    <script src="~/datatables.net/jquery.dataTables.min.js"></script>    
+    <script type="text/javascript">
+        $(function () {
+            $("#groupTable").DataTable({
+                ajax: {
+                    url: "/api/data/groups/table",
+                    type: "POST"
+                },
+                processing: true,
+                serverSide: true,
+                filter: true,
+                columns: [
+                    { 
+                        data: "groupName", 
+                        name: "Name",
+                        render: function (data, type, row, meta) {
+                            if (type === "display") {
+                                let link = '/Group/' + row.groupId;
+                                return '<a href="' + link + '">' + data + '</a>';
+                            }
+                            return data;
+                        }
+                    },
+                    { data: "description", name: "Description" },
+                ]
+            });
+        });
+    </script>
+}
+<link href="~/css/jquery.dataTables.min.css" rel="stylesheet" />

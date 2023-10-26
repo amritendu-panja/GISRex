@@ -1,11 +1,9 @@
 ﻿@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
-@model RegisterModel
+@model RegisterAppUserModel
 @{
 }
-
-@await Html.PartialAsync("_ValidationScriptsPartial")
 
 <div class="row d-flex justify-content-center align-items-center h-100">
     <div class="col-12 col-md-9 col-lg-7 col-xl-6">
@@ -20,14 +18,24 @@
 
                     @Html.AntiForgeryToken()
                     @Html.HiddenFor(m=>m.IsUserExists)
+                    <div class="row mb-4">
+                        <div class="col">
+                            @Html.LabelFor(m=>m.FirstName, new { @class = "form-label" })
+                            @Html.TextBoxFor(m=>m.FirstName, new { @class="form-control", @placeholder = "Firstname" })
+                        </div>
+                        <div class="col">
+                            @Html.LabelFor(m=>m.LastName, new { @class = "form-label" })
+                            @Html.TextBoxFor(m=>m.LastName, new { @class="form-control", @placeholder = "Lastname" })
+                        </div>
+                    </div>
                     <div class="mb-4">
                         @Html.LabelFor(m=> m.Email, new { @class = "form-label" })
-                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control form-control-lg input-validation-error", @placeholder = "someone@email.com", @autocomplete = "off" })
+                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control form-control-lg", @placeholder = "someone@email.com", @autocomplete = "off" })
                     </div>
                     <div class="mb-4">
                         @Html.LabelFor(m=> m.Username, new { @class = "form-label" })
                         <div class="input-group">
-                            @Html.TextBoxFor(m => m.Username, new { @class = "form-control form-control-lg input-validation-error", @placeholder = "Username", @onchange = "checkUserExists();", @autocomplete = "off" })
+                            @Html.TextBoxFor(m => m.Username, new { @class = "form-control form-control-lg", @placeholder = "Username", @onchange = "checkUserExists();", @autocomplete = "off" })
                             <span class="input-group-text">
                                 <img src="images/failure_icon.svg" id="username-status">
                             </span>
@@ -38,12 +46,12 @@
                     </div>
                     <div class="mb-4">
                         @Html.LabelFor(m=> m.Password, new { @class = "form-label" })
-                        @Html.PasswordFor(m => m.Password, new { @class = "form-control form-control-lg input-validation-error", @placeholder = "****", @autocomplete = "off" })
+                        @Html.PasswordFor(m => m.Password, new { @class = "form-control form-control-lg", @placeholder = "****", @autocomplete = "off" })
 
                     </div>
                     <div class="mb-4">
                         @Html.LabelFor(m=> m.ConfirmPassword, new { @class = "form-label" })
-                        @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control form-control-lg input-validation-error", @placeholder = "****", @autocomplete = "off" })
+                        @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control form-control-lg", @placeholder = "****", @autocomplete = "off" })
                     </div>
                     <div class="form-check d-flex justify-content-center mb-3">
                         @Html.CheckBoxFor(m=>m.IsAcceptedTermsAndConditions, new { @class = "form-check-input me-2"})
@@ -64,6 +72,9 @@
 </div>
 
 @section Scripts{
+    
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
     <script type="text/javascript">
 
         $(function(){
@@ -74,7 +85,7 @@
             var token = $('input[name="__RequestVerificationToken"]').val();
             var userName = $("#@Html.IdFor(m=>m.Username)").val();
             if (userName && userName.length >= 6) {
-                var url = '/checkuser/' + userName;
+                var url = '/api/data/checkuser/' + userName;
 
                 $.ajax({
                     type: 'GET',

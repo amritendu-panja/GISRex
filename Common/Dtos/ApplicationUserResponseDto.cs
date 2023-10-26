@@ -3,6 +3,7 @@
     public class ApplicationUserResponseDto : BaseResponseDto
     {
         public int UserId { get; set; }
+        public int? PartnerId { get; set; }
         public string UserName { get; set; }
         public Guid UserGuid { get; set; }
         public string Email { get; set; }

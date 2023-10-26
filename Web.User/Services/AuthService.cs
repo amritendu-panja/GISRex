@@ -30,12 +30,14 @@ namespace Web.User.Services
             return await _client.Login(request, _appSettings.Security.ApiKey, cancellationToken);
         }
 
-        public async Task<ApplicationUserResponseDto> RegisterAsync(string email, string userName, string password, int roleId, CancellationToken cancellationToken)
+        public async Task<ApplicationUserResponseDto> RegisterAsync(string email, string userName, string firstName, string lastName, string password, int roleId, CancellationToken cancellationToken)
         {
             CreateApplicationUserCommand command = new CreateApplicationUserCommand()
             {
                 Email = email,
                 UserName = userName,
+                Firstname = firstName,
+                Lastname = lastName,
                 PasswordSalt = password,
                 Role = roleId
             };
@@ -66,7 +68,7 @@ namespace Web.User.Services
             return await _client.Profile(userGuid, _appSettings.Security.ApiKey, accessToken, cancellationToken);
         }
 
-        public async Task<ApplicationUserResponseDto> UpdateProfileAsync(ProfileModel model, string accessToken, CancellationToken cancellationToken)
+        public async Task<ApplicationUserResponseDto> UpdateProfileAsync(AppUserProfileModel model, string accessToken, CancellationToken cancellationToken)
         {
             UpdateProfileCommand command = new UpdateProfileCommand
             {
@@ -103,6 +105,16 @@ namespace Web.User.Services
         public async Task<ApplicationUserResponseDto> CheckUserExists(string userName, CancellationToken cancellationToken)
         {
             return await _client.FindByUsername(userName, _appSettings.Security.ApiKey, cancellationToken);
+        }
+
+        public async Task<DataTableResponseBase<GetUserResponseRowDto>> GetUserDataTableAsync(GetUsersDataTableRequest request, string accessToken, CancellationToken cancellationToken)
+        {
+            return await _client.GetUserDataTable(request, _appSettings.Security.ApiKey, accessToken, cancellationToken);
+        }
+
+        public async Task<ApplicationUserListResponseDto> GetRecentUsersAsync(string accessToken, CancellationToken cancellationToken)
+        {
+            return await _client.GetRecentUsers(_appSettings.Security.ApiKey, accessToken, cancellationToken);
         }
     }
 }

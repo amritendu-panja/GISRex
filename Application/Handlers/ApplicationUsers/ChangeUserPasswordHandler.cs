@@ -1,6 +1,7 @@
 ﻿using Application.Helpers;
 using Application.Repository;
 using Common.Dtos;
+using Common.Exceptions;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -21,32 +22,40 @@ namespace Application.Handlers.ApplicationUsers
 
         public async Task<LogoutResponseDto> Handle(ChangeUserPasswordCommand request, CancellationToken cancellationToken)
         {
-            var errorMessage = "Old password do not match.";
-            LogoutResponseDto response = new LogoutResponseDto();
-            var user = _repository.Find(u => u.UserGuid == request.UserId).FirstOrDefault();
-            if (user == null)
+            try
             {
-                response.SetError(errorMessage);
-                _logger.LogError(errorMessage);
-            }
-            else
-            {
-                if (!_hashHelper.VerifyPassword(request.OldPassword, user.PasswordEncrypted))
+                var errorMessage = "Old password do not match.";
+                LogoutResponseDto response = new LogoutResponseDto();
+                var user = _repository.Find(u => u.UserGuid == request.UserId).FirstOrDefault();
+                if (user == null)
                 {
                     response.SetError(errorMessage);
                     _logger.LogError(errorMessage);
                 }
                 else
                 {
-                    _logger.LogInformation("Generating tokens");
-                    var newPassword = _hashHelper.HashPassword(request.NewPassword, user.PasswordSalt);
-                    user.SetPassword(newPassword);
-                    await _repository.UpdateAsync(user);
-                    response.SetSuccess();
-                    response.Message = "Password changed successfully";
+                    if (!_hashHelper.VerifyPassword(request.OldPassword, user.PasswordEncrypted))
+                    {
+                        response.SetError(errorMessage);
+                        _logger.LogError(errorMessage);
+                    }
+                    else
+                    {
+                        _logger.LogInformation("Generating tokens");
+                        var newPassword = _hashHelper.HashPassword(request.NewPassword, user.PasswordSalt);
+                        user.SetPassword(newPassword);
+                        await _repository.UpdateAsync(user);
+                        response.SetSuccess();
+                        response.Message = "Password changed successfully";
+                    }
                 }
+                return response;
             }
-            return response;
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occured while changing password for UserId {0}", request.UserId);
+                throw new DbException(ex.Message);
+            }
         }
     }
 }

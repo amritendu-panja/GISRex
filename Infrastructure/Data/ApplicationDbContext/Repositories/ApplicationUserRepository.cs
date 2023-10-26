@@ -1,8 +1,8 @@
 ﻿using Application.Repository;
 using Common.Entities;
+using Dapper;
 using Infrastructure.Data.Repository;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 using System.Linq.Expressions;
 
 namespace Infrastructure.Data.ApplicationDbContext.Repositories
@@ -23,12 +23,24 @@ namespace Infrastructure.Data.ApplicationDbContext.Repositories
             return Find(u => u.UserName.ToLower() == username).Any();
         }
 
-        public override IEnumerable<ApplicationUser> Find(Expression<Func<ApplicationUser, bool>> expression)
+        public IQueryable<ApplicationUser> FindWithDetails(Expression<Func<ApplicationUser, bool>> expression)
         {
             return _context.Set<ApplicationUser>()
                 .Where(expression)
                 .Include(u => u.UserDetails)
-                .Include(u => u.Role);
+                .Include(u => u.Role)
+                .Include(u => u.Group);
         }
-    }
+
+		public async Task<List<ApplicationUserListItemBase>> GetMostRecentUsedUsers(string query, int count)
+		{
+			using (var conn = _context.Database.GetDbConnection())
+			{
+				DynamicParameters parameters = new DynamicParameters();
+				parameters.Add("p_count", count);
+				var records = await conn.QueryAsync<ApplicationUserListItemBase>(query, parameters);
+				return records.ToList();
+			}
+		}
+	}
 }

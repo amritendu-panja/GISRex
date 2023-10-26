@@ -12,7 +12,7 @@ namespace Infrastructure.Data.Repository
             _context = context;
         }
 
-        public IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> expression)
+        public IQueryable<TEntity> Find(Expression<Func<TEntity, bool>> expression)
         {
             return _context.Set<TEntity>().Where(expression);
         }

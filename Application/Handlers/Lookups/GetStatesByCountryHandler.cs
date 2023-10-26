@@ -1,6 +1,7 @@
 ﻿using Application.Repository;
 using Common.Dtos;
 using Common.Entities;
+using Common.Exceptions;
 using Common.Mappings;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -22,20 +23,28 @@ namespace Application.Handlers.Lookups
 
         public async Task<StateLookupResponseDto> Handle(GetStatesByCountryRequest request, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Getting all states");
-            StateLookupResponseDto responseDto = new StateLookupResponseDto();
-            var states = _repository.Find(s => s.CountryCode == request.CountryCode);
-            if (states != null)
+            try
             {
-                _mapping.Map(states, responseDto);
+                _logger.LogInformation("Getting states for {0}", request.CountryCode);
+                StateLookupResponseDto responseDto = new StateLookupResponseDto();
+                var states = _repository.Find(s => s.CountryCode == request.CountryCode);
+                if (states != null)
+                {
+                    _mapping.Map(states, responseDto);
+                }
+                else
+                {
+                    string error = "No states found";
+                    _logger.LogWarning(error);
+                    responseDto.SetError(error);
+                }
+                return responseDto;
             }
-            else
+            catch (Exception ex)
             {
-                string error = "No states found";
-                _logger.LogWarning(error);
-                responseDto.SetError(error);
+                _logger.LogError(ex, "Error occured while getting states for country {0}", request.CountryCode);
+                throw new DbException(ex.Message);
             }
-            return responseDto;
         }
     }
 }

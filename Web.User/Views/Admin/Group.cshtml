@@ -1,0 +1,33 @@
+﻿@model ApplicationGroupModel
+
+@{
+	ViewData["Title"] = "Group";
+	ViewData["ActiveLink"] = "Groups";
+}
+<div class="col-12 d-flex justify-content-center">
+	<div class="col-8">
+		<div class="card">
+			<div class="card-header">
+				<span>Group Details</span>
+			</div>
+			<div class="card-body">
+				<div class="row mb-3">
+					<div class="col">
+						@Html.LabelFor(m=> m.GroupName)
+					</div>
+					<div class="col">
+						@Html.DisplayFor(m=> m.GroupName)
+					</div>
+				</div>
+				<div class="row mb-3">
+					<div class="col">
+						@Html.LabelFor(m=> m.Description)
+					</div>
+					<div class="col">
+						@Html.DisplayFor(m=> m.Description)
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

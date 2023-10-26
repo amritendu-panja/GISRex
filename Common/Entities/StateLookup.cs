@@ -10,5 +10,7 @@ namespace Common.Entities
         public string? StateCode { get; private set; }
         public string StateName { get; private set; }
         public string CountryCode { get; private set; }
+        //public List<ApplicationUserDetails>? ApplicationUsersDetails { get; set; }
+        //public List<ApplicationPartnerOrganization>? ApplicationPartners { get; set; }
     }
 }

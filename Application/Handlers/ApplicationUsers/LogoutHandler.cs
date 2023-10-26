@@ -24,27 +24,39 @@ namespace Application.Handlers.ApplicationUsers
 
         public async Task<LogoutResponseDto> Handle(LogoutRequest request, CancellationToken cancellationToken)
         {
-            var errorMessage = "User not validated.";
-            var user = _userRepository.Find(u => u.UserGuid == request.UserId && u.IsEnabled == true).FirstOrDefault();
-            
-            if (user == null)
+            try
             {
-                throw new InvalidModelException(errorMessage);
-            }
+                var errorMessage = "User not validated.";
+                var user = _userRepository.Find(u => u.UserGuid == request.UserId && u.IsEnabled == true).FirstOrDefault();
 
-            var tokenLogs = _repository.Find(l => l.UserId ==  user.UserId && l.IsEnabled == true).ToList();
-            if (tokenLogs != null && tokenLogs.Count() > 0)
-            {
-                foreach (var tokenLog in tokenLogs)
+                if (user == null)
                 {
-                    tokenLog.Disable();
+                    throw new InvalidModelException(errorMessage);
                 }
-                await _repository.UpdateRangeAsync(tokenLogs);
-            }
 
-            LogoutResponseDto responseDto = new LogoutResponseDto();
-            responseDto.Message = "Logout successful";
-            return responseDto;
+                var tokenLogs = _repository.Find(l => l.UserId == user.UserId && l.IsEnabled == true).ToList();
+                if (tokenLogs != null && tokenLogs.Count() > 0)
+                {
+                    foreach (var tokenLog in tokenLogs)
+                    {
+                        tokenLog.Disable();
+                    }
+                    await _repository.UpdateRangeAsync(tokenLogs);
+                }
+
+                LogoutResponseDto responseDto = new LogoutResponseDto();
+                responseDto.Message = "Logout successful";
+                return responseDto;
+            }
+            catch (InvalidModelException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occured while logging out for UserId {0}", request.UserId);
+                throw new DbException(ex.Message);
+            }
         }
     }
 }

@@ -18,10 +18,21 @@
         public DateTime? CreateDate { get; private set; }
         public DateTime? ModifiedDate { get; private set; }
 
-        public ApplicationUser User { get; set; }
+        public ApplicationUser? User { get; set; }
+        //public CountryLookup? Country { get; set; }
+        //public StateLookup? State { get; set; }
 
         protected ApplicationUserDetails()
         {
+        }
+
+        public ApplicationUserDetails(int userId,
+            string firstName,
+            string lastName)
+        {
+            UserId = userId;
+            FirstName = firstName;
+            LastName = lastName;
         }
 
         public ApplicationUserDetails

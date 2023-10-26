@@ -1,0 +1,65 @@
+﻿@model PartnersDashboardModel
+@{
+    ViewData["Title"] = "Partners";
+    ViewData["ActiveLink"] = "Partners";
+}
+<div class="col-12">
+    <table id="userTable" class="table table-striped" style="width: 100%">
+        <thead>
+            <tr>
+                <th>Organization</th>
+                <th>User name</th>
+                <th>Email</th>
+                <th>Domain</th>
+                <th>Country</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+
+@section Scripts{
+    <script src="~/datatables.net/jquery.dataTables.min.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $("#userTable").DataTable({
+                ajax: {
+                    url: "/api/data/partners/table",
+                    type: "POST"
+                },
+                processing: true,
+                serverSide: true,
+                filter: true,
+                columns: [
+                    {
+                        data: "organizationName",
+                        name: "Organization",
+                        render: function (data, type, row, meta) {
+                            if (type === "display") {
+                                let link = '/Partner/' + row.organizationId;
+                                return '<a href="' + link + '">' + data + '</a>';
+                            }
+                            return data;
+                        }
+                    },
+                    {
+                        data: "userName",
+                        name: "User name"
+                    },
+                    {
+                        data: "email",
+                        name: "Email"
+                    },
+                    {
+                        data: "domainName",
+                        name: "Domain"
+                    },
+                    {
+                        data: "countryCode",
+                        name: "Country"
+                    }
+                ]
+            });
+        });
+    </script>
+}
+<link href="~/css/jquery.dataTables.min.css" rel="stylesheet" />
