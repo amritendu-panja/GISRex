@@ -29,6 +29,7 @@ namespace Web.User.Helpers
 			profileModel.LastName = userResponseDto.LastName;
 			profileModel.StateCode = userResponseDto.StateCode;
 			profileModel.PostCode = userResponseDto.PostCode;
+			profileModel.UserGuid = userResponseDto.UserGuid;
 			profileModel.ImagePath = string.IsNullOrEmpty(userResponseDto.ImagePath) ? Constants.DefaultProfileImage : userResponseDto.ImagePath;
 		}
 
@@ -135,5 +136,26 @@ namespace Web.User.Helpers
             request.SortDirection = model.SortDirection;
             request.Draw = model.Draw;
         }
+
+		public void Map(RegisterPartnerUserModel model, CreateOrganizationUserCommand command)
+		{
+			command.UserName = model.Username;
+			command.PasswordSalt = model.Password;
+			command.Email = model.Email;
+			command.FirstName = model.FirstName;
+			command.LastName = model.LastName;
+			command.AddressLine1 = model.AddressLine1;
+			command.AddressLine2 = model.AddressLine2;
+			command.City = model.City;
+			command.StateCode = model.StateCode;
+			command.PostCode = model.PostCode;
+			command.CountryCode = model.CountryCode;
+			command.AlternateEmail = model.AlternateEmail;
+			command.AlternateMobile = model.AlternateMobile;
+			command.ImagePath = model.ImagePath;
+			command.OrganizationId = model.OrganizationId;
+			command.RoleId = model.RoleId;
+			command.Phone = model.Mobile;			
+		}
 	}
 }

@@ -42,5 +42,13 @@ namespace Infrastructure.Data.ApplicationDbContext.Repositories
 				return records.ToList();
 			}
 		}
-	}
+
+        public IQueryable<ApplicationUser> FindWithRole(Expression<Func<ApplicationUser, bool>> expression)
+        {
+            return _context.Set<ApplicationUser>()
+                .Where(expression)
+                .Include(u => u.Role)
+                .Include(u => u.Group);
+        }
+    }
 }

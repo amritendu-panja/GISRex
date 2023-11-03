@@ -6,6 +6,10 @@
         {
             Layout = "_AdminLayout";
         }
+        else if (viewHelper.GetUserRole(User) == Common.Settings.RoleTypes.Partner)
+        {
+            Layout = "_PartnerLayout";
+        }
         else
         {
             Layout = "_Layout";

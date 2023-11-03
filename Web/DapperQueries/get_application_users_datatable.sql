@@ -1,11 +1,12 @@
 Select Count(*) as "RecordsTotal"
 FROM public."ApplicationUser" AS a
-Where a."RoleId" = 1;
+Where a."RoleId" = ANY(@RoleIds) AND (@OrganizationId Is NULL Or a."OrganizationId" = @OrganizationId);
 
 Select Count(*) as "RecordsFiltered"
 FROM public."ApplicationUser" AS a
 INNER JOIN public."ApplicationUserDetails" AS a0 ON a."UserId" = a0."UserId"
-WHERE a."RoleId" = 1 AND 
+WHERE a."RoleId" = ANY(@RoleIds) AND 
+	(@OrganizationId Is NULL Or a."OrganizationId" = @OrganizationId) AND
 	(@SearchValue Is NULL OR @SearchValue = '' OR
     ((lower(a."UserName") LIKE @SearchValue) OR
         (lower(a."Email") LIKE @SearchValue) OR 
@@ -31,7 +32,8 @@ FROM (
     FROM public."ApplicationUser" AS a
     INNER JOIN public."ApplicationUserDetails" AS a0 ON a."UserId" = a0."UserId"
 	INNER JOIN lookups."UserRoleLookup" AS u ON a."RoleId" = u."RoleId"
-    WHERE a."RoleId" = 1 AND 
+    WHERE a."RoleId" = ANY(@RoleIds) AND
+		(@OrganizationId Is NULL Or a."OrganizationId" = @OrganizationId) AND
 		(@SearchValue Is NULL OR @SearchValue = '' OR
 		((lower(a."UserName") LIKE @SearchValue) OR
 		 (lower(a."Email") LIKE @SearchValue) OR 

@@ -2,6 +2,7 @@
 {
 	public class DataTableRequestBase
 	{
+		public Guid UserGuid { get; set; }
 		public int Draw { get; set; }
 		public string? SortColumn { get; set; }
 		public string? SortDirection { get; set; }

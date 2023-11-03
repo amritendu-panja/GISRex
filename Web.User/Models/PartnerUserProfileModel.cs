@@ -3,15 +3,13 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Web.User.Models
 {
-    public class AppUserProfileModel
+    public class PartnerUserProfileModel
     {
         [Required]
         public int UserId { get; set; }
         [Required]
-        public Guid UserGuid { get; set; }
-        [Required]
         [Display(Name = "Username")]
-        public string UserName { get; set; }
+        public string Username { get; set; }
         public string Email { get; set; }
         public string? ImagePath { get; set; }
         public string? ImageData { get; set; }
@@ -39,9 +37,9 @@ namespace Web.User.Models
         public string? CountryCode { get; set; }
 
         [Display(Name = "Alternate mobile")]
-        public string? AlternateMobile { get; set; }        
+        public string? AlternateMobile { get; set; }
 
-        public AppUserProfileModel()
+        public PartnerUserProfileModel()
         {
             ImagePath = Constants.DefaultProfileImage;
         }

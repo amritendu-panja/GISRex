@@ -3,17 +3,22 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Common.Dtos
 {
-    public class UpdateProfileCommand: IRequest<ApplicationUserResponseDto>
+    public class CreateOrganizationUserCommand : IRequest<OrganizationUserResponseDto>
     {
         [Required]
-        public int UserId { get; set; }
-        [Required]
         public string UserName { get; set; }
+        [Required]
+        public string PasswordSalt { get; set; }
+        [Required]
+        public string Email { get; set; }
+        public string? Phone { get; set; }
+        public int RoleId { get; set; }
+        public int OrganizationId { get; set; }
         public string? ImagePath { get; set; }
         [Required]
-        public string? FirstName { get; set; }
+        public string FirstName { get; set; }
         [Required]
-        public string? LastName { get; set; }
+        public string LastName { get; set; }
         public string? AddressLine1 { get; set; }
         public string? AddressLine2 { get; set; }
         public string? City { get; set; }

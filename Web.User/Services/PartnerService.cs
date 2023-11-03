@@ -7,7 +7,7 @@ using Web.User.Models;
 
 namespace Web.User.Services
 {
-	public class PartnerService
+    public class PartnerService
 	{
 		private readonly ILogger<PartnerService> _logger;
 		private readonly IPartnerApiClient _partnerApiClient;
@@ -47,6 +47,11 @@ namespace Web.User.Services
         public async Task<DataTableResponseBase<GetOrganizationResponseRowDto>> GetPartnerDataTableAsync(GetOrganizationsDataTableRequest request, string accessToken, CancellationToken cancellationToken)
         {
             return await _partnerApiClient.GetPartnerDataTable(request, appSettings.Security.ApiKey, accessToken, cancellationToken);
+        }
+
+		public async Task<OrganizationUserResponseDto> CreateOrgainizationUserAsync(CreateOrganizationUserCommand command, string accessToken, CancellationToken cancellationToken)
+		{
+            return await _partnerApiClient.CreateUser(command, appSettings.Security.ApiKey, accessToken, cancellationToken);
         }
     }
 }

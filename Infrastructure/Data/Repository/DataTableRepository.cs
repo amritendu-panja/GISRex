@@ -3,19 +3,13 @@ using Application.Repository;
 using Common.Dtos;
 using Common.Exceptions;
 using Dapper;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using System.Data;
 
 namespace Infrastructure.Data.Repository
 {
-	public class DataTableRepository<T> : IDataTableRepository<T> where T : class
+    public class DataTableRepository<T> : IDataTableRepository<T> where T : class
 	{
 		private readonly ApplicationDbContext.ApplicationDbContext _context;
 		private readonly IFileHelper _fileHelper;
@@ -33,7 +27,7 @@ namespace Infrastructure.Data.Repository
 			_logger = logger;
 		}
 
-		public async Task<DataTableResponseBase<T>> Get(DataTableRequestBase requestBase, string queryName)
+		public async Task<DataTableResponseBase<T>> Get(DataTableRequestBase requestBase, string queryName, List<DapperParameter>? additionalParams = null)
 		{
 			DataTableResponseBase<T> response = new DataTableResponseBase<T>();
 			string sortColumn = string.Empty;
@@ -53,9 +47,18 @@ namespace Infrastructure.Data.Repository
 				{
 					requestBase.SearchValue = $"%{requestBase.SearchValue.ToLower()}%";
 				}
-				using (var connection = _context.Database.GetDbConnection())
+				var parameters = new DynamicParameters();
+				Map(requestBase, parameters);
+				if(additionalParams != null)
 				{
-					using (var multi = await connection.QueryMultipleAsync(query, requestBase))
+					foreach( var additionalParam in additionalParams)
+					{
+						parameters.Add(additionalParam.Name, additionalParam.Value,(DbType) ((int) additionalParam.DbType), ParameterDirection.Input);
+					}
+				}
+                using (var connection = _context.Database.GetDbConnection())
+				{
+					using (var multi = await connection.QueryMultipleAsync(query, parameters))
 					{
 						response.RecordsTotal = await multi.ReadFirstAsync<int>();
 						response.RecordsFiltered = await multi.ReadFirstAsync<int>();
@@ -64,7 +67,7 @@ namespace Infrastructure.Data.Repository
 						{
 							response.Data = new List<T>();
 							response.Data.AddRange(data);
-						}						
+						}
 					}
 				}
 			}
@@ -74,5 +77,14 @@ namespace Infrastructure.Data.Repository
 			}
 			return response;
 		}
-	}
+
+		private void Map(DataTableRequestBase requestBase, DynamicParameters parameters)
+		{
+			var properties = requestBase.GetType().GetProperties();
+			foreach (var property in properties)
+			{
+				parameters.Add(property.Name, property.GetValue(requestBase));
+			}
+		}
+    }
 }

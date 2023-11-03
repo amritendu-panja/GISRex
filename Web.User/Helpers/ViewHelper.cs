@@ -1,6 +1,5 @@
 ﻿using Common.Dtos;
 using Common.Settings;
-using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 
 namespace Web.User.Helpers
@@ -97,6 +96,13 @@ namespace Web.User.Helpers
             var key = _cachekeyGen.CreateCacheKey(principal, Constants.AuthenticationCacheKey);
             var loginData = _cacheHelper.Get<LoginResponseDto>(key);
             return new Tuple<string, LoginResponseDto>(key, loginData);
+        }
+
+        public string GetAccessToken(ClaimsPrincipal principal)
+        {
+            var key = _cachekeyGen.CreateCacheKey(principal, Constants.AuthenticationCacheKey);
+            var loginData = _cacheHelper.Get<LoginResponseDto>(key);
+            return loginData.AccessToken;
         }
 
         public string GetActiveLink(string currentLinkName, string activeLinkName)

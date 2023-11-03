@@ -19,5 +19,8 @@ namespace Web.User.Clients
 
         [Post("/api/partners/datatable/all")]
         Task<DataTableResponseBase<GetOrganizationResponseRowDto>> GetPartnerDataTable(GetOrganizationsDataTableRequest request, [Header("XApiKey")] string apiKey, [Authorize("Bearer")] string accessToken, CancellationToken cancellationToken);
+
+		[Post("/api/partners/user/create")]
+		Task<OrganizationUserResponseDto> CreateUser([Body] CreateOrganizationUserCommand, [Header("XApiKey")] string apiKey, [Authorize("Bearer")] string accessToken, CancellationToken cancellationToken);
     }
 }

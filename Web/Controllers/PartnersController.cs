@@ -107,5 +107,19 @@ namespace Web.Controllers
                 return BadRequest();
             }
         }
+
+		[HttpPost("user/create")]
+		public async Task<IActionResult> CreateUser(CreateOrganizationUserCommand request)
+		{
+            var result = await _mediator.Send(request);
+            if (result != null)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
     }
 }

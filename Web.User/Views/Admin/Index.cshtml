@@ -1,14 +1,14 @@
 ﻿@model AdminLandingModel
 @{
     ViewData["Title"] = "Home";
-    ViewData["ActiveLink"] = "None";
+    ViewData["ActiveLink"] = "Home";
     var MaxCount = 3;
 }
 <div class="d-flex flex-column">
     <div class="d-flex flex-row pb-3">
         <h4>Most recently opened Partners</h4>
         <div class="ms-auto">
-            <a asp-controller="Admin" asp-action="AddPartner" class="btn btn-primary">Add new Partner <i class="fa-solid fa-plus"></i></a>
+            <a asp-controller="Admin" asp-action="AddPartner" class="btn btn-primary">Add New Partner <i class="fa-solid fa-plus"></i></a>
         </div>
     </div>
 

@@ -37,10 +37,11 @@
                         <div class="input-group">
                             @Html.TextBoxFor(m => m.Username, new { @class = "form-control form-control-lg", @placeholder = "Username", @onchange = "checkUserExists();", @autocomplete = "off" })
                             <span class="input-group-text">
-                                <img src="images/failure_icon.svg" id="username-status">
+                                <i class="fa-solid fa-xmark" id="username-na"></i>
+                                <i class="fa-solid fa-check" id="username-ok"></i>
                             </span>
                             <button type="button" class="btn btn-outline-secondary" onclick="checkUserExists()">
-                                <img src="images/refresh_icon.svg" id="refresh-check-username">
+                                <i class="fa-solid fa-rotate"></i>
                             </button>
                         </div>
                     </div>
@@ -81,7 +82,7 @@
             checkUserExists();
         });
 
-        function checkUserExists() {            
+        function checkUserExists() {
             var token = $('input[name="__RequestVerificationToken"]').val();
             var userName = $("#@Html.IdFor(m=>m.Username)").val();
             if (userName && userName.length >= 6) {
@@ -97,10 +98,12 @@
                     success: function (response) {
                         $("#@Html.IdFor(m=>m.IsUserExists)").val(response.success);
                         if (response.success) {
-                            $("#username-status").attr("src", "images/failure_icon.svg");
+                            $("#username-na").show();
+                            $("#username-ok").hide();
                         }
                         else {
-                            $("#username-status").attr("src", "images/tick_icon.svg")
+                            $("#username-na").hide();
+                            $("#username-ok").show();
                         }
                     },
                     error: function (xhrError) {
@@ -108,6 +111,11 @@
                         alert("Something went wrong! Please contact support")
                     }
                 });
+            }
+            else {
+                $("#@Html.IdFor(m=>m.IsUserExists)").val(false);
+                $("#username-na").show();
+                $("#username-ok").hide();
             }
         }
     </script>

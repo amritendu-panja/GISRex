@@ -39,6 +39,46 @@ namespace Common.Mappings
             }
         }
 
+        public void Map(ApplicationUser user, OrganizationUserResponseDto response)
+        {
+            if (user != null && response != null)
+            {
+                response.UserId = user.UserId;
+                response.UserName = user.UserName;
+                response.UserGuid = user.UserGuid;
+                response.Email = user.Email;
+                response.IsLocked = user.IsUserLocked;
+                response.IsPasswordExpired = user.IsPasswordExpired;
+                if (user.UserDetails != null)
+                {
+                    response.FirstName = user.UserDetails.FirstName;
+                    response.LastName = user.UserDetails.LastName;
+                    response.ImagePath = user.UserDetails.ImagePath;
+                    response.AddressLine1 = user.UserDetails.AddressLine1;
+                    response.AddressLine2 = user.UserDetails.AddressLine2;
+                    response.AlternateEmail = user.UserDetails.AlternateEmail;
+                    response.Mobile = user.UserDetails.Mobile;
+                    response.AlternateMobile = user.UserDetails.AlternateMobile;
+                    response.City = user.UserDetails.City;
+                    response.StateCode = user.UserDetails.StateCode;
+                    response.PostCode = user.UserDetails.PostCode;
+                    response.CountryCode = user.UserDetails.CountryCode;
+                }
+                if (user.PartnerOrganization != null)
+                {
+                    response.OrganizationId = user.PartnerOrganization.OrganizationId;
+                    response.OrganizationName = user.PartnerOrganization.OrganizationName;
+                    response.OrganizationLogo = user.PartnerOrganization.LogoUrl;
+                }
+                if(user.Role != null)
+                {
+                    response.RoleId = user.Role.RoleId;
+                    response.RoleName = user.Role.Role;
+                }
+            }
+
+        }
+
         /// <summary>
         /// Maps ApplicationUser to ApplicationPartnerResponseDto
         /// </summary>
