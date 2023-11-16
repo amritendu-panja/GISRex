@@ -1,6 +1,6 @@
 ﻿namespace Common.Dtos
 {
-    public class ApplicationOrganizationResponseDto: BaseResponseDto
+    public class GetApplicationOrganizationResponseDto: BaseResponseDto
     {
         public int UserId { get; set; }
         public string UserName { get; set; }
@@ -19,5 +19,9 @@
         public string? PostCode { get; set; }
         public string CountryCode { get; set; }
         public bool IsLocked { get; set; }
+        public int RoleId { get; set; }
+        public string RoleName { get; set; }
+        public int GroupId { get; set; }
+        public string GroupName { get; set; }
     }
 }

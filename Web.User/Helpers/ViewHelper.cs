@@ -38,7 +38,7 @@ namespace Web.User.Helpers
                 var userRole = GetUserRole(principal);
                 if(userRole == RoleTypes.AppUser || userRole == RoleTypes.Administrator)
                 {
-                    var userDetails = _cacheHelper.Get<ApplicationUserResponseDto>(userKey);
+                    var userDetails = _cacheHelper.Get<GetApplicationUserResponseDto>(userKey);
                     if (userDetails != null)
                     {
                         if (!string.IsNullOrEmpty(userDetails.FirstName) && !string.IsNullOrEmpty(userDetails.LastName))

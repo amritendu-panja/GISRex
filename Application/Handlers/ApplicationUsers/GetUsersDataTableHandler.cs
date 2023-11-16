@@ -41,7 +41,7 @@ namespace Application.Handlers.ApplicationUsers
 						roleIds.Add((int)RoleTypes.AppUser);
 						roleIds.Add((int)RoleTypes.PartnerUser);
                     }
-					else if (user.RoleId == (int) RoleTypes.Partner)
+					else if (user.RoleId == (int) RoleTypes.Partner || user.RoleId == (int) RoleTypes.PartnerUser)
 					{
                         roleIds.Add((int)RoleTypes.PartnerUser);
                     }

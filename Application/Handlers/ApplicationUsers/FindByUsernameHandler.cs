@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.Handlers.ApplicationUsers
 {
-    public class FindByUsernameHandler : IRequestHandler<FindByUsernameRequest, ApplicationUserResponseDto>
+    public class FindByUsernameHandler : IRequestHandler<FindByUsernameRequest, GetApplicationUserResponseDto>
     {
         private readonly ILogger<FindByUsernameHandler> _logger;
         private readonly IApplicationUserRepository _repository;
@@ -23,13 +23,13 @@ namespace Application.Handlers.ApplicationUsers
             this._sharedMapping = sharedMapping;
         }
 
-        public Task<ApplicationUserResponseDto> Handle(FindByUsernameRequest request, CancellationToken cancellationToken)
+        public Task<GetApplicationUserResponseDto> Handle(FindByUsernameRequest request, CancellationToken cancellationToken)
         {
             try
             {
                 _logger.LogInformation($"Getting user data for {request.Username}");
                 var user = _repository.Find(u => u.UserName == request.Username).FirstOrDefault();
-                ApplicationUserResponseDto responseDto = new ApplicationUserResponseDto();
+                GetApplicationUserResponseDto responseDto = new GetApplicationUserResponseDto();
                 if (user != null)
                 {
                     _sharedMapping.Map(user, responseDto);

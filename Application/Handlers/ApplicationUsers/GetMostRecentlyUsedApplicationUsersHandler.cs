@@ -5,15 +5,10 @@ using Common.Exceptions;
 using Common.Mappings;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.Handlers.ApplicationUsers
 {
-	public class GetMostRecentlyUsedApplicationUsersHandler : IRequestHandler<GetMostRecentUsersRequest, ApplicationUserListResponseDto>
+    public class GetMostRecentlyUsedApplicationUsersHandler : IRequestHandler<GetMostRecentUsersRequest, GetApplicationUserListResponseDto>
 	{
 		private readonly IApplicationUserRepository _repository;
 		private readonly ILogger<GetMostRecentlyUsedApplicationUsersHandler> _logger;
@@ -32,20 +27,20 @@ namespace Application.Handlers.ApplicationUsers
 			_fileHelper = fileHelper;
 		}
 
-		public async Task<ApplicationUserListResponseDto> Handle(GetMostRecentUsersRequest request, CancellationToken cancellationToken)
+		public async Task<GetApplicationUserListResponseDto> Handle(GetMostRecentUsersRequest request, CancellationToken cancellationToken)
 		{
-			ApplicationUserListResponseDto responseDto = new ApplicationUserListResponseDto();
+			GetApplicationUserListResponseDto responseDto = new GetApplicationUserListResponseDto();
 			try
 			{
 				var query = await _fileHelper.GetFileContent("UserMruList");
-				var userList = await _repository.GetMostRecentUsedUsers(query, request.Count);
+				var userList = await _repository.GetMostRecentOpenedApplicationUsers(query, request.Count);
 				if (userList != null)
 				{
 					_sharedMapping.Map(userList, responseDto);
 				}
 				else
 				{
-					responseDto.Users = new List<ApplicationUserListItemBaseDto>();
+					responseDto.Users = new List<BaseApplicationUserListItemDto>();
 				}
 			}
 			catch (Exception ex)

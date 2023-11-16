@@ -32,7 +32,17 @@ namespace Infrastructure.Data.ApplicationDbContext.Repositories
                 .Include(u => u.Group);
         }
 
-		public async Task<List<ApplicationUserListItemBase>> GetMostRecentUsedUsers(string query, int count)
+        public IQueryable<ApplicationUser> FindWithOrganizationDetails(Expression<Func<ApplicationUser, bool>> expression)
+        {
+            return _context.Set<ApplicationUser>()
+                .Where(expression)
+                .Include(u => u.UserDetails)
+                .Include(u => u.PartnerOrganization)
+                .Include(u => u.Role)
+                .Include(u => u.Group);
+        }
+
+        public async Task<List<ApplicationUserListItemBase>> GetMostRecentOpenedApplicationUsers(string query, int count)
 		{
 			using (var conn = _context.Database.GetDbConnection())
 			{
@@ -42,6 +52,18 @@ namespace Infrastructure.Data.ApplicationDbContext.Repositories
 				return records.ToList();
 			}
 		}
+
+        public async Task<List<OrganizationUserListItemBase>> GetMostRecentOpenedOrganizationUsers(string query, int organizationId, int count)
+        {
+            using (var conn = _context.Database.GetDbConnection())
+            {
+                DynamicParameters parameters = new DynamicParameters();
+                parameters.Add("org_id", organizationId);
+                parameters.Add("p_count", count);
+                var records = await conn.QueryAsync<OrganizationUserListItemBase>(query, parameters);
+                return records.ToList();
+            }
+        }
 
         public IQueryable<ApplicationUser> FindWithRole(Expression<Func<ApplicationUser, bool>> expression)
         {

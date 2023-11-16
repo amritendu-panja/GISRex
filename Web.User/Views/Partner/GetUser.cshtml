@@ -27,6 +27,15 @@
                 NeedCountryCallingCode = true
             };
 }
+@section HeaderNavBar{
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a asp-controller="Partners" asp-action="Users" class="btn btn-primary text-white">
+                <i class="fa-solid fa-users"></i><span class="ms-2">Back to Users</span>
+            </a>
+        </li>
+    </ul>
+}
 
 <div class="row d-flex justify-content-center h-100">
     <div class="col-xl-4 align-top">
@@ -42,7 +51,7 @@
         </div>
     </div>
     <div class="col-xl-8">
-        <div class="card mb-4">
+        <div class="card">
             <div class="card-header">
                 <h4>Account Details</h4>
             </div>
@@ -53,25 +62,23 @@
 
                     @Html.AntiForgeryToken()
                     
-                    
+                    @Html.HiddenFor(m=> m.UserId)
+                    @Html.HiddenFor(m=> m.UserGuid)
                     @Html.HiddenFor(m => m.ImageData)
                     @Html.HiddenFor(m=> m.ImageFilename)
-                    <div class="mb-4">
-                        @Html.LabelFor(m=> m.Email, new { @class = "form-label" })
-                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control form-control-lg", @placeholder = "someone@email.com", @autocomplete = "off" })
-                    </div>
-                    <div class="mb-4">
+                    @Html.HiddenFor(m => m.OrganizationId)
+                    @Html.HiddenFor(m => m.RoleId)
+                    @Html.HiddenFor(m => m.GroupId)
+                    
+                    <div class="col-12 mb-3">
                         @Html.LabelFor(m=> m.Username, new { @class = "form-label" })
-                        <div class="input-group">
-                            @Html.TextBoxFor(m => m.Username, new { @class = "form-control form-control-lg", @placeholder = "Username", @onchange = "checkUserExists();", @autocomplete = "off" })
-                            <span class="input-group-text">
-                                <img src="images/failure_icon.svg" id="username-status">
-                            </span>
-                            <button type="button" class="btn btn-outline-secondary" onclick="checkUserExists()">
-                                <img src="images/refresh_icon.svg" id="refresh-check-username">
-                            </button>
-                        </div>
-                    </div>                    
+                        @Html.TextBoxFor(m => m.Username, new { @class = "form-control", @placeholder = "Username", @readonly = "readonly", @onchange = "checkUserExists();", @autocomplete = "off" })
+
+                    </div>
+                    <div class="col-12 mb-3">
+                        @Html.LabelFor(m=> m.Email, new { @class = "form-label" })
+                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control", @placeholder = "someone@email.com", @autocomplete = "off" })
+                    </div>                                        
                     <div class="row mb-3">
                         <div class="col">
                             @Html.LabelFor(m=>m.FirstName, new { @class = "form-label" })

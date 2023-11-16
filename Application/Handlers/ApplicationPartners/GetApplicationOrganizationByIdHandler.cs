@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.Handlers.ApplicationPartners
 {
-	public class GetApplicationOrganizationByIdHandler : IRequestHandler<GetApplicationOrganizationByIdRequest, ApplicationOrganizationResponseDto>
+	public class GetApplicationOrganizationByIdHandler : IRequestHandler<GetApplicationOrganizationByIdRequest, GetApplicationOrganizationResponseDto>
     {
         private readonly IApplicationPartnerOrganizationRepository _organizationRepository;
         private readonly SharedMapping _mapping;
@@ -20,9 +20,9 @@ namespace Application.Handlers.ApplicationPartners
             _logger = logger;
         }
 
-        public async Task<ApplicationOrganizationResponseDto> Handle(GetApplicationOrganizationByIdRequest request, CancellationToken cancellationToken)
+        public async Task<GetApplicationOrganizationResponseDto> Handle(GetApplicationOrganizationByIdRequest request, CancellationToken cancellationToken)
         {
-            ApplicationOrganizationResponseDto responseDto = new ApplicationOrganizationResponseDto();
+            GetApplicationOrganizationResponseDto responseDto = new GetApplicationOrganizationResponseDto();
             try
             {
                 _logger.LogInformation("Getting Organization details for OrgId: {0}", request.OrganizationId);

@@ -10,6 +10,7 @@ namespace Web.User.Models
         [Required]
         [Display(Name = "Username")]
         public string Username { get; set; }
+        public Guid UserGuid { get; set; }
         public string Email { get; set; }
         public string? ImagePath { get; set; }
         public string? ImageData { get; set; }
@@ -38,6 +39,9 @@ namespace Web.User.Models
 
         [Display(Name = "Alternate mobile")]
         public string? AlternateMobile { get; set; }
+        public int OrganizationId { get; set; }
+        public int RoleId { get; set; }
+        public int GroupId { get; set; }
 
         public PartnerUserProfileModel()
         {

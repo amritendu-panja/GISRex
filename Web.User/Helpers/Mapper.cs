@@ -1,14 +1,13 @@
 ﻿using Common.Dtos;
 using Common.Settings;
-using MediatR;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Web.User.Models;
 
 namespace Web.User.Helpers
 {
-	public class Mapper
+    public class Mapper
 	{
-		public void Map(ApplicationUserResponseDto userResponseDto, AppUserProfileModel profileModel)
+		public void Map(GetApplicationUserResponseDto userResponseDto, AppUserProfileModel profileModel)
 		{
 			if (userResponseDto == null) { return; }
 			if (profileModel == null)
@@ -73,7 +72,7 @@ namespace Web.User.Helpers
 			partnerCommand.PostCode = partnerModel.PostCode;
 		}
 
-		public void Map(ApplicationOrganizationResponseDto dto, PartnerProfileModel model)
+		public void Map(GetApplicationOrganizationResponseDto dto, PartnerProfileModel model)
 		{
 			if (dto != null)
 			{
@@ -157,5 +156,83 @@ namespace Web.User.Helpers
 			command.RoleId = model.RoleId;
 			command.Phone = model.Mobile;			
 		}
-	}
+
+        public void Map(RegisterPartnerUserModel model, AppUserProfileModel command)
+        {
+            command.UserName = model.Username;
+            command.Email = model.Email;
+            command.FirstName = model.FirstName;
+            command.LastName = model.LastName;
+            command.AddressLine1 = model.AddressLine1;
+            command.AddressLine2 = model.AddressLine2;
+            command.City = model.City;
+            command.StateCode = model.StateCode;
+            command.PostCode = model.PostCode;
+            command.CountryCode = model.CountryCode;
+            command.AlternateEmail = model.AlternateEmail;
+            command.AlternateMobile = model.AlternateMobile;
+            command.ImagePath = model.ImagePath;
+            command.Mobile = model.Mobile;
+        }
+
+		public void Map(GetOrganizationUserResponseDto dto, PartnerUserProfileModel model)
+		{
+			model.UserId = dto.UserId;
+			model.UserGuid = dto.UserGuid;
+			model.Username = dto.UserName;
+			model.Email = dto.Email;
+			model.FirstName = dto.FirstName;
+			model.LastName = dto.LastName;
+			model.AddressLine1 = dto.AddressLine1;
+			model.AddressLine2 = dto.AddressLine2;
+			model.City = dto.City;
+			model.StateCode = dto.StateCode;
+			model.PostCode = dto.PostCode;
+			model.CountryCode = dto.CountryCode;
+			model.AlternateEmail = dto.AlternateEmail;
+			model.AlternateMobile = dto.AlternateMobile;
+			model.ImagePath = dto.ImagePath;
+			model.Mobile = dto.Mobile;
+			model.OrganizationId = dto.OrganizationId;
+			model.RoleId = dto.RoleId;
+			model.GroupId = dto.GroupId;
+		}
+
+		public void Map(PartnerUserProfileModel model, UpdateOrganizationUserProfileCommand command)
+		{
+			command.UserId = model.UserId;
+			command.UserName = model.Username;
+			command.Email = model.Email;
+			command.FirstName = model.FirstName;
+			command.LastName = model.LastName;
+			command.AddressLine1 = model.AddressLine1;
+			command.AddressLine2 = model.AddressLine2;
+			command.City = model.City;
+			command.StateCode = model.StateCode;
+			command.PostCode = model.PostCode;
+			command.CountryCode = model.CountryCode;
+			command.AlternateEmail = model.AlternateEmail;
+			command.AlternateMobile = model.Mobile;
+			command.ImagePath = model.ImagePath;
+			command.Mobile = model.Mobile;
+		}
+
+        public void Map(RegisterPartnerUserModel model, UpdateOrganizationUserProfileCommand updateCommand)
+        {
+            updateCommand.UserName = model.Username;
+            updateCommand.Email = model.Email;
+            updateCommand.FirstName = model.FirstName;
+            updateCommand.LastName = model.LastName;
+            updateCommand.AddressLine1 = model.AddressLine1;
+            updateCommand.AddressLine2 = model.AddressLine2;
+            updateCommand.City = model.City;
+            updateCommand.StateCode = model.StateCode;
+            updateCommand.PostCode = model.PostCode;
+            updateCommand.CountryCode = model.CountryCode;
+            updateCommand.AlternateEmail = model.AlternateEmail;
+            updateCommand.AlternateMobile = model.Mobile;
+            updateCommand.ImagePath = model.ImagePath;
+            updateCommand.Mobile = model.Mobile;
+        }
+    }
 }

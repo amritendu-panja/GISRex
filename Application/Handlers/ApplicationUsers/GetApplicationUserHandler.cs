@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.Handlers.ApplicationUsers
 {
-    public class GetApplicationUserHandler : IRequestHandler<GetApplicationUserRequest, ApplicationUserResponseDto>
+    public class GetApplicationUserHandler : IRequestHandler<GetApplicationUserRequest, GetApplicationUserResponseDto>
     {
         private readonly ILogger<GetApplicationUserHandler> _logger;
         private readonly IApplicationUserRepository _repository;        
@@ -24,13 +24,13 @@ namespace Application.Handlers.ApplicationUsers
             this._logger = logger;
         }
 
-        public Task<ApplicationUserResponseDto> Handle(GetApplicationUserRequest request, CancellationToken cancellationToken)
+        public Task<GetApplicationUserResponseDto> Handle(GetApplicationUserRequest request, CancellationToken cancellationToken)
         {
             try
             {
                 _logger.LogInformation($"Getting user data for {request.UserGuid}");
                 var user = _repository.FindWithDetails(u => u.UserGuid == request.UserGuid).FirstOrDefault();
-                ApplicationUserResponseDto responseDto = new ApplicationUserResponseDto();
+                GetApplicationUserResponseDto responseDto = new GetApplicationUserResponseDto();
                 if (user != null)
                 {
                     sharedMapping.Map(user, responseDto);

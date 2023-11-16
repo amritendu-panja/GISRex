@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Common.Dtos
 {
-    public class UpdateProfileCommand: IRequest<ApplicationUserResponseDto>
+    public class UpdateApplicationUserProfileCommand: IRequest<GetApplicationUserResponseDto>
     {
         [Required]
         public int UserId { get; set; }

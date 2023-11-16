@@ -12,7 +12,7 @@ namespace Common.Mappings
         /// </summary>
         /// <param name="user">Map From</param>
         /// <param name="response">Mapped To</param>
-        public void Map(ApplicationUser user, ApplicationUserResponseDto response) 
+        public void Map(ApplicationUser user, GetApplicationUserResponseDto response) 
         {
             if(user != null && response != null)
             {
@@ -21,7 +21,8 @@ namespace Common.Mappings
                 response.UserGuid = user.UserGuid;
                 response.Email = user.Email;
                 response.IsLocked = user.IsUserLocked;
-                if(user.UserDetails != null)
+                response.IsPasswordExpired = user.IsPasswordExpired;
+                if (user.UserDetails != null)
                 {
                     response.FirstName = user.UserDetails.FirstName;
                     response.LastName = user.UserDetails.LastName;
@@ -39,7 +40,7 @@ namespace Common.Mappings
             }
         }
 
-        public void Map(ApplicationUser user, OrganizationUserResponseDto response)
+        public void Map(ApplicationUser user, GetOrganizationUserResponseDto response)
         {
             if (user != null && response != null)
             {
@@ -75,8 +76,12 @@ namespace Common.Mappings
                     response.RoleId = user.Role.RoleId;
                     response.RoleName = user.Role.Role;
                 }
+                if (user.Group != null)
+                {
+                    response.GroupId = user.Group.GroupId;
+                    response.GroupName = user.Group.GroupName;
+                }
             }
-
         }
 
         /// <summary>
@@ -84,7 +89,7 @@ namespace Common.Mappings
         /// </summary>
         /// <param name="user">Map From</param>
         /// <param name="response">Mapped To</param>
-        public void Map(ApplicationUser user, ApplicationOrganizationResponseDto response)
+        public void Map(ApplicationUser user, GetApplicationOrganizationResponseDto response)
         {
             if (user != null && response != null)
             {
@@ -106,6 +111,16 @@ namespace Common.Mappings
                     response.StateCode = user.PartnerOrganization.StateCode;
                     response.PostCode = user.PartnerOrganization.PostCode;
                     response.CountryCode = user.PartnerOrganization.CountryCode;
+                }
+                if (user.Role != null)
+                {
+                    response.RoleId = user.Role.RoleId;
+                    response.RoleName = user.Role.Role;
+                }
+                if (user.Group != null)
+                {
+                    response.GroupId = user.Group.GroupId;
+                    response.GroupName = user.Group.GroupName;
                 }
             }
         }
@@ -132,7 +147,7 @@ namespace Common.Mappings
 			}
 		}
 
-		public void Map(ApplicationLayer applicationLayer, ApplicationLayerResponseDto response)
+		public void Map(ApplicationLayer applicationLayer, GetApplicationLayerResponseDto response)
         {
             if (applicationLayer != null && response != null)
             {
@@ -199,7 +214,7 @@ namespace Common.Mappings
             }
         }
 
-        public void Map(UpdateProfileCommand command, ApplicationUserDetails userDetails)
+        public void Map(UpdateApplicationUserProfileCommand command, ApplicationUserDetails userDetails)
         {
             if (command != null)
             {
@@ -254,7 +269,7 @@ namespace Common.Mappings
             }
         }
 
-        public void Map(IEnumerable<ApplicationPartnerListItemBase> applicationPartners, ApplicationOrganizationListResponseDto responseDto)
+        public void Map(IEnumerable<ApplicationPartnerListItemBase> applicationPartners, GetOrganizationListResponseDto responseDto)
         {
             if (applicationPartners != null && applicationPartners.Any())
             {
@@ -268,11 +283,11 @@ namespace Common.Mappings
             }
         }
 
-        public void Map(ApplicationPartnerOrganization entity, ApplicationOrganizationResponseDto dto)
+        public void Map(ApplicationPartnerOrganization entity, GetApplicationOrganizationResponseDto dto)
         {
             if (entity != null)
             {
-                if (dto == null) dto = new ApplicationOrganizationResponseDto();
+                if (dto == null) dto = new GetApplicationOrganizationResponseDto();
 
                 dto.OrganizationId = entity.OrganizationId;
                 dto.OrganizationName = entity.OrganizationName;
@@ -293,6 +308,16 @@ namespace Common.Mappings
                     dto.Email = entity.User.Email;
                     dto.IsLocked = entity.User.IsUserLocked;
                     dto.UserGuid = entity.User.UserGuid;
+                    if (entity.User?.Group != null)
+                    {
+                        dto.GroupId = entity.User.Group.GroupId;
+                        dto.GroupName = entity.User.Group.GroupName;
+                    }
+                    if(entity.User?.Role != null)
+                    {
+                        dto.RoleId = entity.User.Role.RoleId;
+                        dto.RoleName = entity.User.Role.Role;
+                    }
                 }
             }
         }
@@ -323,11 +348,11 @@ namespace Common.Mappings
 			}
         }
 
-		public void Map(ApplicationUserListItemBase entity, ApplicationUserListItemBaseDto dto)
+		public void Map(ApplicationUserListItemBase entity, BaseApplicationUserListItemDto dto)
 		{
 			if (entity != null)
 			{
-				if (dto == null) dto = new ApplicationUserListItemBaseDto();
+				if (dto == null) dto = new BaseApplicationUserListItemDto();
 				dto.UserId = entity.UserId;
 				dto.UserGuid = entity.UserGuid;
 				dto.UserName = entity.UserName;
@@ -340,18 +365,62 @@ namespace Common.Mappings
 			}
 		}
 
-		public void Map(IEnumerable<ApplicationUserListItemBase> applicationUsers, ApplicationUserListResponseDto responseDto)
+		public void Map(IEnumerable<ApplicationUserListItemBase> applicationUsers, GetApplicationUserListResponseDto responseDto)
 		{
 			if (applicationUsers != null && applicationUsers.Any())
 			{
-                responseDto.Users = new List<ApplicationUserListItemBaseDto>();
+                responseDto.Users = new List<BaseApplicationUserListItemDto>();
 				foreach (var partner in applicationUsers)
 				{
-					ApplicationUserListItemBaseDto dto = new ApplicationUserListItemBaseDto();
+					BaseApplicationUserListItemDto dto = new BaseApplicationUserListItemDto();
 					Map(partner, dto);
 					responseDto.Users.Add(dto);
 				}
 			}
 		}
+
+        public void Map(UpdateOrganizationUserProfileCommand command, ApplicationUser applicationUser)
+        {
+            applicationUser.Update(command.UserName, command.Email);
+        }
+
+        public void Map(UpdateOrganizationUserProfileCommand command, ApplicationUserDetails userDetails)
+        {
+            userDetails.Update(command.ImagePath, command.FirstName, command.LastName, command.AddressLine1, command.AddressLine2, command.City, command.StateCode, command.PostCode, command.Mobile, command.AlternateEmail, command.CountryCode, command.AlternateMobile);
+        }
+
+        public void Map(OrganizationUserListItemBase entity, BaseOrganizationUserListItemDto dto)
+        {
+            if (entity != null)
+            {
+                if (dto == null) dto = new BaseOrganizationUserListItemDto();
+                dto.UserId = entity.UserId;
+                dto.UserGuid = entity.UserGuid;
+                dto.UserName = entity.UserName;
+                dto.FirstName = entity.FirstName;
+                dto.LastName = entity.LastName;
+                dto.ImagePath = entity.ImagePath;
+                dto.RoleId = entity.RoleId;
+                dto.RoleName = entity.Role;
+                dto.CountryCode = entity.CountryCode;
+                dto.OrganizationId = entity.OrganizationId;
+                dto.OrganizationName = entity.OrganizationName;
+                dto.OrganizationLogo = entity.LogoUrl;
+            }
+        }
+
+        public void Map(IEnumerable<OrganizationUserListItemBase> entities, GetOrganizationUserListResponseDto dto)
+        {
+            if(entities != null && entities.Any())
+            {
+                dto.Users = new List<BaseOrganizationUserListItemDto>();
+                foreach (var entity in entities)
+                {
+                    BaseOrganizationUserListItemDto userListItemDto = new BaseOrganizationUserListItemDto();
+                    Map(entity, userListItemDto);
+                    dto.Users.Add(userListItemDto);
+                }
+            }            
+        }
 	}
 }

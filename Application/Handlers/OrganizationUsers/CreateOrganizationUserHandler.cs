@@ -7,9 +7,9 @@ using Common.Mappings;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
-namespace Application.Handlers.ApplicationPartners
+namespace Application.Handlers.OrganizationUsers
 {
-    public class CreateOrganizationUserHandler : IRequestHandler<CreateOrganizationUserCommand, OrganizationUserResponseDto>
+    public class CreateOrganizationUserHandler : IRequestHandler<CreateOrganizationUserCommand, GetOrganizationUserResponseDto>
     {
         private readonly ILogger<CreateOrganizationUserHandler> _logger;
         private readonly IApplicationUserRepository _userRepository;
@@ -18,10 +18,10 @@ namespace Application.Handlers.ApplicationPartners
         private readonly IHashHelper _hashHelper;
 
         public CreateOrganizationUserHandler(
-            ILogger<CreateOrganizationUserHandler> logger, 
-            IApplicationUserRepository userRepository, 
-            IRepository<ApplicationUserDetails> detailsRepository, 
-            SharedMapping mapping, 
+            ILogger<CreateOrganizationUserHandler> logger,
+            IApplicationUserRepository userRepository,
+            IRepository<ApplicationUserDetails> detailsRepository,
+            SharedMapping mapping,
             IHashHelper hashHelper)
         {
             _logger = logger;
@@ -31,7 +31,7 @@ namespace Application.Handlers.ApplicationPartners
             _hashHelper = hashHelper;
         }
 
-        public async Task<OrganizationUserResponseDto> Handle(CreateOrganizationUserCommand request, CancellationToken cancellationToken)
+        public async Task<GetOrganizationUserResponseDto> Handle(CreateOrganizationUserCommand request, CancellationToken cancellationToken)
         {
             if (_userRepository.IsEmailExists(request.Email))
             {
@@ -45,7 +45,7 @@ namespace Application.Handlers.ApplicationPartners
 
             _logger.LogInformation("Started creating new user.");
             await _userRepository.BeginTranscationAsync();
-            var response = new OrganizationUserResponseDto();
+            var response = new GetOrganizationUserResponseDto();
             try
             {
                 string salt = _hashHelper.GenerateSalt();
@@ -53,9 +53,9 @@ namespace Application.Handlers.ApplicationPartners
                 ApplicationUser applicationUser = new ApplicationUser(request.UserName, salt, encryptedPassword, request.Email, request.RoleId, (int)Common.Settings.Groups.OrganizationUser, request.OrganizationId);
                 var newUser = await _userRepository.AddAsync(applicationUser);
                 ApplicationUserDetails userDetails = new ApplicationUserDetails(
-                    newUser.UserId, 
+                    newUser.UserId,
                     request.ImagePath,
-                    request.FirstName, 
+                    request.FirstName,
                     request.LastName,
                     request.AddressLine1,
                     request.AddressLine2,
@@ -68,11 +68,13 @@ namespace Application.Handlers.ApplicationPartners
                     request.AlternateMobile);
                 userDetails = await _detailsRepository.AddAsync(userDetails);
 
-                var createdUser = _userRepository.FindWithDetails(u => u.UserId == newUser.UserId).First();
-
-                _mapping.Map(createdUser, response);
-                _logger.LogInformation("New organization user created.");
                 await _userRepository.CommitTransactionAsync();
+                _logger.LogInformation("New organization user created.");
+
+                _logger.LogInformation("Get newly created organization user.");
+                var createdUser = _userRepository.FindWithDetails(u => u.UserId == newUser.UserId).First();
+                _mapping.Map(createdUser, response);
+                               
             }
             catch (Exception ex)
             {

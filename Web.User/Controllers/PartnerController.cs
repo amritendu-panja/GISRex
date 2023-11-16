@@ -3,6 +3,7 @@ using Common.Settings;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Web.User.Helpers;
 using Web.User.Models;
 using Web.User.Services;
@@ -15,35 +16,53 @@ namespace Web.User.Controllers
     {
         private readonly PartnerService _partnerService;
         private readonly LookupsService _lookupsService;
-        private readonly AuthService _authService;
         private readonly ViewHelper _viewHelper;
         private readonly string _profileImageFolder;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly FileHelper _fileHelper;
         private readonly Mapper _mapper;
+        private readonly CacheHelper _cacheHelper;
+        private readonly AppSettings _appSettings;
 
         public PartnerController(
             PartnerService partnerService, 
-            LookupsService lookupsService, 
-            AuthService authService, 
+            LookupsService lookupsService,
             ViewHelper viewHelper,
             IWebHostEnvironment webHostEnvironment, 
             FileHelper fileHelper, 
-            Mapper mapper)
+            Mapper mapper,
+            CacheHelper cacheHelper,
+            IOptions<AppSettings> options)
         {
             _partnerService = partnerService;
             _lookupsService = lookupsService;
-            _authService = authService;
             _viewHelper = viewHelper;
             _webHostEnvironment = webHostEnvironment;
             _fileHelper = fileHelper;
             _mapper = mapper;
+            _cacheHelper = cacheHelper;
+            _appSettings = options.Value;
             _profileImageFolder = Path.Combine(_webHostEnvironment.ContentRootPath, "wwwroot", "images", "userprofiles");
         }
 
-        public IActionResult Index()
+        private int GetOrganizationId()
         {
-            return View();
+            string key = HttpContext.Session.GetString(Constants.LoggedInUserCachekey);
+            var orgUser = _cacheHelper.Get<GetApplicationOrganizationResponseDto>(key);
+            return orgUser.OrganizationId;
+        }
+
+        public async Task<IActionResult> Index(CancellationToken cancellationToken)
+        {
+            PartnerLandingModel model = new PartnerLandingModel();
+            var orgId = GetOrganizationId();
+            var userList = await _partnerService.GetOrganizationUserListAsync(orgId, _appSettings.Partners.MruListCount, _viewHelper.GetAccessToken(User), cancellationToken);
+            if (userList.Success)
+            {
+                model.UserMruList = userList.Users;
+            }
+            
+            return View(model);
         }
 
         [HttpGet("dashboard")]
@@ -88,7 +107,7 @@ namespace Web.User.Controllers
         }
 
         [HttpPost("adduser")]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public async Task<IActionResult> AddUser(RegisterPartnerUserModel model, CancellationToken cancellationToken)
         {
             if (ModelState.IsValid)
@@ -96,19 +115,35 @@ namespace Web.User.Controllers
                 string accessToken = _viewHelper.GetAccessToken(User);
                 CreateOrganizationUserCommand command = new CreateOrganizationUserCommand();
                 _mapper.Map(model, command);
-                var result = await _partnerService.CreateOrgainizationUserAsync(command, accessToken, cancellationToken);
-                if(result.Success)
+                command.OrganizationId = GetOrganizationId();
+                command.RoleId = (int)RoleTypes.PartnerUser;                
+                var result = await _partnerService.CreateOrganizationUserAsync(command, accessToken, cancellationToken);
+                if (result.Success)
                 {
                     if (!string.IsNullOrEmpty(model.ImageData) && !string.IsNullOrEmpty(model.ImageFilename))
                     {
                         model.ImagePath = _fileHelper.UploadImage(model.ImageData, model.ImageFilename, result.UserGuid.ToString(), _profileImageFolder);
                     }
-                    return RedirectToAction($"User/{result.UserGuid}");
+
+                    UpdateOrganizationUserProfileCommand updateCommand = new UpdateOrganizationUserProfileCommand();
+
+                    _mapper.Map(model, updateCommand);
+                    updateCommand.UserId = result.UserId;
+
+                    var userDto = await _partnerService.UpdateOrganizationUserAsync(updateCommand, accessToken, cancellationToken);
+                    if (!userDto.Success)
+                    {
+                        ModelState.AddModelError("", userDto?.Message ?? "Server error occured, please contact support");
+                    }
+                    else
+                    {
+                        return RedirectToAction("User", "Partners", new { id = result.UserGuid });
+                    }
                 }
                 else
                 {
                     ModelState.AddModelError("", result?.Message ?? "Server error occured, please contact support");
-                }                
+                }
             }
             return View(model);
         }
@@ -117,8 +152,8 @@ namespace Web.User.Controllers
         public async Task<IActionResult> GetUser(string userGuid, CancellationToken cancellationToken)
         {
             var accessToken = _viewHelper.GetAccessToken(User);
-            var userDto = await _authService.ProfileAsync(userGuid, accessToken, cancellationToken);
-            AppUserProfileModel profileModel = new AppUserProfileModel();
+            var userDto = await _partnerService.GetOrganizationUserAsync(userGuid, accessToken, cancellationToken);
+            PartnerUserProfileModel profileModel = new PartnerUserProfileModel();
             _mapper.Map(userDto, profileModel);
             if (!string.IsNullOrEmpty(profileModel.ImagePath) && !_fileHelper.IsProfileImageExists(profileModel.ImagePath, _profileImageFolder))
             {
@@ -127,9 +162,9 @@ namespace Web.User.Controllers
             return View(profileModel);
         }
 
-        [HttpPost("user")]
+        [HttpPost("user/{userGuid}")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> PostUser(AppUserProfileModel profileModel, CancellationToken cancellationToken)
+        public async Task<IActionResult> PostUser(PartnerUserProfileModel profileModel, CancellationToken cancellationToken)
         {
             if (ModelState.IsValid)
             {
@@ -138,7 +173,12 @@ namespace Web.User.Controllers
                     profileModel.ImagePath = _fileHelper.UploadImage(profileModel.ImageData, profileModel.ImageFilename, profileModel.UserGuid.ToString(), _profileImageFolder);
                 }
                 string accessToken = _viewHelper.GetAccessToken(User);
-                var userDto = await _authService.UpdateProfileAsync(profileModel, accessToken, cancellationToken);
+
+                UpdateOrganizationUserProfileCommand command = new UpdateOrganizationUserProfileCommand();
+
+                _mapper.Map(profileModel, command);
+
+                var userDto = await _partnerService.UpdateOrganizationUserAsync(command, accessToken, cancellationToken);
                 if (userDto != null && userDto.Success)
                 {
                     _mapper.Map(userDto, profileModel);                    
@@ -148,7 +188,7 @@ namespace Web.User.Controllers
                     ModelState.AddModelError("", userDto?.Message ?? "Server error occured, please contact support");
                 }
             }
-            return View(profileModel);
+            return View("GetUser", profileModel);
         }
     }
 }

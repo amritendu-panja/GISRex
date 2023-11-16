@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Common.Dtos
+﻿namespace Common.Dtos
 {
-    public class OrganizationUserResponseDto: ApplicationUserResponseDto
+    public class GetOrganizationUserResponseDto: GetApplicationUserResponseDto
     {
         public int OrganizationId { get; set; }
         public string OrganizationName { get; set;}
@@ -15,6 +9,5 @@ namespace Common.Dtos
         public string RoleName { get; set; }
         public int GroupId { get; set; }
         public string GroupName { get; set; }
-        public bool IsPasswordExpired { get; set; }
     }
 }

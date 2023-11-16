@@ -40,7 +40,7 @@ namespace Web.Controllers
 
         [HttpPost]
         [Route("profile/update")]
-        public async Task<IActionResult> UpdateUserProfile([FromBody] UpdateProfileCommand request)
+        public async Task<IActionResult> UpdateUserProfile([FromBody] UpdateApplicationUserProfileCommand request)
         {
             var result = await _mediator.Send(request);
             if (result != null)

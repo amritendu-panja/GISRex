@@ -22,24 +22,29 @@ namespace Web.User.Services
 			this.mapper = mapper;
 		}
 
-		public async Task<ApplicationOrganizationResponseDto> AddAsync(RegisterPartnerModel partnerModel, string accessToken, CancellationToken cancellationToken)
+		public async Task<GetApplicationOrganizationResponseDto> AddAsync(RegisterPartnerModel partnerModel, string accessToken, CancellationToken cancellationToken)
 		{
 			CreateApplicationOrganizationCommand command = new CreateApplicationOrganizationCommand();
 			mapper.Map(partnerModel, command);
 			return await _partnerApiClient.Add(command, appSettings.Security.ApiKey, accessToken, cancellationToken);
 		}
 
-		public async Task<ApplicationOrganizationListResponseDto> GetRecentPartners(string accessToken, CancellationToken cancellationToken)
+		public async Task<GetOrganizationListResponseDto> GetRecentPartners(string accessToken, CancellationToken cancellationToken)
 		{
 			return await _partnerApiClient.GetRecentPartners(appSettings.Security.ApiKey, accessToken, cancellationToken);
 		}
 
-        public async Task<ApplicationOrganizationResponseDto> GetByIdAsync(int id, string accessToken, CancellationToken cancellationToken)
+        public async Task<GetApplicationOrganizationResponseDto> GetByIdAsync(int id, string accessToken, CancellationToken cancellationToken)
         {
             return await _partnerApiClient.GetOrganizationbyId(id, appSettings.Security.ApiKey, accessToken, cancellationToken);
         }
 
-		public async Task<BaseResponseDto> CheckDomainExistsAsync(string domain, string accessToken, CancellationToken cancellationToken)
+        public async Task<GetApplicationOrganizationResponseDto> GetByGuidAsync(string guid, string accessToken, CancellationToken cancellationToken)
+        {
+            return await _partnerApiClient.GetOrganizationbyGuid(guid, appSettings.Security.ApiKey, accessToken, cancellationToken);
+        }
+
+        public async Task<BaseResponseDto> CheckDomainExistsAsync(string domain, string accessToken, CancellationToken cancellationToken)
 		{
 			return await _partnerApiClient.CheckDomainExists(domain, appSettings.Security.ApiKey, accessToken, cancellationToken);
 		}
@@ -49,9 +54,24 @@ namespace Web.User.Services
             return await _partnerApiClient.GetPartnerDataTable(request, appSettings.Security.ApiKey, accessToken, cancellationToken);
         }
 
-		public async Task<OrganizationUserResponseDto> CreateOrgainizationUserAsync(CreateOrganizationUserCommand command, string accessToken, CancellationToken cancellationToken)
+		public async Task<GetOrganizationUserResponseDto> CreateOrganizationUserAsync(CreateOrganizationUserCommand command, string accessToken, CancellationToken cancellationToken)
 		{
             return await _partnerApiClient.CreateUser(command, appSettings.Security.ApiKey, accessToken, cancellationToken);
+        }
+
+        public async Task<GetOrganizationUserResponseDto> GetOrganizationUserAsync(string userGuid, string accessToken, CancellationToken cancellationToken)
+        {
+            return await _partnerApiClient.GetUserProfile(userGuid, appSettings.Security.ApiKey, accessToken, cancellationToken);
+        }
+
+		public async Task<GetOrganizationUserResponseDto> UpdateOrganizationUserAsync(UpdateOrganizationUserProfileCommand command, string accessToken, CancellationToken cancellationToken)
+		{
+			return await _partnerApiClient.UpdateUserProfile(command, appSettings.Security.ApiKey, accessToken, cancellationToken);
+		}
+
+        public async Task<GetOrganizationUserListResponseDto> GetOrganizationUserListAsync(int partnerId, int count, string accessToken, CancellationToken cancellationToken)
+        {
+            return await _partnerApiClient.GetRecentUsers(partnerId, count, appSettings.Security.ApiKey, accessToken, cancellationToken);
         }
     }
 }

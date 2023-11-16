@@ -80,6 +80,23 @@
         public void SetOrganizationId(int partnerId)
         {
             OrganizationId = partnerId;
+            CreatedDate = CreatedDate.ToUniversalTime();
+            ModifiedDate = DateTime.UtcNow;
+        }
+
+        public void SetGroupId(int groupId)
+        {
+            GroupId = groupId;
+            CreatedDate = CreatedDate.ToUniversalTime();
+            ModifiedDate = DateTime.UtcNow;
+        }
+
+        public void Update(string userName, string email)
+        {
+            UserName = userName;
+            Email = email;
+            CreatedDate = CreatedDate.ToUniversalTime();
+            ModifiedDate = DateTime.UtcNow;
         }
     }
 }
