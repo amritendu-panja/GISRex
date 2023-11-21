@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.Handlers.ApplicationLayers
 {
-    public class GetApplicationLayerHandler : IRequestHandler<GetApplicationLayerRequest, ApplicationLayerResponseDto>
+    public class GetApplicationLayerHandler : IRequestHandler<GetApplicationLayerRequest, GetApplicationLayerResponseDto>
     {
         private readonly IRepository<ApplicationLayer> repository;
         private readonly ILogger<GetApplicationLayerHandler> logger;
@@ -21,10 +21,10 @@ namespace Application.Handlers.ApplicationLayers
             this.sharedMapping = sharedMapping;
         }
 
-        public async Task<ApplicationLayerResponseDto> Handle(GetApplicationLayerRequest request, CancellationToken cancellationToken)
+        public async Task<GetApplicationLayerResponseDto> Handle(GetApplicationLayerRequest request, CancellationToken cancellationToken)
         {
             logger.LogInformation($"Fetching record for Layer : {request.Id}");
-            ApplicationLayerResponseDto layerDto = new ApplicationLayerResponseDto();
+            GetApplicationLayerResponseDto layerDto = new GetApplicationLayerResponseDto();
             var layer = repository.Find(l => l.LayerId == request.Id).FirstOrDefault();
             if (layer == null)
             {

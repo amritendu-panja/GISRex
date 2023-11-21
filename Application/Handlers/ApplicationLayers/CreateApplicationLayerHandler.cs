@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.Handlers.ApplicationLayers
 {
-    public class CreateApplicationLayerHandler : IRequestHandler<CreateAplicationLayerCommand, ApplicationLayerResponseDto>
+    public class CreateApplicationLayerHandler : IRequestHandler<CreateAplicationLayerCommand, GetApplicationLayerResponseDto>
     {
         private readonly IRepository<ApplicationLayer> _layerRepository;
         private readonly IApplicationUserRepository _userRepository;
@@ -22,9 +22,9 @@ namespace Application.Handlers.ApplicationLayers
             _logger = logger;
         }
 
-        public async Task<ApplicationLayerResponseDto> Handle(CreateAplicationLayerCommand request, CancellationToken cancellationToken)
+        public async Task<GetApplicationLayerResponseDto> Handle(CreateAplicationLayerCommand request, CancellationToken cancellationToken)
         {
-            ApplicationLayerResponseDto layerDto = new ApplicationLayerResponseDto();
+            GetApplicationLayerResponseDto layerDto = new GetApplicationLayerResponseDto();
             try
             {
                 var layer = new ApplicationLayer(Guid.NewGuid(), request.Name, string.Empty, request.OwnerId, DateTime.UtcNow, DateTime.UtcNow);

@@ -36,6 +36,12 @@ namespace Infrastructure.Data.ApplicationDbContext.Mappings
                 .HasOne(u => u.Group)
                 .WithMany(u => u.Users)
                 .HasForeignKey(u => u.GroupId);
+
+            builder
+                .HasOne(u => u.PartnerOrganization)
+                .WithOne(u => u.User)
+                .HasForeignKey<ApplicationUser>(u => u.OrganizationId);
+                            
         }
     }
 }

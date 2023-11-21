@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Common.Dtos
 {
-    public class GetApplicationLayerRequest: IRequest<ApplicationLayerResponseDto>
+    public class GetApplicationLayerRequest: IRequest<GetApplicationLayerResponseDto>
     {
         public Guid Id { get; set; }
     }

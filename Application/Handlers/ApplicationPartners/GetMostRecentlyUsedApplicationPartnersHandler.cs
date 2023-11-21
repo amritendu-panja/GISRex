@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.Handlers.ApplicationPartners
 {
-    public class GetMostRecentlyUsedApplicationPartnersHandler : IRequestHandler<GetMostRecentPartnersRequest, ApplicationOrganizationListResponseDto>
+    public class GetMostRecentlyUsedApplicationPartnersHandler : IRequestHandler<GetMostRecentPartnersRequest, GetOrganizationListResponseDto>
     {
         private readonly IApplicationPartnerOrganizationRepository _repository;
         private readonly ILogger<GetMostRecentlyUsedApplicationPartnersHandler> _logger;
@@ -27,9 +27,9 @@ namespace Application.Handlers.ApplicationPartners
             _fileHelper = fileHelper;
         }
 
-        public async Task<ApplicationOrganizationListResponseDto> Handle(GetMostRecentPartnersRequest request, CancellationToken cancellationToken)
+        public async Task<GetOrganizationListResponseDto> Handle(GetMostRecentPartnersRequest request, CancellationToken cancellationToken)
         {
-            ApplicationOrganizationListResponseDto responseDto = new ApplicationOrganizationListResponseDto();
+            GetOrganizationListResponseDto responseDto = new GetOrganizationListResponseDto();
             try
             {
                 var query = await _fileHelper.GetFileContent("PartnerMruList");

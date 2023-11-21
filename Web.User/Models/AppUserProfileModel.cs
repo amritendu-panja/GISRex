@@ -8,6 +8,8 @@ namespace Web.User.Models
         [Required]
         public int UserId { get; set; }
         [Required]
+        public Guid UserGuid { get; set; }
+        [Required]
         [Display(Name = "Username")]
         public string UserName { get; set; }
         public string Email { get; set; }

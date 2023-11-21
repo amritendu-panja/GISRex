@@ -1,6 +1,6 @@
 ﻿namespace Common.Dtos
 {
-    public class ApplicationLayerResponseDto: BaseResponseDto
+    public class GetApplicationLayerResponseDto: BaseResponseDto
     {
         public Guid LayerId { get; set; }
         public string LayerName { get; set; }

@@ -1,0 +1,69 @@
+﻿@{
+    ViewData["Title"] = "Users";
+    ViewData["ActiveLink"] = "Users";
+}
+<div class="col-12">
+    <table id="userTable" class="table table-striped" style="width: 100%">
+        <thead>
+            <tr>
+                <th>User name</th>
+                <th>Email</th>
+                <th>First name</th>
+                <th>Last name</th>
+                <th>Role</th>
+                <th>Country</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+
+@section Scripts{
+    <script src="~/datatables.net/jquery.dataTables.min.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $("#userTable").DataTable({
+                ajax: {
+                    url: "/api/data/users/table",
+                    type: "POST"
+                },
+                processing: true,
+                serverSide: true,
+                filter: true,
+                columns: [
+                    {
+                        data: "userName",
+                        name: "User name",
+                        render: function (data, type, row, meta) {
+                            if (type === "display") {
+                                let link = '/PartnerUsers/User/' + row.userGuid;
+                                return '<a href="' + link + '">' + data + '</a>';
+                            }
+                            return data;
+                        }
+                    },
+                    {
+                        data: "email",
+                        name: "Email"
+                    },
+                    {
+                        data: "firstName",
+                        name: "First name"
+                    },
+                    {
+                        data: "lastName",
+                        name: "Last name"
+                    },
+                    {
+                        data: "roleName",
+                        name: "Role"
+                    },
+                    {
+                        data: "countryCode",
+                        name: "Country"
+                    }
+                ]
+            });
+        });
+    </script>
+}
+<link href="~/css/jquery.dataTables.min.css" rel="stylesheet" />

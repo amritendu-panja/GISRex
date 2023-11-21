@@ -1,8 +1,6 @@
-﻿using MediatR;
-
-namespace Common.Dtos
+﻿namespace Common.Dtos
 {
-	public class ApplicationUserListItemBaseDto
+    public class BaseApplicationUserListItemDto
 	{
 		public int UserId { get; set; }
 		public string UserName { get; set; }

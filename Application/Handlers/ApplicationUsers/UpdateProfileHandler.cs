@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.Handlers.ApplicationUsers
 {
-    public class UpdateProfileHandler : IRequestHandler<UpdateProfileCommand, ApplicationUserResponseDto>
+    public class UpdateProfileHandler : IRequestHandler<UpdateApplicationUserProfileCommand, GetApplicationUserResponseDto>
     {
         private readonly IRepository<ApplicationUserDetails> _repository;
         private readonly SharedMapping _mapping;
@@ -27,22 +27,14 @@ namespace Application.Handlers.ApplicationUsers
             _logger = logger;
         }
 
-        public async Task<ApplicationUserResponseDto> Handle(UpdateProfileCommand request, CancellationToken cancellationToken)
+        public async Task<GetApplicationUserResponseDto> Handle(UpdateApplicationUserProfileCommand request, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Saving profile details for {0}", request.UserName);
             try
             {
-                var currentRecord = _repository.Find(c => c.UserId == request.UserId).FirstOrDefault();
-                var isNewRecord = currentRecord == null;
+                var currentRecord = _repository.Find(c => c.UserId == request.UserId).First();
                 _mapping.Map(request, currentRecord);
-                if (isNewRecord)
-                {
-                    var result = await _repository.AddAsync(currentRecord);
-                }
-                else
-                {
-                    await _repository.UpdateAsync(currentRecord);
-                }
+                await _repository.UpdateAsync(currentRecord);
 
                 FindByUsernameRequest findByUsernameRequest = new FindByUsernameRequest { Username = request.UserName };
                 return await _mediator.Send(findByUsernameRequest, cancellationToken);

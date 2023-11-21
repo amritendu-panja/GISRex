@@ -1,0 +1,203 @@
+﻿@model RegisterPartnerUserModel
+@{
+    
+    ViewData["Title"] = "New User";
+    ViewData["ActiveLink"] = "Users";
+    var uploadImageModel = new UploadImagePartialModel()
+            {
+                ImageDataStorageId = Html.IdFor(m => m.ImageData),
+                ImageFilenameId = Html.IdFor(m => m.ImageFilename),
+                JsCallBackFunctionName = "formChanged"
+            };
+
+    var countryStateJsModel = new CountryStatePartialModel()
+            {
+                CountrySelectId = Html.IdFor(m => m.CountryCode),
+                StateSelectId = Html.IdFor(m => m.StateCode),
+                SelectedCountryCode = Model.CountryCode,
+                SelectedStateCode = Model.StateCode,
+                CountryCallingCodeClassName = "calling-code",
+                NeedCountryCallingCode = true
+            };
+}
+
+<div class="row d-flex justify-content-center h-100">
+    <div class="col-xl-4 align-top">
+        <div class="card mb-4 mb-xl-0">
+            <div class="card-header">
+                <h4>Profile Picture</h4>
+            </div>
+            <div class="card-body text-center">
+                <img class="img-account-profile rounded-circle mb-2" alt="" src="~/images/userprofiles/@Model.ImagePath">
+                <div class="small font-italic text-muted mb-3">JPG or PNG no larger than 5 MB</div>
+                <button class="btn btn-primary mb-2" onclick="showDialog()">Upload new image</button>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4>Account Details</h4>
+            </div>
+            <div class="card-body">
+                @using (Html.BeginForm(FormMethod.Post, new { @id = "frmProfile", @onchange = "formChanged()", @onsubmit="disableForm()" }))
+                {
+                    @await Html.PartialAsync("Partial/_ValidationSummary")
+
+                    @Html.AntiForgeryToken()
+
+
+                    @Html.HiddenFor(m => m.ImageData)
+                    @Html.HiddenFor(m=> m.ImageFilename)
+                    @Html.HiddenFor(m=>m.IsUserExists)
+                    <div class="mb-4">
+                        @Html.LabelFor(m=> m.Email, new { @class = "form-label" })
+                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control", @placeholder = "someone@email.com", @autocomplete = "off" })
+                    </div>
+                    <div class="mb-4">
+                        @Html.LabelFor(m=> m.Username, new { @class = "form-label" })
+                        <div class="input-group">
+                            @Html.TextBoxFor(m => m.Username, new { @class = "form-control", @placeholder = "Username", @onchange = "checkUserExists();", @autocomplete = "off" })
+                            <span class="input-group-text">
+                                <i class="fa-solid fa-xmark" id="username-na"></i>
+                                <i class="fa-solid fa-check" id="username-ok"></i>
+                            </span>
+                            <button type="button" class="btn btn-outline-secondary" onclick="checkUserExists()">
+                                <i class="fa-solid fa-rotate"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        @Html.LabelFor(m=> m.Password, new { @class = "form-label" })
+                        @Html.PasswordFor(m => m.Password, new { @class = "form-control", @placeholder = "****", @autocomplete = "off" })
+
+                    </div>
+                    <div class="mb-4">
+                        @Html.LabelFor(m=> m.ConfirmPassword, new { @class = "form-label" })
+                        @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control", @placeholder = "****", @autocomplete = "off" })
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            @Html.LabelFor(m=>m.FirstName, new { @class = "form-label" })
+                            @Html.TextBoxFor(m=>m.FirstName, new { @class="form-control", @placeholder = "Firstname" })
+                        </div>
+                        <div class="col">
+                            @Html.LabelFor(m=>m.LastName, new { @class = "form-label" })
+                            @Html.TextBoxFor(m=>m.LastName, new { @class="form-control", @placeholder = "Lastname" })
+                        </div>
+                    </div>
+                    <div class="col-12 mb-3">
+                        @Html.LabelFor(m=>m.AddressLine1, new { @class = "form-label" })
+                        @Html.TextBoxFor(m=>m.AddressLine1, new { @class="form-control", @placeholder = "1234 Main St" })
+                    </div>
+                    <div class="col-12 mb-3">
+                        @Html.LabelFor(m=>m.AddressLine2, new { @class = "form-label" })
+                        @Html.TextBoxFor(m=>m.AddressLine2, new { @class="form-control", @placeholder = "Apartment, studio, or floor" })
+                    </div>
+                    <div class="col-12 mb-3">
+                        @Html.LabelFor(m=>m.AlternateEmail, new { @class = "form-label" })
+                        @Html.TextBoxFor(m=>m.AlternateEmail, new { @class="form-control", @placeholder = "alternate@email.com" })
+                    </div>
+                    <div class="col-12 mb-3">
+                        @Html.LabelFor(m=>m.CountryCode, new { @class = "form-label" })
+                        @Html.DropDownListFor(m=>m.CountryCode,
+                    new List<SelectListItem>{ new SelectListItem(){ Text = "Select...", Disabled = true, Selected = true } },
+                    new { @class="form-select", @onchange = "getCountryDetails()" })
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            @Html.LabelFor(m=>m.Mobile, new { @class = "form-label" })
+                            <div class="input-group">
+                                <span class="input-group-text calling-code"></span>
+                                @Html.TextBoxFor(m=>m.Mobile, new { @class="form-control", @placeholder = "Mobile" })
+                            </div>
+                        </div>
+                        <div class="col">
+                            @Html.LabelFor(m=>m.AlternateMobile, new { @class = "form-label" })
+                            <div class="input-group">
+                                <span class="input-group-text calling-code"></span>
+                                @Html.TextBoxFor(m=>m.AlternateMobile, new { @class="form-control", @placeholder = "Alternate mobile" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3">
+                            @Html.LabelFor(m=>m.City, new { @class = "form-label" })
+                            @Html.TextBoxFor(m=>m.City, new { @class="form-control", @placeholder = "City" })
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            @Html.LabelFor(m=>m.StateCode, new { @class = "form-label" })
+                            @Html.DropDownListFor(m=>m.StateCode,
+                        new List<SelectListItem>{ new SelectListItem(){ Text = "Select...", Disabled = true} },
+                        new { @class="form-select" })
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            @Html.LabelFor(m=>m.PostCode, new { @class = "form-label" })
+                            @Html.TextBoxFor(m=>m.PostCode, new { @class="form-control", @placeholder = "Postal code" })
+                        </div>
+                    </div>
+                    <div class="d-grid mb-3">
+                        <input type="submit" disabled class="btn btn-primary" id="submitForm" value="Save Changes" />
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    @await Html.PartialAsync("Partial/_UploadImagePartial", uploadImageModel)
+    @await Html.PartialAsync("Partial/_CountryStateJSPartial", countryStateJsModel)
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+    <script type="text/javascript">
+        $(function () {
+            checkUserExists();
+        });
+
+        function formChanged() {
+            $("#submitForm").attr("disabled", null);            
+        }
+
+        function disableForm() {
+            $("#submitForm").attr("disabled", "disabled");
+        }
+
+        function checkUserExists() {
+            var token = $('input[name="__RequestVerificationToken"]').val();
+            var userName = $("#@Html.IdFor(m=>m.Username)").val();
+            if (userName && userName.length >= 6) {
+                var url = '/api/data/checkuser/' + userName;
+
+                $.ajax({
+                    type: 'GET',
+                    url: url,
+                    headers: {
+                        "RequestVerificationToken": token
+                    },
+                    accept: 'application/json',
+                    success: function (response) {
+                        $("#@Html.IdFor(m=>m.IsUserExists)").val(response.success);
+                        if (response.success) {
+                            $("#username-na").show();
+                            $("#username-ok").hide();
+                        }
+                        else {
+                            $("#username-na").hide();
+                            $("#username-ok").show();
+                        }
+                    },
+                    error: function (xhrError) {
+                        console.log(xhrError);
+                        alert("Something went wrong! Please contact support")
+                    }
+                });
+            }
+            else {
+                $("#@Html.IdFor(m=>m.IsUserExists)").val(false);
+                $("#username-na").show();
+                $("#username-ok").hide();
+            }
+        }
+    </script>
+}

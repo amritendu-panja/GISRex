@@ -2,7 +2,6 @@
 using Common.Settings;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Web.User.Helpers;
 using Web.User.Models;
@@ -40,13 +39,6 @@ namespace Web.User.Controllers
             _mapper = mapper;
         }
 
-        private string GetAccessToken()
-        {
-            var loginDetails = _viewHelper.GetLoginDetails(User);
-            var loginData = loginDetails.Item2;
-            return loginData.AccessToken;
-        }
-
         [HttpGet("checkuser/{userName}")]
         public async Task<IActionResult> CheckUserExists(string userName, CancellationToken cancellationToken)
         {
@@ -62,8 +54,8 @@ namespace Web.User.Controllers
 		[HttpGet("checkdomain/{domain}")]
 		public async Task<IActionResult> CheckDomainExists(string domain, CancellationToken cancellationToken)
 		{
-			var accessToken = GetAccessToken();
-			var result = await _partnerService.CheckDomainExistsAsync(domain, accessToken, cancellationToken);			
+			var accessToken = _viewHelper.GetAccessToken(User);
+            var result = await _partnerService.CheckDomainExistsAsync(domain, accessToken, cancellationToken);			
 			return new JsonResult(result);
 		}
 
@@ -74,7 +66,7 @@ namespace Web.User.Controllers
             var countryList = _cacheHelper.Get<CountryLookupResponseDto>(Constants.CountryListCacheKey);
             if (countryList == null)
             {
-                var accessToken = GetAccessToken();
+                var accessToken = _viewHelper.GetAccessToken(User);
                 countryList = await _lookupsService.GetAllCountriesAsync(accessToken, cancellationToken);
                 if (countryList.Success)
                 {
@@ -99,7 +91,7 @@ namespace Web.User.Controllers
                 }
             }
 
-            var accessToken = GetAccessToken();
+            var accessToken = _viewHelper.GetAccessToken(User);     
             var result = await _lookupsService.GetCallingCodeAsync(countryCode, accessToken, cancellationToken);
             return new JsonResult(result);
         }
@@ -111,7 +103,7 @@ namespace Web.User.Controllers
             var stateList = _cacheHelper.Get<StateLookupResponseDto>(Constants.StateListCacheKey);
             if (stateList == null)
             {
-                var accessToken = GetAccessToken();
+                var accessToken = _viewHelper.GetAccessToken(User);
                 stateList = await _lookupsService.GetAllStatesAsync(accessToken, cancellationToken);
                 if (stateList.Success)
                 {
@@ -128,7 +120,7 @@ namespace Web.User.Controllers
             var stateList = _cacheHelper.Get<StateLookupResponseDto>(Constants.StateListCacheKey);
             if (stateList == null)
             {
-                var accessToken = GetAccessToken();
+                var accessToken = _viewHelper.GetAccessToken(User);
                 stateList = await _lookupsService.GetAllStatesAsync(accessToken, cancellationToken);
                 if (stateList.Success)
                 {
@@ -151,7 +143,7 @@ namespace Web.User.Controllers
         [HttpGet("partners/recent")]
         public async Task<IActionResult> GetRecentPartners(CancellationToken cancellationToken)
         {
-            var accessToken = GetAccessToken();
+            var accessToken = _viewHelper.GetAccessToken(User);
             var partnerDto = await _partnerService.GetRecentPartners(accessToken, cancellationToken);
             return new JsonResult(partnerDto);
         }
@@ -160,7 +152,7 @@ namespace Web.User.Controllers
         [HttpGet("users/recent")]
         public async Task<IActionResult> GetRecentUsers(CancellationToken cancellationToken)
         {
-            var accessToken = GetAccessToken();
+            var accessToken = _viewHelper.GetAccessToken(User);
             var partnerDto = await _authService.GetRecentUsersAsync(accessToken, cancellationToken);
             return new JsonResult(partnerDto);
         }
@@ -169,11 +161,12 @@ namespace Web.User.Controllers
         [HttpPost("groups/table")]
         public async Task<IActionResult> GetAllGroups(CancellationToken cancellationToken)
         {
-            var accessToken = GetAccessToken();
+            var accessToken = _viewHelper.GetAccessToken(User);
             DataTableRequestModel requestModel = new DataTableRequestModel();
             _mapper.Map(Request.Form, requestModel);
             GetGroupsDataTableRequest request = new GetGroupsDataTableRequest();
             _mapper.Map(requestModel, request);
+            request.UserGuid = Guid.Parse(_viewHelper.GetUserId(User));
 
             var groupList = await _lookupsService.GetGroupsDataTableAsync(request, accessToken, cancellationToken);
 			return new JsonResult(groupList);
@@ -183,11 +176,12 @@ namespace Web.User.Controllers
         [HttpPost("users/table")]
         public async Task<IActionResult> GetAllUsers(CancellationToken cancellationToken)
         {
-            var accessToken = GetAccessToken();
+            var accessToken = _viewHelper.GetAccessToken(User);
             DataTableRequestModel requestModel = new DataTableRequestModel();
             _mapper.Map(Request.Form, requestModel);
             GetUsersDataTableRequest request = new GetUsersDataTableRequest();
             _mapper.Map(requestModel, request);
+            request.UserGuid = Guid.Parse(_viewHelper.GetUserId(User));
 
             var userList = await _authService.GetUserDataTableAsync(request, accessToken, cancellationToken);
             return new JsonResult(userList);
@@ -197,11 +191,12 @@ namespace Web.User.Controllers
         [HttpPost("partners/table")]
         public async Task<IActionResult> GetAllPartners(CancellationToken cancellationToken)
         {
-            var accessToken = GetAccessToken();
+            var accessToken = _viewHelper.GetAccessToken(User);
             DataTableRequestModel requestModel = new DataTableRequestModel();
             _mapper.Map(Request.Form, requestModel);
             GetOrganizationsDataTableRequest request = new GetOrganizationsDataTableRequest();
             _mapper.Map(requestModel, request);
+            request.UserGuid = Guid.Parse(_viewHelper.GetUserId(User));
 
             var userList = await _partnerService.GetPartnerDataTableAsync(request, accessToken, cancellationToken);
             return new JsonResult(userList);

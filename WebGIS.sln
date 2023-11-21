@@ -13,6 +13,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common", "Common\Common.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Web.User", "Web.User\Web.User.csproj", "{58DA2705-52E3-40A7-9C0F-B2BE942F8F43}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebGIS.Services.Base", "WebGIS.Services.Base\WebGIS.Services.Base.csproj", "{6ACC73C3-096A-40B9-8934-15A342C3CE99}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebGIS.Services", "WebGIS.Services\WebGIS.Services.csproj", "{E71C5D7B-1655-411E-BF05-B6BA3AC93A5F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +43,14 @@ Global
 		{58DA2705-52E3-40A7-9C0F-B2BE942F8F43}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58DA2705-52E3-40A7-9C0F-B2BE942F8F43}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58DA2705-52E3-40A7-9C0F-B2BE942F8F43}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6ACC73C3-096A-40B9-8934-15A342C3CE99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6ACC73C3-096A-40B9-8934-15A342C3CE99}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6ACC73C3-096A-40B9-8934-15A342C3CE99}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6ACC73C3-096A-40B9-8934-15A342C3CE99}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E71C5D7B-1655-411E-BF05-B6BA3AC93A5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E71C5D7B-1655-411E-BF05-B6BA3AC93A5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E71C5D7B-1655-411E-BF05-B6BA3AC93A5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E71C5D7B-1655-411E-BF05-B6BA3AC93A5F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

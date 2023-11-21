@@ -15,6 +15,7 @@ namespace Web.User.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly AuthService _authService;
+        private readonly PartnerService _partnerService;
         private readonly AuthHelper _authHelper;
         private readonly CacheHelper _cacheHelper;
         private readonly CacheKeyGenrator _cachekeyGen;
@@ -28,6 +29,7 @@ namespace Web.User.Controllers
         public HomeController(ILogger<HomeController> logger,
             AuthService authService,
             AuthHelper authHelper,
+            PartnerService partnerService,
             CacheHelper cacheHelper,
             CacheKeyGenrator cachekeyGen,
             LookupsService lookupsService,
@@ -38,6 +40,7 @@ namespace Web.User.Controllers
         {
             _logger = logger;
             _authService = authService;
+            _partnerService = partnerService;
             _authHelper = authHelper;
             _cacheHelper = cacheHelper;
             _cachekeyGen = cachekeyGen;
@@ -74,16 +77,39 @@ namespace Web.User.Controllers
                     _cacheHelper.Set<LoginResponseDto>(key, loginResponse);
                     HttpContext.User = principal;
                     HttpContext.Session.SetString(Constants.AuthenticationCacheKey, key);
-
-                    var userDetails = await _authService.CheckUserExists(_viewHelper.GetUsername(principal), cancellationToken);
-                    if (userDetails.Success)
-                    {
-                        var userKey = _cachekeyGen.CreateCacheKey(principal, Constants.LoggedInUserCachekey);
-                        _cacheHelper.Set<ApplicationUserResponseDto>(userKey, userDetails);
-                        HttpContext.Session.SetString(Constants.LoggedInUserCachekey, userKey);
-                    }
-
                     var roleType = _viewHelper.GetUserRole(principal);
+                    switch (roleType)
+                    {
+                        case RoleTypes.AppUser:
+                        case RoleTypes.Administrator:
+                            var userDetails = await _authService.CheckUserExists(_viewHelper.GetUsername(principal), cancellationToken);
+                            if (userDetails.Success)
+                            {
+                                var userKey = _cachekeyGen.CreateCacheKey(principal, Constants.LoggedInUserCachekey);
+                                _cacheHelper.Set<GetApplicationUserResponseDto>(userKey, userDetails);
+                                HttpContext.Session.SetString(Constants.LoggedInUserCachekey, userKey);
+                            }
+                            break;
+                        case RoleTypes.Partner:
+                            var orgDetails = await _partnerService.GetByGuidAsync(_viewHelper.GetUserId(principal), loginResponse.AccessToken, cancellationToken);
+                            if (orgDetails.Success)
+                            {
+                                var userKey = _cachekeyGen.CreateCacheKey(principal, Constants.LoggedInUserCachekey);
+                                _cacheHelper.Set<GetApplicationOrganizationResponseDto>(userKey, orgDetails);
+                                HttpContext.Session.SetString(Constants.LoggedInUserCachekey, userKey);
+                            }
+                            break;
+                        case RoleTypes.PartnerUser:
+                            var orgUserDetails = await _partnerService.GetOrganizationUserAsync(_viewHelper.GetUserId(principal), loginResponse.AccessToken, cancellationToken);
+                            if (orgUserDetails.Success)
+                            {
+                                var userKey = _cachekeyGen.CreateCacheKey(principal, Constants.LoggedInUserCachekey);
+                                _cacheHelper.Set<GetOrganizationUserResponseDto>(userKey, orgUserDetails);
+                                HttpContext.Session.SetString(Constants.LoggedInUserCachekey, userKey);
+                            }
+                            break;
+                    }
+                                        
                     string controllerName = string.Empty; 
                     string actionName = "Index";
                     switch (roleType)
@@ -94,7 +120,9 @@ namespace Web.User.Controllers
                         case RoleTypes.Administrator:
                             controllerName = "Admin";
                             break;
-
+                        case RoleTypes.Partner:
+                            controllerName = "Partner";
+                            break;
                     }
                     return RedirectToAction(actionName, controllerName);
                 }
@@ -160,9 +188,8 @@ namespace Web.User.Controllers
         public async Task<IActionResult> Profile(CancellationToken cancellationToken)
         {
             string userid = _viewHelper.GetUserId(User);
-            var loginDetails = _viewHelper.GetLoginDetails(User);
-            var loginData = loginDetails.Item2;
-            var userDto = await _authService.ProfileAsync(userid, loginData.AccessToken, cancellationToken);
+            string accessToken = _viewHelper.GetAccessToken(User);
+            var userDto = await _authService.ProfileAsync(userid, accessToken, cancellationToken);
             AppUserProfileModel profileModel = new AppUserProfileModel();
             _mapper.Map(userDto, profileModel);
             if(!string.IsNullOrEmpty(profileModel.ImagePath) && !_fileHelper.IsProfileImageExists(profileModel.ImagePath, _profileImageFolder))
@@ -184,16 +211,15 @@ namespace Web.User.Controllers
                 {
                     profileModel.ImagePath = _fileHelper.UploadImage(profileModel.ImageData, profileModel.ImageFilename, userid, _profileImageFolder);
                 }
-                var loginDetails = _viewHelper.GetLoginDetails(User);
-                var loginData = loginDetails.Item2;
-                var userDto = await _authService.UpdateProfileAsync(profileModel, loginData.AccessToken, cancellationToken);
+                string accessToken = _viewHelper.GetAccessToken(User);
+                var userDto = await _authService.UpdateProfileAsync(profileModel, accessToken, cancellationToken);
                 if(userDto != null && userDto.Success)
                 {
                     _mapper.Map(userDto, profileModel);
                     var userKey = HttpContext.Session.GetString(Constants.LoggedInUserCachekey);
                     if (!string.IsNullOrEmpty(userKey))
                     {
-                        _cacheHelper.Set<ApplicationUserResponseDto>(userKey, userDto);
+                        _cacheHelper.Set<GetApplicationUserResponseDto>(userKey, userDto);
                     }
                 }
                 else
@@ -249,8 +275,6 @@ namespace Web.User.Controllers
             return View("ChangePassword", model);
         }
 
-
-        [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme, Roles = RoleTypeNames.Administrator)]
         public IActionResult Privacy()
         {
             return View();

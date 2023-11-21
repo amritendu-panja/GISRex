@@ -34,7 +34,10 @@ namespace Infrastructure.Data.ApplicationDbContext.Repositories
         {
             return _context.Set<ApplicationPartnerOrganization>()
                 .Where(expression)
-                .Include(u => u.User);
+                .Include(u => u.User)
+                .ThenInclude(u => u.Group)
+                .Include(u => u.User)
+                .ThenInclude(u => u.Role);
         }
 
 		public bool IsDomainExists(string domainName)

@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.Handlers.ApplicationPartners
 {
-    public class CreateApplicationPartnerOrganizationHandler : IRequestHandler<CreateApplicationOrganizationCommand, ApplicationOrganizationResponseDto>
+    public class CreateApplicationPartnerOrganizationHandler : IRequestHandler<CreateApplicationOrganizationCommand, GetApplicationOrganizationResponseDto>
     {
         private readonly ILogger<CreateApplicationPartnerOrganizationHandler> _logger;
         private readonly IApplicationUserRepository _repository;
@@ -31,7 +31,7 @@ namespace Application.Handlers.ApplicationPartners
             _hashHelper = hashHelper;
         }
 
-        public async Task<ApplicationOrganizationResponseDto> Handle(CreateApplicationOrganizationCommand request, CancellationToken cancellationToken)
+        public async Task<GetApplicationOrganizationResponseDto> Handle(CreateApplicationOrganizationCommand request, CancellationToken cancellationToken)
         {
             if (_repository.IsEmailExists(request.Email))
             {
@@ -49,7 +49,7 @@ namespace Application.Handlers.ApplicationPartners
             }
 
             _logger.LogInformation("Started creating new user.");
-            ApplicationOrganizationResponseDto responseDto = new ApplicationOrganizationResponseDto();
+            GetApplicationOrganizationResponseDto responseDto = new GetApplicationOrganizationResponseDto();
             try
             {
                 await _repository.BeginTranscationAsync();

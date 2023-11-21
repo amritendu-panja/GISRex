@@ -53,7 +53,7 @@ namespace Application.Handlers.ApplicationUsers
                 }
                 else
                 {
-                    var user = _repository.FindWithDetails(u => u.UserId == securityTokenLog.UserId && u.IsEnabled == true).FirstOrDefault();
+                    var user = _repository.FindWithRole(u => u.UserId == securityTokenLog.UserId && u.IsEnabled == true).FirstOrDefault();
                     if (user == null)
                     {
                         throw new InvalidModelException(errorMessage);

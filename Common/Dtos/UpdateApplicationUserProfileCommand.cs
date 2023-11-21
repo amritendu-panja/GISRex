@@ -3,14 +3,16 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Common.Dtos
 {
-    public class UpdateProfileCommand: IRequest<ApplicationUserResponseDto>
+    public class UpdateApplicationUserProfileCommand: IRequest<GetApplicationUserResponseDto>
     {
         [Required]
         public int UserId { get; set; }
         [Required]
         public string UserName { get; set; }
         public string? ImagePath { get; set; }
+        [Required]
         public string? FirstName { get; set; }
+        [Required]
         public string? LastName { get; set; }
         public string? AddressLine1 { get; set; }
         public string? AddressLine2 { get; set; }

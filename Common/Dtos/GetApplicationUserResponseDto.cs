@@ -1,9 +1,8 @@
 ﻿namespace Common.Dtos
 {
-    public class ApplicationUserResponseDto : BaseResponseDto
+    public class GetApplicationUserResponseDto : BaseResponseDto
     {
         public int UserId { get; set; }
-        public int? PartnerId { get; set; }
         public string UserName { get; set; }
         public Guid UserGuid { get; set; }
         public string Email { get; set; }
@@ -20,5 +19,6 @@
         public string CountryCode { get; set; }
         public string AlternateMobile { get; set; }
         public bool IsLocked { get; set; }
+        public bool IsPasswordExpired { get; set; }
     }
 }

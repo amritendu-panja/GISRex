@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Common.Dtos
 {
-    public class CreateAplicationLayerCommand:IRequest<ApplicationLayerResponseDto>
+    public class CreateAplicationLayerCommand:IRequest<GetApplicationLayerResponseDto>
     {
         [Required]
         public string Name { get; set; }

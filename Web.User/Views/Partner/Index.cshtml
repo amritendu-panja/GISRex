@@ -1,0 +1,64 @@
+﻿@model PartnerLandingModel
+@{
+    ViewData["Title"] = "Home";
+    ViewData["ActiveLink"] = "Home";
+    var MaxCount = 3;
+}
+
+<div class="d-flex flex-column">
+    <div class="d-flex flex-row pb-3">
+        <h4>Recently opened Users</h4>
+        <div class="ms-auto">
+            <a asp-controller="Partners" asp-action="AddUser" class="btn btn-primary">Add New User <i class="fa-solid fa-plus"></i></a>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-center">
+        @{
+            if (Model.UserMruList != null)
+            {
+                foreach (var user in Model.UserMruList)
+                {
+                    var index = Model.UserMruList.IndexOf(user);
+                    var cardMarginClass = string.Empty;
+                    if (index < MaxCount - 1)
+                    {
+                        cardMarginClass = "me-4";
+                    }
+                    <div class="card col @cardMarginClass">
+                        <div class="card-header">
+                            <span>#@(index + 1)</span>
+                        </div>
+                        <div class="card-body">
+                            @user.UserName
+                            <a href="Partners/User/@user.UserGuid">Open</a>
+                        </div>
+                    </div>
+                }            
+            }
+        
+            var placesToPad = MaxCount - (Model.UserMruList?.Count ?? 0);
+            if (placesToPad > 0)
+            {
+                while (placesToPad > 0)
+                {
+                    var cardMarginClass = string.Empty;
+                    if (placesToPad > 1)
+                    {
+                        cardMarginClass = "me-4";
+                    }
+                    <div class="card col @cardMarginClass">
+                        <div class="card-header">
+                            <span>#@(MaxCount - placesToPad + 1)</span>
+                        </div>
+                        <div class="card-body">
+                            User @(MaxCount - placesToPad + 1)
+                        </div>
+                    </div>
+
+                    placesToPad = placesToPad - 1;
+                }
+            }
+        }
+    </div>
+</div>

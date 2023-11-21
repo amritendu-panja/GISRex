@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Reflection;
-using System.Threading;
 using Web.User.Helpers;
 using Web.User.Models;
 using Web.User.Services;
@@ -11,6 +9,7 @@ using Web.User.Services;
 namespace Web.User.Controllers
 {
     [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme, Roles = RoleTypeNames.Administrator)]
+    [Route("Admin")]
     public class AdminController : Controller
     {
         private readonly PartnerService _partnerService;
@@ -44,16 +43,14 @@ namespace Web.User.Controllers
 		public async Task<IActionResult> Index(CancellationToken cancellationToken)
         {
             AdminLandingModel model = new AdminLandingModel();
-            var loginDetails = _viewHelper.GetLoginDetails(User);
-            var loginData = loginDetails.Item2;
-
-            var partnerMruListDto = await _partnerService.GetRecentPartners(loginData.AccessToken, cancellationToken);
+            var accessToken = _viewHelper.GetAccessToken(User);
+            var partnerMruListDto = await _partnerService.GetRecentPartners(accessToken, cancellationToken);
             if (partnerMruListDto.Success)
             {
                 model.PartnerMruList = partnerMruListDto.Organizations;
             }
 
-            var userListDto = await _authService.GetRecentUsersAsync(loginData.AccessToken, cancellationToken);
+            var userListDto = await _authService.GetRecentUsersAsync(accessToken, cancellationToken);
             if (userListDto.Success)
             {
                 model.UserMruList = userListDto.Users;
@@ -90,17 +87,14 @@ namespace Web.User.Controllers
 		{
 			if(ModelState.IsValid)
             {
-				string userid = _viewHelper.GetUserId(User);
-				if (!string.IsNullOrEmpty(registerPartnerModel.ImageData) && !string.IsNullOrEmpty(registerPartnerModel.ImageFilename))
-				{
-					registerPartnerModel.LogoPath = _fileHelper.UploadImage(registerPartnerModel.ImageData, registerPartnerModel.ImageFilename, userid, _profileImageFolder);
-				}
-
-				var loginDetails = _viewHelper.GetLoginDetails(User);
-				var loginData = loginDetails.Item2;
-                var result = await _partnerService.AddAsync(registerPartnerModel, loginData.AccessToken, cancellationToken);
+                var accessToken = _viewHelper.GetAccessToken(User);
+                var result = await _partnerService.AddAsync(registerPartnerModel, accessToken, cancellationToken);
                 if(result.Success)
                 {
+                    if (!string.IsNullOrEmpty(registerPartnerModel.ImageData) && !string.IsNullOrEmpty(registerPartnerModel.ImageFilename))
+                    {
+                        registerPartnerModel.LogoPath = _fileHelper.UploadImage(registerPartnerModel.ImageData, registerPartnerModel.ImageFilename, result.UserGuid.ToString(), _profileImageFolder);
+                    }
                     return RedirectToAction("partners");
                 }
                 else
@@ -108,7 +102,6 @@ namespace Web.User.Controllers
                     ModelState.AddModelError("", result.Message);
 					return View(registerPartnerModel);
 				}
-				
 			}
             else
             {
@@ -121,9 +114,8 @@ namespace Web.User.Controllers
         {
             PartnerProfileModel profileModel = new PartnerProfileModel();
 
-            var loginDetails = _viewHelper.GetLoginDetails(User);
-            var loginData = loginDetails.Item2;
-            var organization = await _partnerService.GetByIdAsync(id, loginData.AccessToken, cancellationToken);
+            var accessToken = _viewHelper.GetAccessToken(User);
+            var organization = await _partnerService.GetByIdAsync(id, accessToken, cancellationToken);
             if (organization.Success)
             {
                 _mapper.Map(organization, profileModel);
@@ -169,10 +161,9 @@ namespace Web.User.Controllers
 
         [HttpGet("user/{userGuid}")]
         public async Task<IActionResult> GetUser(string userGuid, CancellationToken cancellationToken)
-        {            
-            var loginDetails = _viewHelper.GetLoginDetails(User);
-            var loginData = loginDetails.Item2;
-            var userDto = await _authService.ProfileAsync(userGuid, loginData.AccessToken, cancellationToken);
+        {
+            var accessToken = _viewHelper.GetAccessToken(User);
+            var userDto = await _authService.ProfileAsync(userGuid, accessToken, cancellationToken);
             AppUserProfileModel profileModel = new AppUserProfileModel();
             _mapper.Map(userDto, profileModel);
             if (!string.IsNullOrEmpty(profileModel.ImagePath) && !_fileHelper.IsProfileImageExists(profileModel.ImagePath, _profileImageFolder))
