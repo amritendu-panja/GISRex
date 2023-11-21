@@ -1,4 +1,5 @@
-﻿using Common.Settings;
+﻿using Common.Dtos;
+using Common.Settings;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -44,27 +45,69 @@ namespace Web.User.Controllers
             _profileImageFolder = Path.Combine(_webHostEnvironment.ContentRootPath, "wwwroot", "images", "userprofiles");
         }
 
+        private GetOrganizationUserResponseDto GetCurrentUser()
+        {
+            var userKey = HttpContext.Session.GetString(Constants.LoggedInUserCachekey);
+            return _cacheHelper.Get<GetOrganizationUserResponseDto>(userKey);
+        }
+
         public IActionResult Index()
         {
             return View();
         }
 
         [HttpGet("Dashboard")]
-        public async Task<IActionResult> Dashboard(Guid userId, CancellationToken cancellationToken)
+        public async Task<IActionResult> Dashboard(CancellationToken cancellationToken)
         {
             return View();
         }
 
         [HttpGet("Profile")]
-        public async Task<IActionResult> Profile(Guid userId, CancellationToken cancellationToken)
+        public async Task<IActionResult> Profile(CancellationToken cancellationToken)
         {
-            return View();
+            var orgUser = GetCurrentUser();
+            PartnerUserProfileModel profileModel = new PartnerUserProfileModel();
+            _mapper.Map(orgUser, profileModel);
+            if (!string.IsNullOrEmpty(profileModel.ImagePath) && !_fileHelper.IsProfileImageExists(profileModel.ImagePath, _profileImageFolder))
+            {
+                profileModel.ImagePath = Constants.DefaultProfileImage;
+            }
+            return View(profileModel);
         }
 
-        [HttpGet("Group")]
-        public async Task<IActionResult> GetGroup(Guid userId, CancellationToken cancellationToken)
+        [HttpPost("Profile")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateProfile(PartnerUserProfileModel model, CancellationToken cancellationToken)
         {
-            return View();
+            if (!string.IsNullOrEmpty(model.ImageData) && !string.IsNullOrEmpty(model.ImageFilename))
+            {
+                model.ImagePath = _fileHelper.UploadImage(model.ImageData, model.ImageFilename, model.UserGuid.ToString(), _profileImageFolder);
+            }
+            UpdateOrganizationUserProfileCommand updateCommand = new UpdateOrganizationUserProfileCommand();
+            _mapper.Map(model, updateCommand);
+
+            var accessToken = _viewHelper.GetAccessToken(User);
+            var userDto = await _partnerService.UpdateOrganizationUserAsync(updateCommand, accessToken, cancellationToken);
+            if (!userDto.Success)
+            {
+                ModelState.AddModelError("", userDto?.Message ?? "Server error occured, please contact support");
+            }
+            return View("Profile", model);
+        }
+
+
+        [HttpGet("Group")]
+        public async Task<IActionResult> GetGroup(CancellationToken cancellationToken)
+        {
+            ApplicationGroupModel model = new ApplicationGroupModel();
+            var orgUser = GetCurrentUser();
+            var accessToken = _viewHelper.GetAccessToken(User);
+            var result = await _lookupsService.GetGroupByIdAsync(orgUser.GroupId, accessToken, cancellationToken);
+            if (result.Success)
+            {
+                _mapper.Map(result, model);
+            }
+            return View(model);
         }
 
         [HttpGet("Users")]
