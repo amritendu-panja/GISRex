@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Common.Entities.Social;
+using System.ComponentModel.DataAnnotations;
 
 namespace Common.Entities
 {
@@ -29,6 +30,9 @@ namespace Common.Entities
         public ApplicationUser? User { get; set; }
         //public CountryLookup? Country {  get; set; }
         //public StateLookup? State { get; set; }
+        public List<Feed> Feeds { get; set; }
+        public List<SocialPermission> SocialPermissions { get; set; }
+        public List<SocialMessage> SocialMessages { get; set; }
 
         public ApplicationPartnerOrganization(int userId, 
             string organizationName, 

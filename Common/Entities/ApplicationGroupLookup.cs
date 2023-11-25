@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using Common.Entities.Social;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Common.Entities
 {
@@ -12,5 +13,7 @@ namespace Common.Entities
 		public DateTime? ModifiedDate { get; private set; }
 
 		public List<ApplicationUser> Users { get; set; }
+		public List<Feed> Feeds { get; set; }
+		public List<SocialPermission> SocialPermissions { get; set; }
 	}
 }

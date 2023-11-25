@@ -17,6 +17,12 @@
 
         //Groups
         public const string SuperAdminGroupName = "SuperAdmin";
+
+        //Feeds
+        public readonly Guid PublicFeedId = Guid.Parse("eb9cf3a9-a91a-473d-b87b-2728855d351b");
+        public readonly Guid OrganizationFeedId = Guid.Parse("3e7b1ad7-a326-46e6-94b5-81d419dcb379");
+        public readonly Guid GroupFeedId = Guid.Parse("1d245d90-d62e-48b7-bc8a-bc33fa3dbc88");
+        public readonly Guid DirectFeedId = Guid.Parse("5b24e18f-f302-47b4-87ca-582c309ed497");
     }
 
     public enum TokenTypes
@@ -50,6 +56,13 @@
         SuperAdmin = 67847,
         ApplicationUser = 67848,
         OrganizationUser = 67849
+    }
+
+    public enum MessageTargets
+    {
+        Public = 0,
+        OrganizationWide = 1,
+        Private = 2
     }
 
     public enum DapperDbTypes
@@ -182,5 +195,15 @@
         //     with an accuracy of 100 nanoseconds. Time zone value range is -14:00 through
         //     +14:00.
         DateTimeOffset = 27
+    }
+
+    public enum SocialPermissions
+    {
+        Read = 1,
+        Create = 2,
+        Comment = 3,
+        React = 4,
+        Delete = 5,
+        Lock = 6
     }
 }

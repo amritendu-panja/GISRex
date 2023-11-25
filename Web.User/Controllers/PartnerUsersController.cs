@@ -22,7 +22,6 @@ namespace Web.User.Controllers
         private readonly FileHelper _fileHelper;
         private readonly Mapper _mapper;
         private readonly CacheHelper _cacheHelper;
-        private readonly AppSettings _appSettings;
 
         public PartnerUsersController(
             PartnerService partnerService,
@@ -41,7 +40,6 @@ namespace Web.User.Controllers
             _fileHelper = fileHelper;
             _mapper = mapper;
             _cacheHelper = cacheHelper;
-            _appSettings = appSettings.Value;
             _profileImageFolder = Path.Combine(_webHostEnvironment.ContentRootPath, "wwwroot", "images", "userprofiles");
         }
 

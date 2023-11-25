@@ -1,4 +1,6 @@
-﻿namespace Common.Entities
+﻿using Common.Entities.Social;
+
+namespace Common.Entities
 {
     public class ApplicationUser
     {
@@ -27,6 +29,17 @@
         public UserRoleLookup? Role {  get; set; }
         public ApplicationGroupLookup Group { get; set; }
         public ApplicationPartnerOrganization? PartnerOrganization { get; set; }
+        public List<Feed> Feeds { get; set; }
+        public List<Feed> LockedFeeds { get; set; }
+        public List<SocialPermission> SocialPermissions { get; set; }
+        public List<SocialPermission> AuthoredSocialPermissions { get; set; }
+        public List<SocialPermission> UpdatedSocialPermissions { get; set; }
+        public List<Comment> Comments { get; set; }
+        public List<Comment> LockedComments { get; set; }
+        public List<SocialMessage> AuthoredMessages { get; set; }
+        public List<SocialMessage> LockedMessages { get; set; }
+        public List<SocialMessage> ReceivedMessages { get; set; }
+        public List<Reaction> Reactions { get; set; }
 
         protected ApplicationUser() { }
 
